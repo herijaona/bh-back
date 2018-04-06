@@ -16,6 +16,11 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+  idCca:{
+    type: String,
+  },
+  function: String,
   hash: String,
   salt: String
 });
