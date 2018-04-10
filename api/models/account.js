@@ -4,16 +4,16 @@ var crypto = require("crypto");
 var accountSchema = new mongoose.Schema({
   enseigneCommerciale: String,
   raisonSociale: String,
-  Logo: String,
+  Logo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Image"
+  },
   idCompteCCA: String,
   typeOrganisation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "OrganisationType"
   },
-  adresse: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address"
-  },
+  adresse: String,
   presentation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Presentation"

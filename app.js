@@ -23,7 +23,7 @@ require('./api/config/passport');
 
 // [SH] Bring in the routes for the API (delete the default routes)
 var routesApi = require('./api/routes/index');
-var rout= require('./routes/index');
+// var rout= require('./routes/index');
 
 var app = express();
 
@@ -37,14 +37,29 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors());
+/*CORS*/
+var corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200
+};
+
+//create a cors middleware
+app.use(function(req, res, next) {
+//set headers to allow cross origin request.
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+app.use(cors(corsOptions));
 
 // [SH] Initialise Passport before using the route middleware
 app.use(passport.initialize());
 
 // [SH] Use the API routes when path starts with /api
 app.use('/api', routesApi);
-app.use('/', rout);
+// app.use('/', rout);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
