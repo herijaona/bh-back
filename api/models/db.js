@@ -46,6 +46,13 @@ process.on('SIGTERM', function() {
 });
 
 // BRING IN YOUR SCHEMAS & MODELS
-require('./users');
-require('./image');
-require('./usertoken');
+require('./data_schema/users');
+require('./data_schema/image');
+require('./data_schema/account');
+require('./data_schema/organisationtype');
+require('./data_schema/presentation');
+require('./data_schema/member');
+require('./data_schema/projet');
+require('./data_schema/successstories');
+require('./data_schema/meeting');
+require('./data_schema/usertoken');

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name=description content="text/html">
+		<meta name=viewport content="width=device-width, initial-scale=1">
+		<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+		<title></title>
+	</head>
+	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+		<center style="background: #448ccb;width: 620px;margin: 0 auto;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td align="center"><img src="http://safidison.com/wp-content/uploads/2018/03/logo5.png" style="margin: 40px;"></td>
+			</tr>
+			<tr>
+				<td align="left" style="color: white">
+					<table>
+						<tr>
+							<td width="8%"> &nbsp;</td>
+							<td style="text-align: justify;font-size: 13px;color: white" width="84%">
+								{{firstname}}<br>
+								Nous sommes une groupe de développeurs Informatique ( Développement d’application Web et Desktop) basée à Madagascar. Jeune, dynamique et très réactif, nous offrons des services professionnels en fonction des besoins et du timing des clients.
+								}
+							</td>
+							<td width="8%"> &nbsp;</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<table style="margin-bottom: 20px;margin-top: 10px">
+			<tr>
+				<td style="color: white;text-transform: uppercase;text-align: center;font-size: 15px;">Nos technologies :</td>
+			</tr>
+		</table>
+		<div class="container">
+			<table BORDER="0" class="table table-bordered" style="width:550px">
+				<thead>
+					<tr>
+						<th width="100%" style="color: white"> &nbsp; </th>
+						<th width="100%" style="color: white"> &nbsp; </th>
+						<th width="100%" style="color: white"> &nbsp; </th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- <tr>
+												<td> -Framework: Symfony - Laravel - CodeIgniter.
+																			<br> -CMS: Wordpress - Joomla.
+																			<br> -E-commerce: Woocommerce - Prestashop.
+												</td>
+												<td>
+																			-Jquery
+																			<br> -Framework: -AngularJs - Angular 2 / 4.
+																			<br> -VueJS.
+																			<br> -ReactJS.
+												</td>
+												<td>
+																			-Android
+																			<br> -Hybrid : Ionic.
+												</td>
+					</tr> -->
+					<tr>
+						<td align="center" style="color: white; border: solid 1px #b0d6d6;"> <b margin="15">PHP</b></td>
+						<td colspan="2"> &nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<table>
+								<tr>
+									<td><img width="85" src="https://snippetsofcode.files.wordpress.com/2011/08/php.png" alt="PHP"></td>
+									<td> <img width="85" src="https://symfony.com/images/v5/pictos/home-main-illu.svg" alt="Symfony"></td>
+									<td> <img width="85" src="https://www.supinfo.com/articles/resources/205039/3343/0.png" alt="Laravel"></td>
+									<td> <img width="85" src="http://www.developpeur-codeigniter.fr/wp-content/uploads/2016/07/Codeigniter.png" alt="CodeIgniter"></td>
+									<td> <img width="85" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Wordpress_logo_8.png" alt="Wordpress"></td>
+									<td> <img width="95" src="https://www.tekkiwebsolutions.com/wp-content/uploads/2016/10/Prestashop-quote.png" alt="Prestashop"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="2"> &nbsp;</td>
+						<td align="center" style="color: white; border: solid 1px #b0d6d6;"> <b margin="15">JAVASCRIPT</b></td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<table>
+								<tr>
+									<td> <img width="85" src="http://www.ac-grenoble.fr/disciplines/informatiquelycee/img/javascript.png" alt="JAVASCRIPT"></td>
+									<td><img width="85" src="http://www.icone-png.com/png/52/52460.png" alt="JQUERY"></td>
+									<td> <img width="85" src="https://cdn.iconscout.com/public/images/icon/free/png-512/angular-logo-brand-development-tools-3302a189c01a32b9-512x512.png" alt="ANGULAR"></td>
+									<td> <img width="85" src="https://www.technoscore.com/images/services/react-js-icon.png" alt="ReactJS"></td>
+									<td> <img width="85" src="https://www.grafikart.fr/uploads/formations/17.png" alt="VueJS"></td>
+									<td> <img width="95" src="https://nodejs.org/static/images/logos/nodejs-new-pantone-black.png" alt="NodeJs"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">&nbsp;</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- <table class="table table-bordered" style="width:550px">
+						<thead>
+									<tr>
+												<th style="color: white">Java</th>
+												<th style="color: white">HTML5/CSS3</th>
+												<th style="color: white">Mobile</th>
+												<th style="color: white">Outils</th>
+									</tr>
+						</thead>
+						<tbody>
+									<tr>
+												<td>-JSE
+															<br> -Spring
+												</td>
+												<td>
+															- Bootstrap
+															<br> - Materialize
+															<br> - Foundation.
+												</td>
+												<td>
+															-Android
+															<br> -Hybrid : Ionic.
+												</td>
+												<td>
+															-Git
+															<br> -Docker
+												</td>
+									</tr>
+						</tbody>
+			</table> -->
+		</div>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top: 40px;">
+			<tr>
+				<td align="center"><img src="http://safidison.com/wp-content/uploads/2018/03/Capture2.jpg"></td>
+			</tr>
+			<tr>
+				<td align="center"><img src="http://safidison.com/wp-content/uploads/2018/03/Capture3-1.jpg"></td>
+			</tr>
+		</table>
+		<table width="550px" border="0" cellpadding="5" cellspacing="0">
+			<tr>
+				<td style="text-align: justify; font-size: 13px;color: white">
+					Nous pouvons réaliser des développements de sites web ou d’applications de A à Z, des refontes ou des modifications ... et cela à un prix très abordable. Pour vos futurs projets ou pour le besoins de vos clients, Nous sommes disponible pour des devis et d'exécuter tous vos demandes. Nous faisons aussi de la sous-traitance de projet si vous avez des projets ou en manque de personnel.
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table BORDER="0" class="table table-bordered" style="width:100%">
+						<thead>
+							<tr>
+								<th width="100%" style="color: white"> &nbsp; </th>
+								<th width="100%" style="color: white"> &nbsp; </th>
+								<th width="100%" style="color: white"> &nbsp; </th>
+							</tr>
+						</thead>
+						<tr>
+							<td colspan="3">
+								<table>
+									<tr>
+										<td><img width="85" src="http://codehustler.org/wp-content/uploads/2012/12/java_logo.png" title="JAVA" alt="JAVA"></td>
+										<td> <img width="85" src="http://www.seeicons.com/images/iconstore/512/seeicons__57e90b703eba6.png" title="Bootstrap" alt="Bootstrap"></td>
+										<td> <img width="85" src="https://git-scm.com/images/logos/downloads/Git-Logo-1788C.png" alt="Git"></td>
+										<td> <img width="85" src="https://ml.berkeley.edu/decals/DSD/images/docker_logo.png" alt="Docker"></td>
+										<td> <img width="85" src="http://pluspng.com/img-png/logo-mongodb-png-mongodb-logo-anything-but-the-simplest-of-web-applications-requires-a-database-to-store-and-serve-content-from-choosing-the-right-database-and-structuring-413.png" alt="MongoDb"></td>
+										<td> <img width="95" src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Android-icon.png" alt="Android"></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td style="color: white">
+					Veuillez nous contacter pour plus d’informations:
+				</td>
+			</tr>
+		</table>
+		<table width="100%" border="0" cellpadding="25" cellspacing="0">
+			<tr>
+				<td>
+					<table align="left">
+						<tr>
+							<td style="color: white"><span style="margin:0px;font-family: sans-serif;font-size: 14px;"><b>Safidison RAKOTOVAO</b></span></td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;text-decoration: none;"><u>Tél:</u> +261340958610 </td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;"><u>Skype:</u> Safidison Jean (safidison)</td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;"><u>E-mail:</u><a style="text-decoration: none" href="mailto:safidison.rj@gmail.com"> safidison.rj@gmail.com</a></td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<table align="left">
+						<tr>
+							<td style="color: white"><span style="margin:0px;font-family: sans-serif;font-size: 14px;"><b>Fanilo RAKOTOVAO</b></span></td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;text-decoration: none;"><u>Tél:</u> +261348402783 </td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;"><u>Skype:</u> Fanilo RAKOTOVAO</td>
+						</tr>
+						<tr>
+							<td style="color: white;font-family: sans-serif;font-size: 12px;"><u>E-mail:</u><a style="text-decoration: none" href="mailto:fanilorakoto.94@gmail.com"> fanilorakoto.94@gmail.com</a></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		</center>
+	</body>
+</html>

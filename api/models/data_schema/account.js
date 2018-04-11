@@ -48,6 +48,8 @@ var accountSchema = new mongoose.Schema({
   ]
 });
 
+accountSchema.add({ userAdmin: [{type: mongoose.Schema.Types.ObjectId , ref: "User"}]});
+
 mongoose.model("Account", accountSchema);
 
 /* email: {

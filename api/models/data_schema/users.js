@@ -24,9 +24,18 @@ var userSchema = new mongoose.Schema({
   salt: String
 });
 
+userSchema.add({activation_text: String, active: Boolean});
+
+
+
 userSchema.methods.setPassword = function(password){
   this.salt = crypto.randomBytes(16).toString('hex');
   this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
+};
+
+userSchema.methods.generateActivationCode = function(){
+  var _salt = crypto.randomBytes(24).toString('hex');
+  this.activation_text = crypto.pbkdf2Sync(this.email, _salt, 1000, 64, 'sha512').toString('hex');
 };
 
 userSchema.methods.validPassword = function(password) {
