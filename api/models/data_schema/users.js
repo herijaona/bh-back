@@ -38,6 +38,10 @@ userSchema.methods.generateActivationCode = function(){
   this.activation_text = crypto.pbkdf2Sync(this.email, _salt, 1000, 64, 'sha512').toString('hex');
 };
 
+userSchema.methods.activate = function(){
+  this.active = true;
+};
+
 userSchema.methods.validPassword = function(password) {
   var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
   return this.hash === hash;

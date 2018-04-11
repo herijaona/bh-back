@@ -19,6 +19,7 @@ router.get('/profile', auth, ctrlProfile.profileRead);
 // authentication
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
+router.post('/activate', ctrlAuth.activate_user);
 
 // Uploads
 router.post('/up_images', ctrlUploads.uploadImage); //images
