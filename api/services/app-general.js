@@ -33,7 +33,7 @@ module.exports.sendMail = function(argMail) {
 				},
 				To: [
 					{
-						Email: "fanilorakoto.94@gmail.com",
+						Email: argMail.user.email,
 						Name: "passenger 1"
 					}
 				],
