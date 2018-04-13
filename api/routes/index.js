@@ -18,6 +18,9 @@ router.get('/profile', auth, ctrlProfile.profileRead);
 
 //EditProfile
 router.post('/profile/edit', auth, ctrlProfile.editprofile);
+//EditPassword
+router.post('/profile/editpass', auth, ctrlProfile.editpass);
+
 
 // authentication
 router.post('/register', ctrlAuth.register);
