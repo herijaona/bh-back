@@ -96,11 +96,12 @@ module.exports.activate_user = function(req, res) {
     err,
     doc
   ) {
+    console.log('User Active state: '+ doc);
     if (!err) {
-      var u_ = new User(doc);
-      if (!u_.active) {
-        u_.activate();
-        u_.save(function(err) {
+      // var u_ = new User(doc);
+      if (!doc.active) {
+        doc.activate();
+        doc.save(function(err) {
           res.status(200);
           res.json({
             status: 'OK',
@@ -114,27 +115,12 @@ module.exports.activate_user = function(req, res) {
             message: 'User already Active'
           });
       }
+    } else {
+      res.status(200);
+          res.json({
+            status: 'NOK',
+            message: 'User Not Found'
+          });
     }
   });
-  /*passport.authenticate("local", function(err, user, info) {
-    var token;
-
-    // If Passport throws/catches an error
-    if (err) {
-      res.status(404).json(err);
-      return;
-    }
-
-    // If a user is found
-    if (user) {
-      token = user.generateJwt();
-      res.status(200);
-      res.json({
-        token: token
-      });
-    } else {
-      // If user is not found
-      res.status(401).json(info);
-    }
-  })(req, res);*/
 };
