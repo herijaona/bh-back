@@ -3,8 +3,6 @@ var User = mongoose.model('User');
 
 module.exports.profileRead = function(req, res) {
 
-  console.log('Anything');
-
   if (!req.payload._id) {
     res.status(401).json({
       "message" : "UnauthorizedError: private profile",
@@ -30,7 +28,6 @@ module.exports.editpass = function(req, res){
     _u.setPassword(req.body.password);
     
     _u.save(function(e_, u_){
-      console.log(e_);
       if(!e_){
         res.status(200).json(u_);
       }else{
@@ -60,7 +57,6 @@ module.exports.editprofile = function(req, res) {
   }
 
   // User.updateUser(id, user,{}, function(err, user){
-    console.log(req.payload);
     User.findOne({ email: req.payload.email },function(
         err,user
     ){
@@ -68,13 +64,9 @@ module.exports.editprofile = function(req, res) {
       user.lastname = req.body.lastname;
       user.firstname = req.body.firstname;
       user.function = req.body.function;
-      console.log('--------');
-      console.log(user);
-      console.log('--------');
       if(!err){
         
         user.save(function(e_, u_){
-          console.log(e_);
           if(!e_){
             res.status(200).json(u_);
           }else{

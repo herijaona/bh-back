@@ -19,7 +19,6 @@ module.exports.register = function(req, res) {
   user.generateActivationCode();
   user.active = false;
 
-  // console.log(req.body);
   user.setPassword(req.body.password);
   user.save(function(err, user_) {
     if (!err) {
@@ -40,7 +39,6 @@ module.exports.register = function(req, res) {
 
           resEmail
             .then(result => {
-              console.log(result.body);
               var token;
               token = user.generateJwt();
               res.status(200);
@@ -51,12 +49,10 @@ module.exports.register = function(req, res) {
               });
             })
             .catch(err => {
-              console.log(err.statusCode);
             });
         }
       });
     } else {
-      console.log(err.code);
       res.status(409);
       res.json({
         error: true,
@@ -96,7 +92,6 @@ module.exports.activate_user = function(req, res) {
     err,
     doc
   ) {
-    console.log('User Active state: '+ doc);
     if (!err) {
       // var u_ = new User(doc);
       if (!doc.active) {
@@ -104,23 +99,23 @@ module.exports.activate_user = function(req, res) {
         doc.save(function(err) {
           res.status(200);
           res.json({
-            status: 'OK',
-            message: 'Activation successful'
+            status: "OK",
+            message: "Activation successful"
           });
         });
-      } else{
+      } else {
         res.status(200);
-          res.json({
-            status: '_OK',
-            message: 'User already Active'
-          });
+        res.json({
+          status: "_OK",
+          message: "User already Active"
+        });
       }
     } else {
       res.status(200);
-          res.json({
-            status: 'NOK',
-            message: 'User Not Found'
-          });
+      res.json({
+        status: "NOK",
+        message: "User Not Found"
+      });
     }
   });
 };
