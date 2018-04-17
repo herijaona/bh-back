@@ -48,8 +48,7 @@ module.exports.register = function(req, res) {
                 user_email: user_.email
               });
             })
-            .catch(err => {
-            });
+            .catch(err => {});
         }
       });
     } else {
@@ -100,14 +99,16 @@ module.exports.activate_user = function(req, res) {
           res.status(200);
           res.json({
             status: "OK",
-            message: "Activation successful"
+            message: "Activation successful",
+            _id: doc._id
           });
         });
       } else {
         res.status(200);
         res.json({
           status: "_OK",
-          message: "User already Active"
+          message: "User already Active",
+          _id: doc._id
         });
       }
     } else {

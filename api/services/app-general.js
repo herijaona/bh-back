@@ -13,7 +13,6 @@ const mailjet = require("node-mailjet").connect(
 );
 var compiledTemplate = Hogan.compile(templateActivation);
 
-
 module.exports.sendMail = function(argMail) {
 	/**
 	 *
@@ -55,8 +54,18 @@ module.exports.sendMail = function(argMail) {
 	return request;
 };
 
+/* Copy data between object */
+module.exports.copydata = function(model, source) {
+	var k2 = JSON.parse(JSON.stringify(source));
+	Object.keys(k2).forEach(function(keyn) {
+		if (keyn in model) {
+			model[keyn] = k2[keyn];
+		}
+	});
+	return model;
+};
 
-
+/* Capitalize all word in string */
 function titleCase(str) {
 	var splitStr = str.toLowerCase().split(" ");
 	for (var i = 0; i < splitStr.length; i++) {

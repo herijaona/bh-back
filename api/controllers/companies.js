@@ -10,6 +10,7 @@ module.exports.listall = function(req, res) {
 			var accMap = [];
 
 			acc.forEach(function(acc_) {
+				// console.log(acc_);
 				var m = {
 					_id: "",
 					adresse: "",
