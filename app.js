@@ -62,7 +62,8 @@ app.use('/api', routesApi);
 // app.use('/', rout);
 
 // Static image
-app.use( express.static(__dirname + '/uploads'));
+app.use('/files' , express.static('./uploads'));
+// app.use(express.static('images'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
