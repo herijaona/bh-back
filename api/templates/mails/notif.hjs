@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bhaven</title>
+</head>
+<body>
+<h1>Bhaven</h1>
+{{username}}
+<div>
+	your Password has been changed
+</div>
+</body>
+</html>

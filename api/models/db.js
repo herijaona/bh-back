@@ -4,7 +4,7 @@ var dbURI = 'mongodb://localhost/meanAuth4';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGOLAB_URI;
 }
-
+mongoose.Promise = global.Promise;
 mongoose.connect(dbURI);
 
 // CONNECTION EVENTS
@@ -56,3 +56,4 @@ require('./data_schema/projet');
 require('./data_schema/successstories');
 require('./data_schema/meeting');
 require('./data_schema/usertoken');
+require('./data_schema/password-reset');

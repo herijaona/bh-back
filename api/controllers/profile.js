@@ -32,6 +32,9 @@ module.exports.profileRead = function(req, res) {
           });
           send_data.accountAdmin = ws;
           send_data.isAdmin = true;
+          /*to delete before pushing*/
+          send_data.active = true;
+          send_data.isAdmin = true;
           res.status(200).json(send_data);
         }
       });
@@ -79,6 +82,8 @@ module.exports.editprofile = function(req, res) {
         if (!e_) {
           var usr = gen_services.copydata(userTosend, u_);
           delete usr.isAdmin;
+          /*to delete before pushing*/
+          usr.active = true;
           res.status(200).json(usr);
         } else {
           res.status(404).json({

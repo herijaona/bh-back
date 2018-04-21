@@ -9,11 +9,8 @@ var accountSchema = new mongoose.Schema({
     ref: "Image"
   },
   idCompteCCA: String,
-  typeOrganisation: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "OrganisationType"
-  },
-  adresse: String,
+  typeOrganisation:String,
+  adresse: [String],
   presentation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Presentation"
@@ -52,3 +49,9 @@ accountSchema.add({ userAdmin: [{type: mongoose.Schema.Types.ObjectId , ref: "Us
 
 mongoose.model("Account", accountSchema);
 
+/*
+typeOrganisation: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OrganisationType"
+  },
+*/

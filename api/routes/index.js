@@ -5,7 +5,7 @@ var auth = jwt({
 	secret: "MY_SECRET",
 	userProperty: "payload"
 });
-var req_mid = require ('../services/requestMiddleware');
+var req_mid = require("../services/requestMiddleware");
 var ctrlProfile = require("../controllers/profile");
 var ctrlAuth = require("../controllers/authentication");
 var ctrlUploads = require("../controllers/upload_file");
@@ -24,11 +24,27 @@ router.post("/profile/editpass", auth, req_mid.validUser, ctrlProfile.editpass);
 router.post("/register", ctrlAuth.register);
 router.post("/login", ctrlAuth.login);
 router.post("/activate", ctrlAuth.activate_user);
+router.post("/reset-password-request", ctrlAuth.requestResetPass);
+router.post("/reset-password-check", ctrlAuth.checkResetPass);
+router.post("/reset-password-submit-new", ctrlAuth.submitNewPass);
 
 // Uploads
 router.post("/up_images", ctrlUploads.uploadImage); //images
 
 //Companies
 router.get("/all_companies", ctrCompanies.listall);
+router.post(
+	"/gen_info_companies",
+	auth,
+	req_mid.validUser,
+	ctrCompanies.general_info
+);
+router.post(
+	"/updatecompanies",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.updategeneral_info
+);
 
 module.exports = router;
