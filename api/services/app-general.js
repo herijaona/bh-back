@@ -41,7 +41,6 @@ module.exports.sendActivationMail = function(argMail) {
 		name: data_email.name,
 		email: argMail.user.email
 	};
-
 	console.log(data_email.url_activation);
 
 	return deliverEmail(templ, data_email, dest);

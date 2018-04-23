@@ -40,29 +40,15 @@ module.exports.listall = function(req, res) {
 
 			waitData.then(
 				() => {
-					var formt = /[{:}]/;
 					var l = accMap.length;
 					for (var iter = 0; iter < l; iter++) {
-						var el = accMap[iter].adresse;
-						var li = el.length;
-						var adrText = "";
-						for (var itern = 0; itern < li; itern++) {
-							if (formt.test(el[itern])) {
-								var sd = JSON.parse(el[itern]).data.vicinity;
-								adrText += " " + sd;
-							}
-						}
-						if (adrText) {
-							accMap[iter].adresse = adrText;
-						}
+						accMap[iter].adresse = getAddrData(accMap[iter])
 					}
-
 					res.json(accMap);
 				},
 				() => {}
 			);
 		});
-	// res.json({ list: "a moment please ..." });
 };
 
 /* Controllers handle request on  company generale info */
@@ -102,7 +88,6 @@ module.exports.general_info = function(req, res) {
 	dataW.then(
 		r => {
 			r.adresse = getAddrData(r);
-			console.log(r);
 			res.status(200).json(r);
 		},
 		er => {
@@ -154,7 +139,6 @@ module.exports.updateCompanyLogo = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
-	console.log(et);
 				et.Logo = img_url(et.Logo.url);
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
@@ -182,7 +166,6 @@ function img_url(img_u) {
 
 /* Address Data reformat */
 function getAddrData(ac) {
-	// console.log(arrData);
 	var formt = /[{:}]/;
 	var el = ac.adresse;
 	var li = el.length;
