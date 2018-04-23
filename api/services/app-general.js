@@ -26,6 +26,7 @@ var resetPassTemplate = Hogan.compile(templateResetpass);
 var notifresetPassTemplate = Hogan.compile(notifResetpass);
 
 module.exports.sendActivationMail = function(argMail) {
+	var subj = 'Active votre compte';
 	var data_email = {
 		name:
 			titleCase(argMail.user.firstname) +
@@ -43,10 +44,11 @@ module.exports.sendActivationMail = function(argMail) {
 	};
 	console.log(data_email.url_activation);
 
-	return deliverEmail(templ, data_email, dest);
+	return deliverEmail(subj, templ, data_email, dest);
 };
 
 module.exports.sendResetPasswordMail = function(u, d) {
+	var subj = 'Demande de reinitialisation de mot de passe ';
 	var templ = resetPassTemplate;
 	var data_m = {
 		sitename: app_const.name,
@@ -58,10 +60,14 @@ module.exports.sendResetPasswordMail = function(u, d) {
 		email: u.email
 	};
 	console.log(data_m.url_reset);
-	return deliverEmail(templ, data_m, dest);
+	return deliverEmail(subj, templ, data_m, dest);
 };
 
+
+/*Send Mail password was changed*/
 module.exports.sendEmailPassResetednotif = function(u) {
+	var subj = 'Votre mot de passe a changé ';
+
 	var templ = notifresetPassTemplate;
 	var data_m = {
 		username: titleCase(u.firstname) + " " + titleCase(u.lastname)
@@ -70,7 +76,7 @@ module.exports.sendEmailPassResetednotif = function(u) {
 		name: titleCase(u.firstname) + " " + titleCase(u.lastname),
 		email: u.email
 	};
-	return deliverEmail(templ, data_m, dest);
+	return deliverEmail(subj, templ, data_m, dest);
 };
 
 
@@ -95,8 +101,11 @@ function titleCase(str) {
 	return splitStr.join(" ");
 }
 
+
+
+
 /* Real mail Service*/
-function deliverEmail(template, data_email, to_) {
+function deliverEmail(subject, template, data_email, to_) {
 	// body...
 	const request = mailjet.post("send", { version: "v3.1" }).request({
 		Messages: [
@@ -111,7 +120,7 @@ function deliverEmail(template, data_email, to_) {
 						Name: to_.name
 					}
 				],
-				Subject: "Your email flight plan!",
+				Subject: subject,
 				TextPart:
 					"Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
 				HTMLPart: template.render(data_email)
