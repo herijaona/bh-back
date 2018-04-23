@@ -3,7 +3,6 @@ var User = mongoose.model("User");
 var Account = mongoose.model("Account");
 
 module.exports.validUser = function(req, res, next) {
-	// body...
 	if (req.payload) {
 		User.findOne({ email: req.payload.email }, function(err, doc) {
 			if (!err && doc) {

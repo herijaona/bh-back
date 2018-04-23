@@ -133,7 +133,6 @@ module.exports.requestResetPass = function(req, res) {
   }
   var userMail = req.body.email;
   User.findOne({ email: userMail }, (err, usr_) => {
-    console.log(usr_);
     if (err) {
       res.status(404).json({
         status: "NOK",
@@ -145,13 +144,10 @@ module.exports.requestResetPass = function(req, res) {
         resetPass.iduser = usr_.id;
         resetPass.setResetCode(usr_.email);
         resetPass.save((er_, doc_reset) => {
-          console.log(er_);
           if (!er_) {
             var mail_res = gen_services.sendResetPasswordMail(usr_, doc_reset);
-            console.log(mail_res);
             mail_res
               .then(result => {
-                console.log(result.body);
                 res.status(200).json({
                   status: "OK",
                   message: "Email envoye avec success",
@@ -159,7 +155,6 @@ module.exports.requestResetPass = function(req, res) {
                 });
               })
               .catch(err => {
-                console.log(err.statusCode);
               });
           }
         });
@@ -180,12 +175,10 @@ module.exports.checkResetPass = function(req, res) {
     res.status(403).json({ status: "NOK", data: "code de reset obligatoire" });
   } else {
     ResetPassword.findById(req.body.id_data).exec((err, doc) => {
-      console.log(doc);
       if (!err) {
         if (doc) {
           if (doc.resetCode == req.body.code_) {
             isValid = doc.checkValidate();
-            console.log(isValid);
             if (isValid) {
               res.status(200).json({
                 status: "valid",
@@ -232,7 +225,6 @@ module.exports.submitNewPass = function(req, res) {
   // var decrypted = CryptoJS.AES.decrypt(b, key);
   // console.log(decrypted);
   // var c = decrypted.toString(CryptoJS.enc.Utf8);
-  console.log("same");
   var mdp = req.body.mdp_dump;
   var id_data = req.body.id_data;
   var code_ = req.body.code_;
@@ -243,7 +235,6 @@ module.exports.submitNewPass = function(req, res) {
         if (doc && doc.resetCode == code_) {
           User.findById(doc.iduser).exec((e1, d1) => {
             if (!e1) {
-              console.log(d1);
               d1.setPassword(mdp);
               d1.save((e, r) => {
                 if (!e) {
@@ -260,7 +251,6 @@ module.exports.submitNewPass = function(req, res) {
       }
     });
     step.then(et => {
-      console.log(et);
       doc.setStatus(false);
       doc.save((w, c) => {
         if (!w) {

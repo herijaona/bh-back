@@ -39,12 +39,21 @@ router.post(
 	req_mid.validUser,
 	ctrCompanies.general_info
 );
+/* Post the company general info update */
 router.post(
 	"/updatecompanies",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrCompanies.updategeneral_info
+);
+/* Post update the company Logo*/
+router.post(
+	"/update-logo-companie",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.updateCompanyLogo
 );
 
 module.exports = router;
