@@ -9,7 +9,7 @@ var accountSchema = new mongoose.Schema({
     ref: "Image"
   },
   idCompteCCA: String,
-  typeOrganisation:String,
+  typeOrganisation: String,
   adresse: [String],
   presentation: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,7 +45,16 @@ var accountSchema = new mongoose.Schema({
   ]
 });
 
-accountSchema.add({ userAdmin: [{type: mongoose.Schema.Types.ObjectId , ref: "User"}]});
+accountSchema.add({ pagetoShow: String });
+accountSchema.add({
+  userAdmin: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+});
+accountSchema.add({
+  coverImage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Image"
+  }
+});
 
 mongoose.model("Account", accountSchema);
 

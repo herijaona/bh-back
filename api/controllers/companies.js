@@ -20,7 +20,8 @@ module.exports.listall = function(req, res) {
 						adresse: "",
 						Logo: "",
 						raisonSociale: "",
-						enseigneCommerciale: ""
+						enseigneCommerciale: "",
+						coverImage: ""
 					};
 					User.findById(userAdmin, function(er_r, _doc) {
 						if (!er_r) {
@@ -42,7 +43,7 @@ module.exports.listall = function(req, res) {
 				() => {
 					var l = accMap.length;
 					for (var iter = 0; iter < l; iter++) {
-						accMap[iter].adresse = getAddrData(accMap[iter])
+						accMap[iter].adresse = getAddrData(accMap[iter]);
 					}
 					res.json(accMap);
 				},
@@ -59,13 +60,16 @@ module.exports.general_info = function(req, res) {
 		Logo: "",
 		raisonSociale: "",
 		enseigneCommerciale: "",
-		typeOrganisation: ""
+		typeOrganisation: "",
+		pagetoShow: "",
+		coverImage: ""
 	};
+	var populateQuery = [{ path: "Logo" }, { path: "coverImage" }];
 	var curr = req.userDATA;
 	var id_v = req.body.c;
 	var dataW = new Promise((resolve, reject) => {
 		Account.find({ userAdmin: curr._id })
-			.populate("Logo")
+			.populate(populateQuery)
 			.exec((e_, u_) => {
 				if (!e_) {
 					var r;
@@ -73,6 +77,9 @@ module.exports.general_info = function(req, res) {
 						if (id_v == elt._id) {
 							r = copydata(m, elt);
 							r.Logo = img_url(r.Logo.url);
+							if (r.coverImage) {
+								r.coverImage = img_url(r.coverImage.url);
+							}
 						}
 					});
 
@@ -105,7 +112,8 @@ module.exports.updategeneral_info = function(req, res) {
 		Logo: "",
 		raisonSociale: "",
 		enseigneCommerciale: "",
-		typeOrganisation: ""
+		typeOrganisation: "",
+		coverImage: ""
 	};
 	var acc = req.ACC;
 	acc.raisonSociale = req.body.raisonSociale;
@@ -125,16 +133,17 @@ module.exports.updategeneral_info = function(req, res) {
 };
 
 /* Controllers handle  company generale Logo Update*/
-module.exports.updateCompanyLogo = function(req, res) {
+module.exports.updateCompanyImage = function(req, res) {
 	var m = {
 		_id: "",
 		adresse: "",
 		Logo: "",
 		raisonSociale: "",
-		enseigneCommerciale: ""
+		enseigneCommerciale: "",
+		coverImage: ""
 	};
 	var acc = req.ACC;
-	acc.Logo = new mongoose.mongo.ObjectId(req.body.IdIm);
+	acc[req.body.dataIm] = new mongoose.mongo.ObjectId(req.body.IdIm);
 	acc.save(function(e, r) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
@@ -143,6 +152,17 @@ module.exports.updateCompanyLogo = function(req, res) {
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
 			});
+		}
+	});
+};
+
+module.exports.updatePageShow = function(req, res) {
+	var ac = req.ACC;
+	delete req.body.acc_id;
+	ac.pagetoShow = JSON.stringify(req.body);
+	ac.save(function(e, r) {
+		if (!e) {
+			res.status(200).json({ status: "OK" });
 		}
 	});
 };

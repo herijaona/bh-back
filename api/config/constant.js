@@ -22,6 +22,8 @@ APP.mailjet = {}
 APP.mailjet.api_pub = '90953041cf7cebfada8d7921450a743f'
 APP.mailjet.api_priv = '86d6a97a804f962be68102a06f601d70'
 
+APP.key_secret_token = '%d]^JP54B(?JB8LQ5rCMk+P2Xr=fQCC&'
+
 
 
 module.exports = APP

@@ -49,11 +49,19 @@ router.post(
 );
 /* Post update the company Logo*/
 router.post(
-	"/update-logo-companie",
+	"/update-DataImage-companie",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.updateCompanyLogo
+	ctrCompanies.updateCompanyImage
+);
+/**/
+router.post(
+	"/updateCompanyShowPage",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.updatePageShow
 );
 
 module.exports = router;
