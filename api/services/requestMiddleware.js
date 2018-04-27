@@ -22,6 +22,7 @@ module.exports.validUser = function(req, res, next) {
 };
 
 module.exports.checkRole = function(req, res, next) {
+	var id_comp = req.headers["x-ccompany-id"];
 	if (req.payload) {
 		Account.find({ userAdmin: req.userDATA._id }, function(err, doc) {
 			var currAcc;
@@ -29,8 +30,8 @@ module.exports.checkRole = function(req, res, next) {
 				var l = doc.length,
 					li = 1;
 				var pr = new Promise((resolve, reject) => {
-					doc.forEach( d => {						
-						if (req.body.acc_id == d._id) {
+					doc.forEach(d => {
+						if (id_comp == d._id) {
 							currAcc = d;
 						}
 						if (l == li) {
@@ -41,11 +42,14 @@ module.exports.checkRole = function(req, res, next) {
 				});
 
 				pr.then(() => {
+					if (!currAcc) {
+						notFoundRes(res, "action not Permitted 1");
+					}
 					req.ACC = currAcc;
 					next();
 				});
 			} else {
-				notFoundRes(res, "Action not Permitted");
+				notFoundRes(res, "Action not Permitted 2");
 			}
 		});
 	}

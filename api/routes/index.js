@@ -29,7 +29,8 @@ router.post("/reset-password-check", ctrlAuth.checkResetPass);
 router.post("/reset-password-submit-new", ctrlAuth.submitNewPass);
 
 // Uploads
-router.post("/up_images", ctrlUploads.uploadImage); //images
+router.post("/up_images", ctrlUploads.uploadImage);
+router.post("/up_Mimages", ctrlUploads.multipleFileAdd); //images
 
 //Companies
 router.get("/all_companies", ctrCompanies.listall);
@@ -55,13 +56,46 @@ router.post(
 	req_mid.checkRole,
 	ctrCompanies.updateCompanyImage
 );
-/**/
+/* Show page config save*/
 router.post(
 	"/updateCompanyShowPage",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrCompanies.updatePageShow
+);
+
+router.post(
+	"/new-presentation",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.AddNewPresentation
+);
+
+/**/
+router.post(
+	"/updateCompanyImages",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.updateImageBiblio
+);
+
+router.get(
+	"/biblioImageCompany",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.getCbiblioImage
+);
+
+router.post(
+	"/saveZoneData",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.saveZoneDATA
 );
 
 module.exports = router;

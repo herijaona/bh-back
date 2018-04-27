@@ -2,6 +2,9 @@ var mongoose = require("mongoose");
 var Account = mongoose.model("Account");
 var app_const = require("../config/constant");
 var User = mongoose.model("User");
+var Image = mongoose.model("Image");
+var Video = mongoose.model("Video");
+var Zone = mongoose.model("Zone");
 // var Promise = require("promise");
 
 /* Get the list of activated company */
@@ -27,7 +30,7 @@ module.exports.listall = function(req, res) {
 						if (!er_r) {
 							if (_doc.active) {
 								var c = copydata(m, acc_);
-								c.Logo = img_url(c.Logo.url);
+								c.Logo = img_url(c.Logo.url, 'images');
 								accMap.push(c);
 							}
 							if (l == li) {
@@ -71,14 +74,15 @@ module.exports.general_info = function(req, res) {
 		Account.find({ userAdmin: curr._id })
 			.populate(populateQuery)
 			.exec((e_, u_) => {
+				console.log(u_);
 				if (!e_) {
 					var r;
 					u_.forEach(function(elt) {
 						if (id_v == elt._id) {
 							r = copydata(m, elt);
-							r.Logo = img_url(r.Logo.url);
+							r.Logo = img_url(r.Logo.url, 'images');
 							if (r.coverImage) {
-								r.coverImage = img_url(r.coverImage.url);
+								r.coverImage = img_url(r.coverImage.url, 'images');
 							}
 						}
 					});
@@ -124,7 +128,7 @@ module.exports.updategeneral_info = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
-				et.Logo = img_url(et.Logo.url);
+				et.Logo = img_url(et.Logo.url, 'images');
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
 			});
@@ -148,7 +152,7 @@ module.exports.updateCompanyImage = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
-				et.Logo = img_url(et.Logo.url);
+				et.Logo = img_url(et.Logo.url, 'images');
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
 			});
@@ -167,6 +171,85 @@ module.exports.updatePageShow = function(req, res) {
 	});
 };
 
+module.exports.getCbiblioImage = function(req, res) {
+	var x_type = req.headers["x-type-data"];
+	var dtype = x_type == "images" ? Image : Video;
+	var ac_id = req.ACC._id;
+	var pr = new Promise((resolve, reject) => {
+		dtype.find({ acc_owner: ac_id }).exec((e, i) => {
+			if (e || i.length == 0) {
+				res.status(400).json({ err: "Not Found or Data Not Valid" });
+			}
+			console.log(i);
+			var l = i.length;
+			var l_ = [];
+			i.forEach(function(el, indx) {
+				console.log(el);
+				var on_ = {
+					_id: el._id,
+					url: img_url(el.url, x_type.toLowerCase()),
+					mimetype: el.mimetype
+				};
+				l_.push(on_);
+
+				if (l == indx + 1) {
+					resolve(l_);
+				}
+			});
+		});
+	});
+
+	pr.then(iml => {
+		res.status(200).json({ allIm: iml });
+	});
+};
+
+module.exports.updateImageBiblio = function(req, res) {
+	var data_T = req.body.ty_pe == "images" ? Image : Video;
+	var ac = req.body.all_im;
+	var prom = new Promise((resolve, reject) => {
+		var l = ac.length;
+		ac.forEach(function(ee, ie) {
+			data_T.findById(new mongoose.mongo.ObjectId(ee), function(er, im) {
+				im.acc_owner = req.ACC._id;
+				im.save(function(e, r) {
+					if (l == ie + 1) {
+						resolve();
+					}
+				});
+			});
+		});
+	});
+
+	prom.then(() => {
+		res.status(200).json({ status: "OK", message: "VAlue updated" });
+	});
+};
+
+/* add new presentation*/
+module.exports.AddNewPresentation = function(req, res) {
+	
+}
+
+/* add new zone */
+module.exports.saveZoneDATA = function(req, res) {
+	var dt = req.body;
+	var zn = new Zone();
+		console.log(dt);
+	if (dt.media_type == 1) {
+		zn.image = dt.media_id;
+	} else{
+		zn.video = dt.media_id;
+	}
+	zn.account = new mongoose.mongo.ObjectId(req.ACC._id);
+	zn.caption = dt.name;
+	console.log(zn);
+	zn.save((e,zi)=>{
+		if(!e){
+			res.status(200).json({status:'OK', message: 'reussi'});
+		}
+	})
+}
 /* Helpers to copy data between object */
 function copydata(data1, data2) {
 	var k2 = JSON.parse(JSON.stringify(data2));
@@ -179,9 +262,9 @@ function copydata(data1, data2) {
 }
 
 /*Formulate an url for Image */
-function img_url(img_u) {
+function img_url(img_u, f) {
 	var x = img_u.split("/");
-	return app_const.url + "/files/images/" + x[2];
+	return app_const.url + "/files/"+f+"/" + x[2];
 }
 
 /* Address Data reformat */

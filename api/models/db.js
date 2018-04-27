@@ -48,6 +48,7 @@ process.on('SIGTERM', function() {
 // BRING IN YOUR SCHEMAS & MODELS
 require('./data_schema/users');
 require('./data_schema/image');
+require('./data_schema/video');
 require('./data_schema/account');
 require('./data_schema/organisationtype');
 require('./data_schema/presentation');
@@ -57,3 +58,5 @@ require('./data_schema/successstories');
 require('./data_schema/meeting');
 require('./data_schema/usertoken');
 require('./data_schema/password-reset');
+require('./data_schema/zone');
+// require('./data_schema/biblioImage');
