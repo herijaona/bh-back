@@ -38,6 +38,7 @@ router.post(
 	"/gen_info_companies",
 	auth,
 	req_mid.validUser,
+	req_mid.checkRole,
 	ctrCompanies.general_info
 );
 /* Post the company general info update */
@@ -73,7 +74,7 @@ router.post(
 	ctrCompanies.AddNewPresentation
 );
 
-/**/
+/*update company images*/
 router.post(
 	"/updateCompanyImages",
 	auth,
@@ -90,6 +91,7 @@ router.get(
 	ctrCompanies.getCbiblioImage
 );
 
+/* Save data about mindset zone*/
 router.post(
 	"/saveZoneData",
 	auth,
@@ -97,5 +99,14 @@ router.post(
 	req_mid.checkRole,
 	ctrCompanies.saveZoneDATA
 );
+
+/**/
+router.get(
+	"/getAdminMindsetData",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrCompanies.getAdminDataMindset
+	);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 var passport = require("passport");
 var mongoose = require("mongoose");
 var User = mongoose.model("User");
+var Presentation = mongoose.model("Presentation");
 var Account = mongoose.model("Account");
 var ResetPassword = mongoose.model("ResetPassword");
 var gen_services = require("../services/app-general");
@@ -42,10 +43,17 @@ module.exports.register = function(req, res) {
             account: accID
           });
 
+          resEmail.then(result => {
+            var p = new Presentation({ account: accID._id });
+            p.save((ee, ie) => {
+              if (!ee) {
+                resolve({ status: "OK" });
+              }
+            });
+          });
+
           resEmail
             .then(result => {
-              var token;
-              token = user.generateJwt();
               res.status(200);
               res.json({
                 status: "OK",
@@ -217,15 +225,6 @@ module.exports.checkResetPass = function(req, res) {
 /* Submit new pass */
 
 module.exports.submitNewPass = function(req, res) {
-  // body...
-  /*var key = CryptoJS.enc.Base64.parse(req.body.code_);
-  const a = req.body.mdp_dump.toString().replace(" ", "+");
-  var b = a.replace(" ", "+");
-*/
-  //Decrypt Message
-  // var decrypted = CryptoJS.AES.decrypt(b, key);
-  // console.log(decrypted);
-  // var c = decrypted.toString(CryptoJS.enc.Utf8);
   var mdp = req.body.mdp_dump;
   var id_data = req.body.id_data;
   var code_ = req.body.code_;

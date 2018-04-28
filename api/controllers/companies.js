@@ -5,6 +5,7 @@ var User = mongoose.model("User");
 var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
+var Presentation = mongoose.model("Presentation");
 // var Promise = require("promise");
 
 /* Get the list of activated company */
@@ -30,7 +31,7 @@ module.exports.listall = function(req, res) {
 						if (!er_r) {
 							if (_doc.active) {
 								var c = copydata(m, acc_);
-								c.Logo = img_url(c.Logo.url, 'images');
+								c.Logo = media_url(c.Logo.url, "images");
 								accMap.push(c);
 							}
 							if (l == li) {
@@ -74,15 +75,17 @@ module.exports.general_info = function(req, res) {
 		Account.find({ userAdmin: curr._id })
 			.populate(populateQuery)
 			.exec((e_, u_) => {
-				console.log(u_);
 				if (!e_) {
 					var r;
 					u_.forEach(function(elt) {
 						if (id_v == elt._id) {
 							r = copydata(m, elt);
-							r.Logo = img_url(r.Logo.url, 'images');
+							r.Logo = media_url(r.Logo.url, "images");
 							if (r.coverImage) {
-								r.coverImage = img_url(r.coverImage.url, 'images');
+								r.coverImage = media_url(
+									r.coverImage.url,
+									"images"
+								);
 							}
 						}
 					});
@@ -128,7 +131,7 @@ module.exports.updategeneral_info = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
-				et.Logo = img_url(et.Logo.url, 'images');
+				et.Logo = media_url(et.Logo.url, "images");
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
 			});
@@ -152,7 +155,7 @@ module.exports.updateCompanyImage = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
-				et.Logo = img_url(et.Logo.url, 'images');
+				et.Logo = media_url(et.Logo.url, "images");
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
 			});
@@ -180,14 +183,12 @@ module.exports.getCbiblioImage = function(req, res) {
 			if (e || i.length == 0) {
 				res.status(400).json({ err: "Not Found or Data Not Valid" });
 			}
-			console.log(i);
 			var l = i.length;
 			var l_ = [];
 			i.forEach(function(el, indx) {
-				console.log(el);
 				var on_ = {
 					_id: el._id,
-					url: img_url(el.url, x_type.toLowerCase()),
+					url: media_url(el.url, x_type.toLowerCase()),
 					mimetype: el.mimetype
 				};
 				l_.push(on_);
@@ -228,29 +229,44 @@ module.exports.updateImageBiblio = function(req, res) {
 
 /* add new presentation*/
 module.exports.AddNewPresentation = function(req, res) {
-	
-}
+	var d = req.body;
+	var newPr = new Presentation(d);
+	newPr.account = new mongoose.mongo.ObjectId(req.ACC._id);
+	newPr.save((e, i) => {
 
-/* add new zone */
+	});
+};
+
+/* 
+* Return the mindset data for admin view 
+*/
+module.exports.getAdminDataMindset = function(req, res) {
+	var zn;
+};
+
+/*
+* add new zone 
+*/
 module.exports.saveZoneDATA = function(req, res) {
 	var dt = req.body;
 	var zn = new Zone();
-		console.log(dt);
 	if (dt.media_type == 1) {
 		zn.image = dt.media_id;
-	} else{
+	} else {
 		zn.video = dt.media_id;
 	}
 	zn.account = new mongoose.mongo.ObjectId(req.ACC._id);
 	zn.caption = dt.name;
-	console.log(zn);
-	zn.save((e,zi)=>{
-		if(!e){
-			res.status(200).json({status:'OK', message: 'reussi'});
+	zn.save((e, zi) => {
+		if (!e) {
+			res.status(200).json({ status: "OK", message: "reussi" });
 		}
-	})
-}
-/* Helpers to copy data between object */
+	});
+};
+
+/*
+* Helpers to copy data between object 
+*/
 function copydata(data1, data2) {
 	var k2 = JSON.parse(JSON.stringify(data2));
 	Object.keys(k2).forEach(function(keyn) {
@@ -261,13 +277,17 @@ function copydata(data1, data2) {
 	return data1;
 }
 
-/*Formulate an url for Image */
-function img_url(img_u, f) {
+/*
+* Formulate an url for media files 
+*/
+function media_url(img_u, f) {
 	var x = img_u.split("/");
-	return app_const.url + "/files/"+f+"/" + x[2];
+	return app_const.url + "/files/" + f + "/" + x[2];
 }
 
-/* Address Data reformat */
+/* 
+* Address Data reformat 
+*/
 function getAddrData(ac) {
 	var formt = /[{:}]/;
 	var el = ac.adresse;
