@@ -5,7 +5,10 @@ var zoneSchema = new mongoose.Schema({
 	video: { type: mongoose.Schema.Types.ObjectId, ref: "Video" },
 	image: { type: mongoose.Schema.Types.ObjectId, ref: "Image" },
 	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
-	caption: String
+	caption: String,
+	zHeight:  Number,
+	dtype:  Number,
+	zWidth: Number
 });
 
 mongoose.model("Zone", zoneSchema);

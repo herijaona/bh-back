@@ -6,8 +6,15 @@ var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
-// var Promise = require("promise");
-
+var DtoS = {
+	_id: "",
+	adresse: "",
+	Logo: "",
+	raisonSociale: "",
+	enseigneCommerciale: "",
+	typeOrganisation: "",
+	coverImage: ""
+};
 /* Get the list of activated company */
 module.exports.listall = function(req, res) {
 	Account.find()
@@ -89,7 +96,6 @@ module.exports.general_info = function(req, res) {
 							}
 						}
 					});
-
 					if (r) {
 						resolve(r);
 					} else {
@@ -113,7 +119,7 @@ module.exports.general_info = function(req, res) {
 
 /* Controllers handle  company generale info Update*/
 module.exports.updategeneral_info = function(req, res) {
-	var m = {
+	var sd = {
 		_id: "",
 		adresse: "",
 		Logo: "",
@@ -122,6 +128,9 @@ module.exports.updategeneral_info = function(req, res) {
 		typeOrganisation: "",
 		coverImage: ""
 	};
+
+	var m = Object.create(DtoS);
+
 	var acc = req.ACC;
 	acc.raisonSociale = req.body.raisonSociale;
 	acc.enseigneCommerciale = req.body.enseigneCommerciale;
@@ -131,6 +140,7 @@ module.exports.updategeneral_info = function(req, res) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
 				var et = copydata(m, a);
+				console.log(et);
 				et.Logo = media_url(et.Logo.url, "images");
 				et.adresse = getAddrData(et);
 				res.status(200).json(et);
@@ -228,12 +238,16 @@ module.exports.updateImageBiblio = function(req, res) {
 };
 
 /* add new presentation*/
-module.exports.AddNewPresentation = function(req, res) {
+module.exports.updatePresentation = function(req, res) {
 	var d = req.body;
-	var newPr = new Presentation(d);
-	newPr.account = new mongoose.mongo.ObjectId(req.ACC._id);
-	newPr.save((e, i) => {
-
+	Presentation.findOne({ account: req.ACC._id }).exec((er, elt) => {
+		elt.description = d.description;
+		elt.autreDescription = d.autreDescription;
+		elt.save((e,p)=>{
+			if (!e) {
+				res.status(200).json({status: 'OK', message:'Element mis a jour avec succes'});
+			}
+		})
 	});
 };
 
@@ -241,7 +255,20 @@ module.exports.AddNewPresentation = function(req, res) {
 * Return the mindset data for admin view 
 */
 module.exports.getAdminDataMindset = function(req, res) {
-	var zn;
+	var znData = getZoneData(req.ACC._id);
+	znData.then(
+		zn => {
+			Presentation.find({ account: req.ACC._id }).exec((er, elt) => {
+				if (!er) {
+					res.status(200).json({
+						zone: zn,
+						presentation: elt[0]
+					});
+				}
+			});
+		},
+		err => {}
+	);
 };
 
 /*
@@ -252,9 +279,13 @@ module.exports.saveZoneDATA = function(req, res) {
 	var zn = new Zone();
 	if (dt.media_type == 1) {
 		zn.image = dt.media_id;
+		zn.dtype = 1;
 	} else {
 		zn.video = dt.media_id;
+		zn.dtype = 2;
 	}
+	zn.zHeight = req.body.height;
+	zn.zWidth = req.body.width;
 	zn.account = new mongoose.mongo.ObjectId(req.ACC._id);
 	zn.caption = dt.name;
 	zn.save((e, zi) => {
@@ -264,6 +295,40 @@ module.exports.saveZoneDATA = function(req, res) {
 	});
 };
 
+/*
+*	Get zone of a Company send in header 
+*/
+function getZoneData(ac_id) {
+	var zoneData = new Promise((resolve, reject) => {
+		var populateQuery = [{ path: "image" }, { path: "video" }];
+		Zone.find({ account: ac_id })
+			.populate(populateQuery)
+			.exec((er, elts) => {
+				if (!er) {
+					for (el in elts) {
+						var e1 = elts[el];
+						if (e1.dtype == 1) {
+							elts[el].image.url = media_url(
+								e1.image.url,
+								"images"
+							);
+							delete elts[el].video;
+						} else if (e1.dtype == 2) {
+							elts[el].video.url = media_url(
+								e1.video.url,
+								"videos"
+							);
+							delete elts[el].image;
+						}
+					}
+					resolve(elts);
+				} else {
+					reject(0);
+				}
+			});
+	});
+	return zoneData;
+}
 /*
 * Helpers to copy data between object 
 */

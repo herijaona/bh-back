@@ -50,6 +50,9 @@ accountSchema.add({
   userAdmin: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
 accountSchema.add({
+  presentation: { type: mongoose.Schema.Types.ObjectId, ref: "Presentation" }
+});
+accountSchema.add({
   coverImage: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Image"

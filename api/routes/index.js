@@ -67,11 +67,11 @@ router.post(
 );
 
 router.post(
-	"/new-presentation",
+	"/save-presentation",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.AddNewPresentation
+	ctrCompanies.updatePresentation
 );
 
 /*update company images*/
@@ -107,6 +107,9 @@ router.get(
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrCompanies.getAdminDataMindset
-	);
+);
+
+/* Specific Route for modify default data*/
+router.get("/patchDATA", ctrlUploads.patchDATA);
 
 module.exports = router;
