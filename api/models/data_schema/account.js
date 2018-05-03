@@ -49,9 +49,15 @@ accountSchema.add({ pagetoShow: String });
 accountSchema.add({
   userAdmin: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
+
 accountSchema.add({
   presentation: { type: mongoose.Schema.Types.ObjectId, ref: "Presentation" }
 });
+
+accountSchema.add({
+  _slug: { type: String , unique: true}
+}); 
+
 accountSchema.add({
   coverImage: {
     type: mongoose.Schema.Types.ObjectId,

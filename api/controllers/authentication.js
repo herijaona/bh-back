@@ -29,7 +29,7 @@ module.exports.register = function(req, res) {
       account_.enseigneCommerciale = req.body.enseigneCommerciale;
       account_.raisonSociale = req.body.raisonSociale;
       account_.pagetoShow =
-        '{"pMindset":false,"pTeam":false,"pSs":false,"pIdeas":false,"pProjects":false}';
+        '{"pMindset":false,"pTeam":false,"pSs":false,"pIdeas":false,"pMeeting":false,"pProjects":false}';
       account_.typeOrganisation = req.body.typeOrganisation;
       account_.Logo = new mongoose.mongo.ObjectId(req.body.Logo);
       account_.adresse.push(req.body.adresse);

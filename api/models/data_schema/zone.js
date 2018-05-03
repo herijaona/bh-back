@@ -6,9 +6,11 @@ var zoneSchema = new mongoose.Schema({
 	image: { type: mongoose.Schema.Types.ObjectId, ref: "Image" },
 	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 	caption: String,
-	zHeight:  Number,
-	dtype:  Number,
+	zHeight: Number,
 	zWidth: Number
 });
+
+zoneSchema.add({ dtype: Number });
+zoneSchema.add({ rang: Number });
 
 mongoose.model("Zone", zoneSchema);

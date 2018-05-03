@@ -5,12 +5,25 @@ var auth = jwt({
 	secret: "MY_SECRET",
 	userProperty: "payload"
 });
+
+/*
+*  Middleware
+*/
 var req_mid = require("../services/requestMiddleware");
+
+/*
+* Controllers
+*/
 var ctrlProfile = require("../controllers/profile");
 var ctrlAuth = require("../controllers/authentication");
 var ctrlUploads = require("../controllers/upload_file");
-var ctrCompanies = require("../controllers/companies");
-//Middleware
+var ctrlCompanies = require("../controllers/companies");
+var ctrlCompanies = require("../controllers/companies");
+var ctrlPatch = require("../controllers/patchData");
+
+/*
+*     ROUTES
+*/
 
 // profile
 router.get("/profile", auth, req_mid.validUser, ctrlProfile.profileRead);
@@ -33,13 +46,13 @@ router.post("/up_images", ctrlUploads.uploadImage);
 router.post("/up_Mimages", ctrlUploads.multipleFileAdd); //images
 
 //Companies
-router.get("/all_companies", ctrCompanies.listall);
+router.get("/all_companies", ctrlCompanies.listall);
 router.post(
 	"/gen_info_companies",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.general_info
+	ctrlCompanies.general_info
 );
 /* Post the company general info update */
 router.post(
@@ -47,7 +60,7 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.updategeneral_info
+	ctrlCompanies.updategeneral_info
 );
 /* Post update the company Logo*/
 router.post(
@@ -55,7 +68,7 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.updateCompanyImage
+	ctrlCompanies.updateCompanyImage
 );
 /* Show page config save*/
 router.post(
@@ -63,16 +76,9 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.updatePageShow
+	ctrlCompanies.updatePageShow
 );
 
-router.post(
-	"/save-presentation",
-	auth,
-	req_mid.validUser,
-	req_mid.checkRole,
-	ctrCompanies.updatePresentation
-);
 
 /*update company images*/
 router.post(
@@ -80,7 +86,7 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.updateImageBiblio
+	ctrlCompanies.updateImageBiblio
 );
 
 router.get(
@@ -88,7 +94,7 @@ router.get(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.getCbiblioImage
+	ctrlCompanies.getCbiblioImage
 );
 
 /* Save data about mindset zone*/
@@ -97,19 +103,60 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.saveZoneDATA
+	ctrlCompanies.saveZoneDATA
+);
+/* Delete zone*/
+router.delete(
+	"/zone",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.deleteZoneDATA
 );
 
-/**/
+/* get zone data by id */
+router.get(
+	"/zone",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.getZoneDATA
+);
+
+/* */
 router.get(
 	"/getAdminMindsetData",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrCompanies.getAdminDataMindset
+	ctrlCompanies.getAdminDataMindset
+);
+
+/*
+* Check If user IS admin of an Account (Company)
+*/
+router.get(
+	"/check_role",
+	auth,
+	req_mid.validUser,
+	ctrlCompanies.checkRole_userAdmin
+);
+
+/* Get company DATA DETAILS*/
+router.get("/company_details", ctrlCompanies.getCompanyDetailsData);
+
+/* Get company presentation */
+router.get("/company_presentation",req_mid.accReqSlug, ctrlCompanies.getCompanyPresentation);
+
+router.post(
+	"/save-presentation",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.updatePresentation
 );
 
 /* Specific Route for modify default data*/
-router.get("/patchDATA", ctrlUploads.patchDATA);
+router.get("/patchDATA", ctrlPatch.patchDATA);
 
 module.exports = router;

@@ -6,15 +6,18 @@ var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
-var DtoS = {
+var DataForResponse = {
 	_id: "",
 	adresse: "",
 	Logo: "",
 	raisonSociale: "",
 	enseigneCommerciale: "",
 	typeOrganisation: "",
-	coverImage: ""
+	coverImage: "",
+	_slug: "",
+	pagetoShow: ""
 };
+
 /* Get the list of activated company */
 module.exports.listall = function(req, res) {
 	Account.find()
@@ -26,14 +29,7 @@ module.exports.listall = function(req, res) {
 			waitData = new Promise((resolve, reject) => {
 				acc.forEach(function(acc_) {
 					var userAdmin = acc_.userAdmin[0];
-					var m = {
-						_id: "",
-						adresse: "",
-						Logo: "",
-						raisonSociale: "",
-						enseigneCommerciale: "",
-						coverImage: ""
-					};
+					var m = Object.create(DataForResponse);
 					User.findById(userAdmin, function(er_r, _doc) {
 						if (!er_r) {
 							if (_doc.active) {
@@ -65,16 +61,7 @@ module.exports.listall = function(req, res) {
 
 /* Controllers handle request on  company generale info */
 module.exports.general_info = function(req, res) {
-	var m = {
-		_id: "",
-		adresse: "",
-		Logo: "",
-		raisonSociale: "",
-		enseigneCommerciale: "",
-		typeOrganisation: "",
-		pagetoShow: "",
-		coverImage: ""
-	};
+	var m = Object.create(DataForResponse);
 	var populateQuery = [{ path: "Logo" }, { path: "coverImage" }];
 	var curr = req.userDATA;
 	var id_v = req.body.c;
@@ -117,48 +104,84 @@ module.exports.general_info = function(req, res) {
 	);
 };
 
+/* handle the get requet about company details info*/
+module.exports.getCompanyDetailsData = function(req, res) {
+	console.log(req.query);
+	var m = Object.create(DataForResponse);
+	var populateQuery = [{ path: "Logo" }, { path: "coverImage" }];
+	Account.findOne({ _slug: req.query.company_slug })
+		.populate(populateQuery)
+		.exec((err, elt) => {
+			if (!err) {
+				if (elt) {
+					var cmp = copydata(m, elt);
+					cmp.Logo = media_url(cmp.Logo.url, "images");
+					if (cmp.coverImage) {
+						cmp.coverImage = media_url(
+							cmp.coverImage.url,
+							"images"
+						);
+					}
+					cmp.adresse = getAddrData(cmp);
+					res.status(200).json(cmp);
+				} else {
+					res.status(404).json({ dtls: "account not Found" });
+				}
+			}
+		});
+};
+
 /* Controllers handle  company generale info Update*/
-module.exports.updategeneral_info = function(req, res) {
-	var sd = {
-		_id: "",
-		adresse: "",
-		Logo: "",
-		raisonSociale: "",
-		enseigneCommerciale: "",
-		typeOrganisation: "",
-		coverImage: ""
-	};
-
-	var m = Object.create(DtoS);
-
+module.exports.updategeneral_info = async function(req, res) {
+	var m = Object.create(DataForResponse);
 	var acc = req.ACC;
-	acc.raisonSociale = req.body.raisonSociale;
-	acc.enseigneCommerciale = req.body.enseigneCommerciale;
-	acc.typeOrganisation = req.body.typeOrganisation;
+	var sl_ = "";
+	var sl_dupl = 0;
+	var loop_ind = true;
 
-	acc.save(function(e, r) {
-		if (!e) {
-			Account.populate(r, { path: "Logo" }, function(err, a) {
-				var et = copydata(m, a);
-				console.log(et);
-				et.Logo = media_url(et.Logo.url, "images");
-				et.adresse = getAddrData(et);
-				res.status(200).json(et);
-			});
+	Object.keys(req.body).forEach(function(keyn) {
+		console.log(keyn);
+		acc[keyn] = req.body[keyn];
+		if (keyn == "enseigneCommerciale") {
+			sl_ = req.body[keyn].replace(/ /g, "");
+			acc["_slug"] = sl_;
 		}
 	});
+
+	while (loop_ind) {
+		try {
+			let vt = await acc.save();
+			if (vt) {
+				let a_ = await Account.populate(vt, [
+					{ path: "Logo" },
+					{ path: "coverImage" }
+				]);
+				if (a_) {
+					loop_ind = false;
+					var et = copydata(m, vt);
+					et.Logo = media_url(et.Logo.url, "images");
+					et.adresse = getAddrData(et);
+					if (et.coverImage) {
+						et.coverImage = media_url(et.coverImage.url, "images");
+					}
+					res.status(200).json(et);
+				}
+			}
+		} catch (e) {
+			// statements
+			console.log(e);
+			if (e.code == 11000) {
+				acc["_slug"] = sl_ + "_" + sl_dupl;
+				sl_dupl++;
+				loop_ind = true;
+			}
+		}
+	}
 };
 
 /* Controllers handle  company generale Logo Update*/
 module.exports.updateCompanyImage = function(req, res) {
-	var m = {
-		_id: "",
-		adresse: "",
-		Logo: "",
-		raisonSociale: "",
-		enseigneCommerciale: "",
-		coverImage: ""
-	};
+	var m = Object.create(DataForResponse);
 	var acc = req.ACC;
 	acc[req.body.dataIm] = new mongoose.mongo.ObjectId(req.body.IdIm);
 	acc.save(function(e, r) {
@@ -175,7 +198,6 @@ module.exports.updateCompanyImage = function(req, res) {
 
 module.exports.updatePageShow = function(req, res) {
 	var ac = req.ACC;
-	delete req.body.acc_id;
 	ac.pagetoShow = JSON.stringify(req.body);
 	ac.save(function(e, r) {
 		if (!e) {
@@ -238,24 +260,109 @@ module.exports.updateImageBiblio = function(req, res) {
 };
 
 /* add new presentation*/
-module.exports.updatePresentation = function(req, res) {
+module.exports.updatePresentation = async (req, res) => {
 	var d = req.body;
-	Presentation.findOne({ account: req.ACC._id }).exec((er, elt) => {
-		elt.description = d.description;
-		elt.autreDescription = d.autreDescription;
-		elt.save((e,p)=>{
-			if (!e) {
-				res.status(200).json({status: 'OK', message:'Element mis a jour avec succes'});
+	try {
+		let pr_ = await Presentation.findOne({ account: req.ACC._id });
+		if (pr_) {
+			let k = await Object.keys(d).map((elem, index) => {
+				pr_[elem] = d[elem];
+				return elem;
+			});
+
+			if (k) {
+				console.log(k);
+				let sav_ = await pr_.save();
+				if (sav_) {
+					console.log(sav_);
+					res.status(200).json({
+						status: "OK",
+						message: "Element mis a jour avec succes"
+					});
+				}
 			}
-		})
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+
+	/*Presentation.findOne({ account: req.ACC._id }).exec((er, elt) => {
+	elt.description = d.description;
+	elt.autreDescription = d.autreDescription;
+	elt.save((e, p) => {
+		if (!e) {
+			res.status(200).json({
+				status: "OK",
+				message: "Element mis a jour avec succes"
+			});
+		}
 	});
+});*/
+};
+
+module.exports.getCompanyPresentation = async (req, res) => {
+	try {
+		let pr = await Presentation.findOne({ account: req.ACC._id });
+		if (pr) {
+			res.status(200).json({ data: pr });
+		} else {
+			res.status(404).json({ message: "Presentation not found" });
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
 };
 
 /* 
 * Return the mindset data for admin view 
 */
 module.exports.getAdminDataMindset = function(req, res) {
-	var znData = getZoneData(req.ACC._id);
+	var znData = new Promise((resolve, reject) => {
+		var populateQuery = [{ path: "video" }, { path: "image" }];
+		Zone.find({ account: req.ACC._id })
+			.populate(populateQuery)
+			.exec((er, elts) => {
+				if (!er) {
+					resolve(elts);
+				} else {
+					reject(0);
+				}
+			});
+	});
+
+	znData.then(function(arrElts) {
+		var ln = arrElts.length;
+		var id_in = [];
+		for (var i = 0; i < ln; i++) {
+			var el;
+			var el = arrElts[i];
+			if (el.dtype == 2) {
+				if (inArray(el.video._id, id_in)) {
+					arrElts[i].video.url = el.video.url;
+				} else {
+					arrElts[i].video.url =
+						app_const.url +
+						"/" +
+						el.video.url.replace("uploads", "files");
+					id_in.push(el.video._id);
+				}
+			} else if (el.dtype == 1) {
+				if (inArray(el.image._id, id_in)) {
+					arrElts[i].image.url = el.image.url;
+				} else {
+					arrElts[i].image.url =
+						app_const.url +
+						"/" +
+						el.image.url.replace("uploads", "files");
+				}
+				id_in.push(el.image._id);
+			}
+			delete el;
+		}
+		return arrElts;
+	});
 	znData.then(
 		zn => {
 			Presentation.find({ account: req.ACC._id }).exec((er, elt) => {
@@ -296,6 +403,71 @@ module.exports.saveZoneDATA = function(req, res) {
 };
 
 /*
+* Delete zone data
+*/
+module.exports.deleteZoneDATA = function(req, res) {
+	var dt = req.body.idzone;
+	var zn_rem = Zone.findById(dt).remove();
+	zn_rem.exec(e => {
+		if (!e) {
+			res.status(200).json({ status: "OK", message: "reussi" });
+		}
+	});
+};
+
+/**/
+module.exports.getZoneDATA = function(req, res) {
+	console.log(req.query.idzone);
+	var dt = req.query.idzone;
+	Zone.findById(dt)
+		.populate([{ path: "image" }, { path: "video" }])
+		.exec((e, el) => {
+			if (!e) {
+				console.log(el);
+				if (el.dtype == 1) {
+					el.image.url =
+						app_const.url +
+						"/" +
+						el.image.url.replace("uploads", "files");
+				} else {
+					el.video.url =
+						app_const.url +
+						"/" +
+						el.video.url.replace("uploads", "files");
+				}
+				res.status(200).json({ status: "OK", message: el });
+			}
+		});
+};
+
+module.exports.checkRole_userAdmin = function(req, res) {
+	var currUSERID = req.userDATA._id;
+	var dt = req.query.slug_chk;
+	Account.findOne({ _slug: dt }).exec((er, elts) => {
+		if (!er) {
+			if (elts) {
+				var usersAdm = elts.userAdmin;
+				var existIN = false;
+				for (i_d in usersAdm) {
+					if (currUSERID.toString() == usersAdm[i_d].toString()) {
+						existIN = true;
+						break;
+					}
+				}
+				res.status(200).json({
+					data_check_response: existIN,
+					_id_check: elts._id
+				});
+			} else {
+				res.status(200).json({
+					data_check_response: false
+				});
+			}
+		}
+	});
+};
+
+/*
 *	Get zone of a Company send in header 
 */
 function getZoneData(ac_id) {
@@ -305,27 +477,33 @@ function getZoneData(ac_id) {
 			.populate(populateQuery)
 			.exec((er, elts) => {
 				if (!er) {
-					for (el in elts) {
-						var e1 = elts[el];
-						if (e1.dtype == 1) {
-							elts[el].image.url = media_url(
-								e1.image.url,
-								"images"
-							);
-							delete elts[el].video;
-						} else if (e1.dtype == 2) {
-							elts[el].video.url = media_url(
-								e1.video.url,
-								"videos"
-							);
-							delete elts[el].image;
-						}
-					}
 					resolve(elts);
 				} else {
 					reject(0);
 				}
 			});
+	});
+	zoneData.then(function(arrElts) {
+		var ew = arrElts.map(function(elem, index) {
+			if (elem.dtype == 1) {
+				elem.image.url =
+					app_const.url +
+					"/files/" +
+					"images" +
+					"/" +
+					elem.image.url.split("/")[2];
+			} else {
+				elem.video.url =
+					app_const.url +
+					"/files/" +
+					"videos" +
+					"/" +
+					elem.video.url.split("/")[2];
+			}
+
+			return elem;
+		});
+		resolve(ew);
 	});
 	return zoneData;
 }
@@ -367,4 +545,13 @@ function getAddrData(ac) {
 		}
 	}
 	return adrText;
+}
+
+/* IN_Array*/
+function inArray(needle, haystack) {
+	var length = haystack.length;
+	for (var i = 0; i < length; i++) {
+		if (haystack[i] == needle) return true;
+	}
+	return false;
 }

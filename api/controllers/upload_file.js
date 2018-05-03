@@ -4,11 +4,6 @@ var DIR = "./uploads/";
 var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 
-var User = mongoose.model("User");
-var Account = mongoose.model("Account");
-var Presentation = mongoose.model("Presentation");
-var Zone = mongoose.model("Zone");
-
 /*
 * Uploading single Image saving them in database
 */
@@ -74,46 +69,7 @@ module.exports.multipleFileAdd = function(req, res) {
 	});
 };
 
-/*Specific DATAPATCH*/
-module.exports.patchDATA = function(req, res) {
-	/* Patch Zone */
-	Zone.find().exec((er, el) => {
-		/*for (zn in el) {
-			var data = el[zn];
-			if (data.image) {
-				el[zn].dtype = 1;
-			} else if (data.video) {
-				el[zn].dtype = 2;
-			}
-			el[zn].save((er1, el1) => {
-				console.log(el1)
-			});
-		}*/
-	});
 
-	/* patch all user*/
-	Account.find().exec((er, reslt) => {
-		/*console.log(reslt);
-		for (i in reslt) {
-			var elt = reslt[i];
-			var newPr = new Presentation();
-			newPr.description =
-				"Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un peintre anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte";
-			newPr.autreDescription = "Information complementaire";
-			newPr.account = elt._id;
-
-			newPr.save((ee, eelts) => {
-				elt.presentation = eelts._id;
-				elt.save((sw, doc) => {
-					console.log(doc);
-				});
-			});
-		}*/
-		console.log(reslt);
-	});
-
-	res.status(200).json({ s: "calme" });
-};
 
 /* IN_Array*/
 function inArray(needle, haystack) {

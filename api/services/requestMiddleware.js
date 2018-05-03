@@ -2,16 +2,16 @@ var mongoose = require("mongoose");
 var User = mongoose.model("User");
 var Account = mongoose.model("Account");
 
-
 /*
 * Verify if the user in the token is a valid user 
 */
-module.exports.validUser = function(req, res, next) {
+module.exports.validUser = async function(req, res, next) {
 	if (req.payload) {
-		User.findOne({ email: req.payload.email }, function(err, doc) {
-			if (!err && doc) {
-				if (req.payload._id == doc._id) {
-					req.userDATA = doc;
+		try {
+			let userOne = await User.findOne({ email: req.payload.email });
+			if (userOne) {
+				if (req.payload._id == userOne._id) {
+					req.userDATA = userOne;
 					next();
 				} else {
 					notFoundRes(res, "User not Found");
@@ -19,9 +19,12 @@ module.exports.validUser = function(req, res, next) {
 			} else {
 				notFoundRes(res, "User not Found");
 			}
-		});
+		} catch (e) {
+			console.log(e);
+			res.status(500).json({ err: "Erreur serveur" });
+		}
 	} else {
-		notFoundRes(res, "User not Found");
+		res.status(401).json({ err: "UnAuthorized" });
 	}
 };
 
@@ -60,6 +63,38 @@ module.exports.checkRole = function(req, res, next) {
 				notFoundRes(res, "Action not Permitted 2");
 			}
 		});
+	}
+};
+
+/*
+*
+*
+*/
+module.exports.accReqSlug = async (req, res, next) => {
+	let acc_slug = "";
+	if (req.query.company_slug) {
+		acc_slug = req.query.company_slug;
+	} else if (req.body.company_slug) {
+		acc_slug = req.body.company_slug;
+	}
+
+	if (acc_slug) {
+		try {
+			let acc_comp = await Account.findOne({ _slug: acc_slug });
+			if (acc_comp) {
+				req.ACC = acc_comp;
+				next();
+			} else {
+				res
+					.status(404)
+					.json({ err: true, message: "Account not Found" });
+			}
+		} catch (e) {
+			// statements
+			console.log("error");
+			console.log(e);
+			res.status(500).json({ message: "Serveur Error" });
+		}
 	}
 };
 
