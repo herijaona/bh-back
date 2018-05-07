@@ -118,8 +118,7 @@ module.exports.getCompanyDetailsData = function(req, res) {
 					cmp.Logo = media_url(cmp.Logo.url, "images");
 					if (cmp.coverImage) {
 						cmp.coverImage = media_url(
-							cmp.coverImage.url,
-							"images"
+							cmp.coverImage.url
 						);
 					}
 					cmp.adresse = getAddrData(cmp);
