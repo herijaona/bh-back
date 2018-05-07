@@ -5,6 +5,7 @@ var User = mongoose.model("User");
 var Account = mongoose.model("Account");
 var Presentation = mongoose.model("Presentation");
 var Zone = mongoose.model("Zone");
+var ResetPassword = mongoose.model("ResetPassword");
 
 /*Specific DATAPATCH*/
 module.exports.patchDATA = function(req, res) {
@@ -88,4 +89,30 @@ module.exports.patchDATA = function(req, res) {
 
 		res.status(200).json({ s: reslt });
 	});
+};
+
+module.exports.DeleteCollections = (req, res) => {
+	User.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	Image.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	Video.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	Account.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	Zone.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	Presentation.remove({}, function(err) {
+		console.log("collection removed");
+	});
+	ResetPassword.remove({}, function(err) {
+		console.log("collection removed");
+	});
+
+	res.status(200).json({ state: 200, messge: "riro" });
 };
