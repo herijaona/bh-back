@@ -302,7 +302,7 @@ module.exports.updatePresentation = async (req, res) => {
 };
 
 module.exports.getCompanyPresentation = async (req, res) => {
-	console.log(req.ACC)
+	console.log(req.ACC);
 	try {
 		let pr = await Presentation.findOne({ account: req.ACC._id });
 		if (pr) {
@@ -501,11 +501,11 @@ module.exports.getAllZoneData = async (req, res) => {
 							id_in.push(e.image._id);
 						} else {
 							let i = new Image();
-							i.url = app_const.url +
+							i.url =
+								app_const.url +
 								"/" +
 								"defaults/team_default.png";
-							znData[i][image] = i
-								
+							znData[i][image] = i;
 						}
 					}
 				});
@@ -582,9 +582,8 @@ function copydata(data1, data2) {
 /*
 * Formulate an url for media files 
 */
-function media_url(img_u, f) {
-	var x = img_u.split("/");
-	return app_const.url + "/files/" + f + "/" + x[2];
+function media_url(img_) {
+	return app_const.url + "/" + img_.replace("uploads", "files");
 }
 
 /* 
