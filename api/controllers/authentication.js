@@ -31,14 +31,12 @@ var registerUser = async (rq, rs) => {
     }
   } catch (e) {
     if (e.code == 11000) {
-      rs.status(409);
-      rs.json({
+      sendJSONresponse(res, 409, {
         error: true,
         text: "Email deja Utilisee"
       });
     } else {
-      rs.status(500);
-      rs.json({
+      sendJSONresponse(res, 500, {
         error: true,
         text: "Erreur Serveur"
       });
@@ -108,6 +106,8 @@ var defaultDATAAcc = async (rs, ac) => {
       zn.image = imageDF._id;
       let znD = await zn.save();
       let pre = await pr.save();
+      console.log(znD);
+      console.log(pre);
       return Promise.all([pre, znD]);
     }
   } catch (e) {
@@ -120,36 +120,33 @@ module.exports.register = async (req, res) => {
   let user = await registerUser(req, res);
   let acc = await registerAccount(req, res, user);
   let createDefaultData = await defaultDATAAcc(res, acc);
-
-  console.log("Defaults Data");
-  console.log(createDefaultData);
-  console.log("---- Data --- ");
-  let resEmail = gen_services
-    .sendActivationMail({
-      user: user,
-      account: acc
-    })
-    .then(
-      reslt => {
-        console.log(reslt.body.Messages[0].Status == "success");
-        if (reslt.body.Messages[0].Status == "success") {
-          res.status(200);
-          res.json({
-            status: "OK",
-            message: "email sent",
-            user_email: user.email
+  if (createDefaultData.length == 2) {
+    let resEmail = gen_services
+      .sendActivationMail({
+        user: user,
+        account: acc
+      })
+      .then(
+        reslt => {
+          if (reslt.body.Messages[0].Status == "success") {
+            res.status(200);
+            res.json({
+              status: "OK",
+              message: "email sent",
+              user_email: user.email
+            });
+          }
+        },
+        err => {
+          console.log(err);
+          rs.status(500);
+          rs.json({
+            error: true,
+            text: "Erreur Serveur"
           });
         }
-      },
-      err => {
-        console.log(err);
-        rs.status(500);
-        rs.json({
-          error: true,
-          text: "Erreur Serveur"
-        });
-      }
-    );
+      );
+  }
 };
 
 module.exports.login = function(req, res) {

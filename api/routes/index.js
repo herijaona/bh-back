@@ -184,6 +184,6 @@ router.post(
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
-router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
+// router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
 
 module.exports = router;
