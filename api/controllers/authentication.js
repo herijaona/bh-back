@@ -1,6 +1,8 @@
 var passport = require("passport");
 var mongoose = require("mongoose");
 var User = mongoose.model("User");
+var Image = mongoose.model("Image");
+var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
 var Account = mongoose.model("Account");
 var ResetPassword = mongoose.model("ResetPassword");
@@ -12,83 +14,142 @@ var sendJSONresponse = function(res, status, content) {
   res.json(content);
 };
 
-module.exports.register = function(req, res) {
+var registerUser = async (rq, rs) => {
   var user = new User();
 
-  user.firstname = req.body.firstname;
-  user.lastname = req.body.lastname;
-  user.email = req.body.email;
-  user.function = req.body.function;
+  user.firstname = rq.body.firstname;
+  user.lastname = rq.body.lastname;
+  user.email = rq.body.email;
+  user.function = rq.body.function;
   user.generateActivationCode();
   user.active = false;
-
-  user.setPassword(req.body.password);
-  user.save(function(err, user_) {
-    if (!err) {
-      var account_ = new Account();
-      account_.enseigneCommerciale = req.body.enseigneCommerciale;
-      account_.raisonSociale = req.body.raisonSociale;
-      account_.pagetoShow =
-        '{"pMindset":false,"pTeam":false,"pSs":false,"pIdeas":false,"pMeeting":false,"pProjects":false}';
-      account_.typeOrganisation = req.body.typeOrganisation;
-      account_.Logo = new mongoose.mongo.ObjectId(req.body.Logo);
-      account_.adresse.push(req.body.adresse);
-      account_.userAdmin.push(user_.id);
-      account_.users.push(user_.id);
-
-      account_.save(function(err_, accID) {
-        if (!err_) {
-          var pr = new Presentation();
-          pr.account = accID._id;
-          pr.description =
-            "Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un peintre anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte";
-          pr.autreDescription = "Information complementaire";
-
-          pr.save((er, elt) => {
-            if (!er) {
-              accID.presentation = elt._id;
-              accID.save((ee, dd) => {
-                if (!ee) {
-                  console.log("Presentation cree");
-                }
-              });
-            }
-          });
-          
-          var resEmail = gen_services.sendActivationMail({
-            user: user_,
-            account: accID
-          });
-
-          resEmail.then(result => {
-            var p = new Presentation({ account: accID._id });
-            p.save((ee, ie) => {
-              if (!ee) {
-                resolve({ status: "OK" });
-              }
-            });
-          });
-
-          resEmail
-            .then(result => {
-              res.status(200);
-              res.json({
-                status: "OK",
-                message: "email sent",
-                user_email: user_.email
-              });
-            })
-            .catch(err => {});
-        }
-      });
-    } else {
-      res.status(409);
-      res.json({
+  user.setPassword(rq.body.password);
+  try {
+    let usr = await user.save();
+    if (usr) {
+      return usr;
+    }
+  } catch (e) {
+    if (e.code == 11000) {
+      rs.status(409);
+      rs.json({
         error: true,
         text: "Email deja Utilisee"
       });
+    } else {
+      rs.status(500);
+      rs.json({
+        error: true,
+        text: "Erreur Serveur"
+      });
     }
-  });
+  }
+};
+
+var registerAccount = async (rq, rs, usr) => {
+  var account_ = new Account();
+  account_.enseigneCommerciale = rq.body.enseigneCommerciale;
+  account_.raisonSociale = rq.body.raisonSociale;
+  account_.pagetoShow =
+    '{"pMindset":true,"pTeam":false,"pSs":false,"pIdeas":false,"pMeeting":false,"pProjects":false}';
+  account_.typeOrganisation = rq.body.typeOrganisation;
+  account_.Logo = new mongoose.mongo.ObjectId(rq.body.Logo);
+  account_.adresse.push(rq.body.adresse);
+  account_.userAdmin.push(usr.id);
+  account_.users.push(usr.id);
+  sl_ = rq.body.enseigneCommerciale.replace(/ /g, "");
+  account_["_slug"] = sl_;
+
+  var sl_dupl = 0;
+  var loop_ind = true;
+
+  while (loop_ind) {
+    try {
+      let acc = await account_.save();
+      if (acc) {
+        loop_ind = false;
+        return acc;
+      }
+    } catch (e) {
+      // statements
+      console.log(e);
+      if (e.code == 11000) {
+        account_["_slug"] = sl_ + "_" + sl_dupl;
+        sl_dupl++;
+        loop_ind = true;
+      } else {
+        rs.status(500);
+        rs.json({
+          error: true,
+          text: "Erreur Serveur"
+        });
+      }
+    }
+  }
+};
+
+var defaultDATAAcc = async (rs, ac) => {
+  var pr = new Presentation();
+  pr.account = ac._id;
+  pr.description =
+    "Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un peintre anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte";
+  pr.autreDescription = "Information complementaire";
+
+  var zn = new Zone();
+  zn.caption = "Default";
+  zn.account = ac._id;
+  zn.dtype = 1;
+  zn.canDeleted = false;
+  zn.rang = 100;
+
+  try {
+    let imageDF = await Image.findOne({ name: "DefaultsZone" });
+    if (imageDF) {
+      zn.image = imageDF._id;
+      let znD = await zn.save();
+      let pre = await pr.save();
+      return Promise.all([pre, znD]);
+    }
+  } catch (e) {
+    // statements
+    console.log(e);
+  }
+};
+
+module.exports.register = async (req, res) => {
+  let user = await registerUser(req, res);
+  let acc = await registerAccount(req, res, user);
+  let createDefaultData = await defaultDATAAcc(res, acc);
+
+  console.log("Defaults Data");
+  console.log(createDefaultData);
+  console.log("---- Data --- ");
+  let resEmail = gen_services
+    .sendActivationMail({
+      user: user,
+      account: acc
+    })
+    .then(
+      reslt => {
+        console.log(reslt.body.Messages[0].Status == "success");
+        if (reslt.body.Messages[0].Status == "success") {
+          res.status(200);
+          res.json({
+            status: "OK",
+            message: "email sent",
+            user_email: user.email
+          });
+        }
+      },
+      err => {
+        console.log(err);
+        rs.status(500);
+        rs.json({
+          error: true,
+          text: "Erreur Serveur"
+        });
+      }
+    );
 };
 
 module.exports.login = function(req, res) {

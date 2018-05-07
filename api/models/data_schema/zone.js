@@ -12,5 +12,7 @@ var zoneSchema = new mongoose.Schema({
 
 zoneSchema.add({ dtype: Number });
 zoneSchema.add({ rang: Number });
+zoneSchema.add({ data_suppl: String });
+zoneSchema.add({ canDeleted: Boolean });
 
 mongoose.model("Zone", zoneSchema);

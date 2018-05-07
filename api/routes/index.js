@@ -43,7 +43,14 @@ router.post("/reset-password-submit-new", ctrlAuth.submitNewPass);
 
 // Uploads
 router.post("/up_images", ctrlUploads.uploadImage);
-router.post("/up_Mimages", ctrlUploads.multipleFileAdd); //images
+router.post("/up_Mimages", ctrlUploads.multipleFileAdd);
+router.post(
+	"/save_videos_no_hosted",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlUploads.saveVideos
+); //images
 
 //Companies
 router.get("/all_companies", ctrlCompanies.listall);
@@ -79,7 +86,6 @@ router.post(
 	ctrlCompanies.updatePageShow
 );
 
-
 /*update company images*/
 router.post(
 	"/updateCompanyImages",
@@ -105,6 +111,15 @@ router.post(
 	req_mid.checkRole,
 	ctrlCompanies.saveZoneDATA
 );
+
+/* save edit  zone */
+router.post(
+	"/saveZoneEditData",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.saveZoneEditDATA
+);
 /* Delete zone*/
 router.delete(
 	"/zone",
@@ -121,6 +136,13 @@ router.get(
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrlCompanies.getZoneDATA
+);
+
+/* get zone data of one company*/
+router.get(
+	"/all-zone",
+	req_mid.accReqSlug,
+	ctrlCompanies.getAllZoneData
 );
 
 /* */
@@ -146,7 +168,11 @@ router.get(
 router.get("/company_details", ctrlCompanies.getCompanyDetailsData);
 
 /* Get company presentation */
-router.get("/company_presentation",req_mid.accReqSlug, ctrlCompanies.getCompanyPresentation);
+router.get(
+	"/company_presentation",
+	req_mid.accReqSlug,
+	ctrlCompanies.getCompanyPresentation
+);
 
 router.post(
 	"/save-presentation",

@@ -5,7 +5,8 @@ var videoSchema = new mongoose.Schema({
 	url: String,
 	user_owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 	acc_owner: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
-	mimetype: String
+	mimetype: String ,
+	hosted: Boolean
 });
 
 mongoose.model("Video", videoSchema);

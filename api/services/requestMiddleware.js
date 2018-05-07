@@ -67,7 +67,7 @@ module.exports.checkRole = function(req, res, next) {
 };
 
 /*
-*
+* Get the Account company by it's slug and put it in the req.ACC
 *
 */
 module.exports.accReqSlug = async (req, res, next) => {
@@ -77,7 +77,7 @@ module.exports.accReqSlug = async (req, res, next) => {
 	} else if (req.body.company_slug) {
 		acc_slug = req.body.company_slug;
 	}
-
+	
 	if (acc_slug) {
 		try {
 			let acc_comp = await Account.findOne({ _slug: acc_slug });
@@ -90,8 +90,6 @@ module.exports.accReqSlug = async (req, res, next) => {
 					.json({ err: true, message: "Account not Found" });
 			}
 		} catch (e) {
-			// statements
-			console.log("error");
 			console.log(e);
 			res.status(500).json({ message: "Serveur Error" });
 		}

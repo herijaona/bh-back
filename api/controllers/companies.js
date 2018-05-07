@@ -302,6 +302,7 @@ module.exports.updatePresentation = async (req, res) => {
 };
 
 module.exports.getCompanyPresentation = async (req, res) => {
+	console.log(req.ACC)
 	try {
 		let pr = await Presentation.findOne({ account: req.ACC._id });
 		if (pr) {
@@ -386,15 +387,19 @@ module.exports.saveZoneDATA = function(req, res) {
 	var zn = new Zone();
 	if (dt.media_type == 1) {
 		zn.image = dt.media_id;
-		zn.dtype = 1;
-	} else {
+	} else if (dt.media_type == 2) {
 		zn.video = dt.media_id;
-		zn.dtype = 2;
 	}
-	zn.zHeight = req.body.height;
-	zn.zWidth = req.body.width;
+	zn.dtype = dt.media_type;
+	delete dt.media_id;
+	delete dt.media_type;
+
+	zn.canDeleted = true;
+
+	Object.keys(dt).forEach(elt => {
+		zn[elt] = dt[elt];
+	});
 	zn.account = new mongoose.mongo.ObjectId(req.ACC._id);
-	zn.caption = dt.name;
 	zn.save((e, zi) => {
 		if (!e) {
 			res.status(200).json({ status: "OK", message: "reussi" });
@@ -468,45 +473,99 @@ module.exports.checkRole_userAdmin = function(req, res) {
 };
 
 /*
-*	Get zone of a Company send in header 
+*	Get zone of a Company send in header
 */
-function getZoneData(ac_id) {
-	var zoneData = new Promise((resolve, reject) => {
-		var populateQuery = [{ path: "image" }, { path: "video" }];
-		Zone.find({ account: ac_id })
-			.populate(populateQuery)
-			.exec((er, elts) => {
-				if (!er) {
-					resolve(elts);
-				} else {
-					reject(0);
-				}
-			});
-	});
-	zoneData.then(function(arrElts) {
-		var ew = arrElts.map(function(elem, index) {
-			if (elem.dtype == 1) {
-				elem.image.url =
-					app_const.url +
-					"/files/" +
-					"images" +
-					"/" +
-					elem.image.url.split("/")[2];
-			} else {
-				elem.video.url =
-					app_const.url +
-					"/files/" +
-					"videos" +
-					"/" +
-					elem.video.url.split("/")[2];
-			}
 
-			return elem;
-		});
-		resolve(ew);
-	});
-	return zoneData;
-}
+module.exports.getAllZoneData = async (req, res) => {
+	let acc_id = req.ACC._id;
+	let populateQuery = [{ path: "image" }, { path: "video" }];
+
+	try {
+		let znData = await Zone.find({ account: acc_id });
+		if (znData) {
+			znData = await Zone.populate(znData, populateQuery);
+
+			if (znData) {
+				let id_in = [];
+				await znData.forEach((e, i) => {
+					if (e.dtype == 1) {
+						if (e.image) {
+							if (inArray(e.image._id, id_in)) {
+								znData[i].image.url = e.image.url;
+							} else {
+								znData[i].image.url =
+									app_const.url +
+									"/" +
+									e.image.url.replace("uploads", "files");
+							}
+							id_in.push(e.image._id);
+						} else {
+							let i = new Image();
+							i.url = app_const.url +
+								"/" +
+								"defaults/team_default.png";
+							znData[i][image] = i
+								
+						}
+					}
+				});
+				console.log(znData);
+				res.status(200).json(znData);
+			}
+		}
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+module.exports.saveZoneEditDATA = async (req, res) => {
+	// console.log(req.body);
+	let postData = req.body;
+	let curr = postData.currZn;
+	delete postData.currZn;
+	try {
+		let currDB = await Zone.findById(curr._id);
+		if (currDB) {
+			if (curr.dtype != postData.media_type) {
+				if (postData.media_type == 1) {
+					currDB.image = postData.media_id;
+					if (curr.dtype == 2) delete currDB.video;
+					else {
+						delete curr.data_suppl;
+					}
+				} else if (postData.media_type == 2) {
+					currDB.video = postData.media_id;
+					if (curr.dtype == 2) delete currDB.image;
+					else {
+						delete currDB.data_suppl;
+					}
+					delete postData.media_id;
+				}
+
+				currDB.dtype = postData.media_type;
+				delete postData.media_id;
+			} else {
+				if (postData.media_type == 1) {
+					currDB.image = postData.media_id;
+				} else if (postData.media_type == 2) {
+					currDB.video = postData.media_id;
+				}
+			}
+			delete postData.media_type;
+			Object.keys(postData).forEach(elt => {
+				currDB[elt] = postData[elt];
+			});
+
+			let sv = await currDB.save();
+			if (sv) {
+				res.status(200).json({ status: "OK", message: "reussi" });
+			}
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+};
 /*
 * Helpers to copy data between object 
 */

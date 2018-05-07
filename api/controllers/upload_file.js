@@ -69,7 +69,32 @@ module.exports.multipleFileAdd = function(req, res) {
 	});
 };
 
+/*
+*
+*/
 
+module.exports.saveVideos = async (req, res) => {
+	let vidd = req.body;
+	let v_ = new Video();
+	Object.keys(vidd).forEach(elt => {
+		v_[elt] = vidd[elt];
+	});
+
+	try {
+		let rsp = await v_.save();
+		if (rsp) {
+			res.status(200).json({ status: "ok", data: rsp });
+		}
+	} catch (e) {
+		res
+			.status(500)
+			.json({
+				status: "NOK",
+				message: "erreur lors save videos no hosted"
+			});
+		console.log(e);
+	}
+};
 
 /* IN_Array*/
 function inArray(needle, haystack) {
