@@ -26,7 +26,7 @@ var resetPassTemplate = Hogan.compile(templateResetpass);
 var notifresetPassTemplate = Hogan.compile(notifResetpass);
 
 module.exports.sendActivationMail = function(argMail) {
-	var subj = 'Active votre compte';
+	var subj = "Active votre compte";
 	var data_email = {
 		name:
 			titleCase(argMail.user.firstname) +
@@ -48,7 +48,7 @@ module.exports.sendActivationMail = function(argMail) {
 };
 
 module.exports.sendResetPasswordMail = function(u, d) {
-	var subj = 'Demande de reinitialisation de mot de passe ';
+	var subj = "Demande de reinitialisation de mot de passe ";
 	var templ = resetPassTemplate;
 	var data_m = {
 		sitename: app_const.name,
@@ -63,10 +63,9 @@ module.exports.sendResetPasswordMail = function(u, d) {
 	return deliverEmail(subj, templ, data_m, dest);
 };
 
-
 /*Send Mail password was changed*/
 module.exports.sendEmailPassResetednotif = function(u) {
-	var subj = 'Votre mot de passe a changé ';
+	var subj = "Votre mot de passe a changé ";
 
 	var templ = notifresetPassTemplate;
 	var data_m = {
@@ -79,18 +78,6 @@ module.exports.sendEmailPassResetednotif = function(u) {
 	return deliverEmail(subj, templ, data_m, dest);
 };
 
-
-/* Copy data between object */
-module.exports.copydata = function(model, source) {
-	var k2 = JSON.parse(JSON.stringify(source));
-	Object.keys(k2).forEach(function(keyn) {
-		if (keyn in model) {
-			model[keyn] = k2[keyn];
-		}
-	});
-	return model;
-};
-
 /* Capitalize all word in string */
 function titleCase(str) {
 	var splitStr = str.toLowerCase().split(" ");
@@ -100,9 +87,6 @@ function titleCase(str) {
 	}
 	return splitStr.join(" ");
 }
-
-
-
 
 /* Real mail Service*/
 function deliverEmail(subject, template, data_email, to_) {
@@ -129,3 +113,46 @@ function deliverEmail(subject, template, data_email, to_) {
 	});
 	return request;
 }
+
+/* IN_Array*/
+module.exports.inArray = (needle, haystack) => {
+	var length = haystack.length;
+	for (var i = 0; i < length; i++) {
+		if (haystack[i] == needle) return true;
+	}
+	return false;
+};
+
+/* Copy data between object */
+module.exports.copydata = function(model, source) {
+	var k2 = JSON.parse(JSON.stringify(source));
+	Object.keys(k2).forEach(function(keyn) {
+		if (keyn in model) {
+			model[keyn] = k2[keyn];
+		}
+	});
+	return model;
+};
+
+/* 
+* Address Data reformat 
+*/
+module.exports.getAddrData = ac => {
+	var formt = /[{:}]/;
+	var el = ac.adresse;
+	var li = el.length;
+	var adrText = "";
+	for (var itern = 0; itern < li; itern++) {
+		if (formt.test(el[itern])) {
+			var sd = JSON.parse(el[itern]).data.vicinity;
+			adrText += " " + sd;
+		} else {
+			adrText += el[itern];
+		}
+	}
+	return adrText;
+};
+
+module.exports.media_url = img_ => {
+	return app_const.url + "/" + img_.replace("uploads", "files");
+};

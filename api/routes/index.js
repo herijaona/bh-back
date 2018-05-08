@@ -18,7 +18,7 @@ var ctrlProfile = require("../controllers/profile");
 var ctrlAuth = require("../controllers/authentication");
 var ctrlUploads = require("../controllers/upload_file");
 var ctrlCompanies = require("../controllers/companies");
-var ctrlCompanies = require("../controllers/companies");
+var ctrlZones = require("../controllers/zones");
 var ctrlTeams = require("../controllers/team_ctrl");
 var ctrlPatch = require("../controllers/patchData");
 
@@ -28,6 +28,7 @@ var ctrlPatch = require("../controllers/patchData");
 
 // profile
 router.get("/profile", auth, req_mid.validUser, ctrlProfile.profileRead);
+
 
 //EditProfile
 router.post("/profile/edit", auth, req_mid.validUser, ctrlProfile.editprofile);
@@ -110,7 +111,7 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrlCompanies.saveZoneDATA
+	ctrlZones.saveZoneDATA
 );
 
 /* save edit  zone */
@@ -119,15 +120,16 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrlCompanies.saveZoneEditDATA
+	ctrlZones.saveZoneEditDATA
 );
+
 /* Delete zone*/
 router.delete(
 	"/zone",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrlCompanies.deleteZoneDATA
+	ctrlZones.deleteZoneDATA
 );
 
 /* get zone data by id */
@@ -136,14 +138,14 @@ router.get(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrlCompanies.getZoneDATA
+	ctrlZones.getZoneDATA
 );
 
 /* get zone data of one company*/
 router.get(
 	"/all-zone",
 	req_mid.accReqSlug,
-	ctrlCompanies.getAllZoneData
+	ctrlZones.getAllZoneData
 );
 
 /* */
@@ -166,7 +168,11 @@ router.get(
 );
 
 /* Get company DATA DETAILS*/
-router.get("/company_details", ctrlCompanies.getCompanyDetailsData);
+	/* by slug */
+	router.get("/company_details", ctrlCompanies.getCompanyDetailsData);
+
+	/* by user ID*/
+	router.get("/userCompanyDetails", auth, req_mid.validUser, ctrlCompanies.companyDetailsByUserID);
 
 /* Get company presentation */
 router.get(
@@ -190,7 +196,7 @@ router.post(
 *
 */
 
-/* Sae front team video data */
+/* Save front team video data */
 router.post(
 	"/team_front_video",
 	auth,
@@ -198,6 +204,15 @@ router.post(
 	req_mid.checkRole,
 	ctrlTeams.saveTeamsFrontVideoData
 );
+
+/* Get front team video data */
+router.get(
+	"/team_front_video",
+	req_mid.accReqSlug,
+	ctrlTeams.getTeamsFrontVideoData
+);
+
+
 
 
 /* Specific Route for modify default data*/

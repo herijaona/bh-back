@@ -20,3 +20,18 @@ module.exports.saveTeamsFrontVideoData = async (req, res) => {
 		console.log(e);
 	}
 };
+
+module.exports.getTeamsFrontVideoData = async (req,res) =>{
+	console.log(req.ACC);
+	try {
+		let allmyVideoTeamFrom = await TeamFront.find({account: req.ACC._id});
+		if (allmyVideoTeamFrom) {
+			sendJSONresponse(res,200, {status: 200, videoTeam: allmyVideoTeamFrom})
+		}else{
+			sendJSONresponse(res,200, {status: 0, videoTeam: []})
+		}
+	} catch(e) {
+		// statements
+		console.log(e);
+	}
+}

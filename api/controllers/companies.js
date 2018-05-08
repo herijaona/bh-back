@@ -6,6 +6,7 @@ var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
+var tools_service = require("../services/app-general");
 var DataForResponse = {
 	_id: "",
 	adresse: "",
@@ -15,6 +16,7 @@ var DataForResponse = {
 	typeOrganisation: "",
 	coverImage: "",
 	_slug: "",
+	website: "",
 	pagetoShow: ""
 };
 
@@ -33,8 +35,8 @@ module.exports.listall = function(req, res) {
 					User.findById(userAdmin, function(er_r, _doc) {
 						if (!er_r) {
 							if (_doc.active) {
-								var c = copydata(m, acc_);
-								c.Logo = media_url(c.Logo.url, "images");
+								var c = tools_service.copydata(m, acc_);
+								c.Logo = tools_service.media_url(c.Logo.url, "images");
 								accMap.push(c);
 							}
 							if (l == li) {
@@ -50,7 +52,7 @@ module.exports.listall = function(req, res) {
 				() => {
 					var l = accMap.length;
 					for (var iter = 0; iter < l; iter++) {
-						accMap[iter].adresse = getAddrData(accMap[iter]);
+						accMap[iter].adresse = tools_service.getAddrData(accMap[iter]);
 					}
 					res.json(accMap);
 				},
@@ -73,10 +75,10 @@ module.exports.general_info = function(req, res) {
 					var r;
 					u_.forEach(function(elt) {
 						if (id_v == elt._id) {
-							r = copydata(m, elt);
-							r.Logo = media_url(r.Logo.url, "images");
+							r = tools_service.copydata(m, elt);
+							r.Logo = tools_service.media_url(r.Logo.url, "images");
 							if (r.coverImage) {
-								r.coverImage = media_url(
+								r.coverImage = tools_service.media_url(
 									r.coverImage.url,
 									"images"
 								);
@@ -94,7 +96,7 @@ module.exports.general_info = function(req, res) {
 
 	dataW.then(
 		r => {
-			r.adresse = getAddrData(r);
+			r.adresse = tools_service.getAddrData(r);
 			res.status(200).json(r);
 		},
 		er => {
@@ -114,14 +116,12 @@ module.exports.getCompanyDetailsData = function(req, res) {
 		.exec((err, elt) => {
 			if (!err) {
 				if (elt) {
-					var cmp = copydata(m, elt);
-					cmp.Logo = media_url(cmp.Logo.url, "images");
+					var cmp = tools_service.copydata(m, elt);
+					cmp.Logo = tools_service.media_url(cmp.Logo.url, "images");
 					if (cmp.coverImage) {
-						cmp.coverImage = media_url(
-							cmp.coverImage.url
-						);
+						cmp.coverImage = tools_service.media_url(cmp.coverImage.url);
 					}
-					cmp.adresse = getAddrData(cmp);
+					cmp.adresse = tools_service.getAddrData(cmp);
 					res.status(200).json(cmp);
 				} else {
 					res.status(404).json({ dtls: "account not Found" });
@@ -157,11 +157,11 @@ module.exports.updategeneral_info = async function(req, res) {
 				]);
 				if (a_) {
 					loop_ind = false;
-					var et = copydata(m, vt);
-					et.Logo = media_url(et.Logo.url, "images");
-					et.adresse = getAddrData(et);
+					var et = tools_service.copydata(m, vt);
+					et.Logo = tools_service.media_url(et.Logo.url, "images");
+					et.adresse = tools_service.getAddrData(et);
 					if (et.coverImage) {
-						et.coverImage = media_url(et.coverImage.url, "images");
+						et.coverImage = tools_service.media_url(et.coverImage.url, "images");
 					}
 					res.status(200).json(et);
 				}
@@ -186,9 +186,9 @@ module.exports.updateCompanyImage = function(req, res) {
 	acc.save(function(e, r) {
 		if (!e) {
 			Account.populate(r, { path: "Logo" }, function(err, a) {
-				var et = copydata(m, a);
-				et.Logo = media_url(et.Logo.url, "images");
-				et.adresse = getAddrData(et);
+				var et = tools_service.copydata(m, a);
+				et.Logo = tools_service.media_url(et.Logo.url, "images");
+				et.adresse = tools_service.getAddrData(et);
 				res.status(200).json(et);
 			});
 		}
@@ -219,7 +219,7 @@ module.exports.getCbiblioImage = function(req, res) {
 			i.forEach(function(el, indx) {
 				var on_ = {
 					_id: el._id,
-					url: media_url(el.url, x_type.toLowerCase()),
+					url: tools_service.media_url(el.url, x_type.toLowerCase()),
 					mimetype: el.mimetype
 				};
 				l_.push(on_);
@@ -285,19 +285,6 @@ module.exports.updatePresentation = async (req, res) => {
 		// statements
 		console.log(e);
 	}
-
-	/*Presentation.findOne({ account: req.ACC._id }).exec((er, elt) => {
-	elt.description = d.description;
-	elt.autreDescription = d.autreDescription;
-	elt.save((e, p) => {
-		if (!e) {
-			res.status(200).json({
-				status: "OK",
-				message: "Element mis a jour avec succes"
-			});
-		}
-	});
-});*/
 };
 
 module.exports.getCompanyPresentation = async (req, res) => {
@@ -339,7 +326,7 @@ module.exports.getAdminDataMindset = function(req, res) {
 			var el;
 			var el = arrElts[i];
 			if (el.dtype == 2) {
-				if (inArray(el.video._id, id_in)) {
+				if (tools_service.inArray(el.video._id, id_in)) {
 					arrElts[i].video.url = el.video.url;
 				} else {
 					arrElts[i].video.url =
@@ -349,7 +336,7 @@ module.exports.getAdminDataMindset = function(req, res) {
 					id_in.push(el.video._id);
 				}
 			} else if (el.dtype == 1) {
-				if (inArray(el.image._id, id_in)) {
+				if (tools_service.inArray(el.image._id, id_in)) {
 					arrElts[i].image.url = el.image.url;
 				} else {
 					arrElts[i].image.url =
@@ -378,71 +365,7 @@ module.exports.getAdminDataMindset = function(req, res) {
 	);
 };
 
-/*
-* add new zone 
-*/
-module.exports.saveZoneDATA = function(req, res) {
-	var dt = req.body;
-	var zn = new Zone();
-	if (dt.media_type == 1) {
-		zn.image = dt.media_id;
-	} else if (dt.media_type == 2) {
-		zn.video = dt.media_id;
-	}
-	zn.dtype = dt.media_type;
-	delete dt.media_id;
-	delete dt.media_type;
 
-	zn.canDeleted = true;
-
-	Object.keys(dt).forEach(elt => {
-		zn[elt] = dt[elt];
-	});
-	zn.account = new mongoose.mongo.ObjectId(req.ACC._id);
-	zn.save((e, zi) => {
-		if (!e) {
-			res.status(200).json({ status: "OK", message: "reussi" });
-		}
-	});
-};
-
-/*
-* Delete zone data
-*/
-module.exports.deleteZoneDATA = function(req, res) {
-	var dt = req.body.idzone;
-	var zn_rem = Zone.findById(dt).remove();
-	zn_rem.exec(e => {
-		if (!e) {
-			res.status(200).json({ status: "OK", message: "reussi" });
-		}
-	});
-};
-
-/**/
-module.exports.getZoneDATA = function(req, res) {
-	console.log(req.query.idzone);
-	var dt = req.query.idzone;
-	Zone.findById(dt)
-		.populate([{ path: "image" }, { path: "video" }])
-		.exec((e, el) => {
-			if (!e) {
-				console.log(el);
-				if (el.dtype == 1) {
-					el.image.url =
-						app_const.url +
-						"/" +
-						el.image.url.replace("uploads", "files");
-				} else {
-					el.video.url =
-						app_const.url +
-						"/" +
-						el.video.url.replace("uploads", "files");
-				}
-				res.status(200).json({ status: "OK", message: el });
-			}
-		});
-};
 
 module.exports.checkRole_userAdmin = function(req, res) {
 	var currUSERID = req.userDATA._id;
@@ -471,144 +394,24 @@ module.exports.checkRole_userAdmin = function(req, res) {
 	});
 };
 
-/*
-*	Get zone of a Company send in header
-*/
-
-module.exports.getAllZoneData = async (req, res) => {
-	let acc_id = req.ACC._id;
-	let populateQuery = [{ path: "image" }, { path: "video" }];
-
+module.exports.companyDetailsByUserID = async (req, res) => {
+	let userId = req.userDATA._id;
 	try {
-		let znData = await Zone.find({ account: acc_id });
-		if (znData) {
-			znData = await Zone.populate(znData, populateQuery);
-
-			if (znData) {
-				let id_in = [];
-				await znData.forEach((e, i) => {
-					if (e.dtype == 1) {
-						if (e.image) {
-							if (inArray(e.image._id, id_in)) {
-								znData[i].image.url = e.image.url;
-							} else {
-								znData[i].image.url =
-									app_const.url +
-									"/" +
-									e.image.url.replace("uploads", "files");
-							}
-							id_in.push(e.image._id);
-						} else {
-							let i = new Image();
-							i.url =
-								app_const.url +
-								"/" +
-								"defaults/team_default.png";
-							znData[i][image] = i;
-						}
-					}
-				});
-				console.log(znData);
-				res.status(200).json(znData);
-			}
-		}
-	} catch (e) {
-		console.log(e);
-	}
-};
-
-module.exports.saveZoneEditDATA = async (req, res) => {
-	// console.log(req.body);
-	let postData = req.body;
-	let curr = postData.currZn;
-	delete postData.currZn;
-	try {
-		let currDB = await Zone.findById(curr._id);
-		if (currDB) {
-			if (curr.dtype != postData.media_type) {
-				if (postData.media_type == 1) {
-					currDB.image = postData.media_id;
-					if (curr.dtype == 2) delete currDB.video;
-					else {
-						delete curr.data_suppl;
-					}
-				} else if (postData.media_type == 2) {
-					currDB.video = postData.media_id;
-					if (curr.dtype == 2) delete currDB.image;
-					else {
-						delete currDB.data_suppl;
-					}
-					delete postData.media_id;
-				}
-
-				currDB.dtype = postData.media_type;
-				delete postData.media_id;
-			} else {
-				if (postData.media_type == 1) {
-					currDB.image = postData.media_id;
-				} else if (postData.media_type == 2) {
-					currDB.video = postData.media_id;
-				}
-			}
-			delete postData.media_type;
-			Object.keys(postData).forEach(elt => {
-				currDB[elt] = postData[elt];
-			});
-
-			let sv = await currDB.save();
-			if (sv) {
-				res.status(200).json({ status: "OK", message: "reussi" });
-			}
+		let arrComp = await Account.find({ users: userId });
+		if (arrComp.length > 0) {
+			console.log(arrComp);
 		}
 	} catch (e) {
 		// statements
 		console.log(e);
 	}
 };
+
+
 /*
 * Helpers to copy data between object 
 */
-function copydata(data1, data2) {
-	var k2 = JSON.parse(JSON.stringify(data2));
-	Object.keys(k2).forEach(function(keyn) {
-		if (keyn in data1) {
-			data1[keyn] = k2[keyn];
-		}
-	});
-	return data1;
-}
 
-/*
-* Formulate an url for media files 
-*/
-function media_url(img_) {
-	return app_const.url + "/" + img_.replace("uploads", "files");
-}
 
-/* 
-* Address Data reformat 
-*/
-function getAddrData(ac) {
-	var formt = /[{:}]/;
-	var el = ac.adresse;
-	var li = el.length;
-	var adrText = "";
-	for (var itern = 0; itern < li; itern++) {
-		if (formt.test(el[itern])) {
-			var sd = JSON.parse(el[itern]).data.vicinity;
-			adrText += " " + sd;
-		} else {
-			adrText += el[itern];
-		}
-	}
-	return adrText;
-}
 
-/* IN_Array*/
-function inArray(needle, haystack) {
-	var length = haystack.length;
-	for (var i = 0; i < length; i++) {
-		if (haystack[i] == needle) return true;
-	}
-	return false;
-}
+

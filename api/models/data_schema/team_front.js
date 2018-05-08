@@ -7,6 +7,8 @@ var TeamFrontSchema = new mongoose.Schema({
 	iframe_: String,
 	id_video:String,
 	video_url: String,
+	caption: String,
+	textTeam: String,
 	im_poster: String
 });
 

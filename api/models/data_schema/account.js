@@ -56,6 +56,10 @@ accountSchema.add({
 
 accountSchema.add({
   _slug: { type: String , unique: true}
+});
+
+accountSchema.add({
+  website: { type: String }
 }); 
 
 accountSchema.add({

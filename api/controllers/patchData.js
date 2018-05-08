@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var User = mongoose.model("User");
+var tools_service = require("../services/app-general");
 var Account = mongoose.model("Account");
 var Presentation = mongoose.model("Presentation");
 var Zone = mongoose.model("Zone");
@@ -48,7 +49,7 @@ module.exports.patchDATA = function(req, res) {
 		for (i in reslt) {
 			var elt = reslt[i];
 			var cm_name = elt.enseigneCommerciale.replace(" ", "");
-			while (inArray(cm_name, all_slug)) {
+			while (tools_service.inArray(cm_name, all_slug)) {
 				cm_name += "_1";
 			}
 
@@ -92,7 +93,8 @@ module.exports.patchDATA = function(req, res) {
 };
 
 module.exports.DeleteCollections = (req, res) => {
-	User.remove({}, function(err) {
+	
+	/*User.remove({}, function(err) {
 		console.log("collection removed");
 	});
 	Image.remove({}, function(err) {
@@ -112,7 +114,7 @@ module.exports.DeleteCollections = (req, res) => {
 	});
 	ResetPassword.remove({}, function(err) {
 		console.log("collection removed");
-	});
+	});*/
 
 	res.status(200).json({ state: 200, messge: "riro" });
 };
