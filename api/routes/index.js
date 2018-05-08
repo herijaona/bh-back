@@ -19,6 +19,7 @@ var ctrlAuth = require("../controllers/authentication");
 var ctrlUploads = require("../controllers/upload_file");
 var ctrlCompanies = require("../controllers/companies");
 var ctrlCompanies = require("../controllers/companies");
+var ctrlTeams = require("../controllers/team_ctrl");
 var ctrlPatch = require("../controllers/patchData");
 
 /*
@@ -181,6 +182,23 @@ router.post(
 	req_mid.checkRole,
 	ctrlCompanies.updatePresentation
 );
+
+
+/**
+*
+*  TEAMS DATA ROUTES
+*
+*/
+
+/* Sae front team video data */
+router.post(
+	"/team_front_video",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.saveTeamsFrontVideoData
+);
+
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
