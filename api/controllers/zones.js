@@ -50,7 +50,6 @@ module.exports.getAllZoneData = async (req, res) => {
 	}
 };
 
-
 /*
 * add new zone 
 */
@@ -92,7 +91,6 @@ module.exports.deleteZoneDATA = function(req, res) {
 	});
 };
 
-
 /* getZoneData*/
 module.exports.getZoneDATA = function(req, res) {
 	console.log(req.query.idzone);
@@ -117,7 +115,6 @@ module.exports.getZoneDATA = function(req, res) {
 			}
 		});
 };
-
 
 module.exports.saveZoneEditDATA = async (req, res) => {
 	// console.log(req.body);
@@ -161,9 +158,12 @@ module.exports.saveZoneEditDATA = async (req, res) => {
 			if (sv) {
 				res.status(200).json({ status: "OK", message: "reussi" });
 			}
+		} else {
+			res.status(404).json({ status: "NOK", message: "No data Found" });
 		}
 	} catch (e) {
 		// statements
 		console.log(e);
+		res.status(500).json({ status: "NOK", message: "Erreur Serveur" });
 	}
 };

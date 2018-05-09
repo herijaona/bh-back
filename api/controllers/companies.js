@@ -36,7 +36,10 @@ module.exports.listall = function(req, res) {
 						if (!er_r) {
 							if (_doc.active) {
 								var c = tools_service.copydata(m, acc_);
-								c.Logo = tools_service.media_url(c.Logo.url, "images");
+								c.Logo = tools_service.media_url(
+									c.Logo.url,
+									"images"
+								);
 								accMap.push(c);
 							}
 							if (l == li) {
@@ -52,7 +55,9 @@ module.exports.listall = function(req, res) {
 				() => {
 					var l = accMap.length;
 					for (var iter = 0; iter < l; iter++) {
-						accMap[iter].adresse = tools_service.getAddrData(accMap[iter]);
+						accMap[iter].adresse = tools_service.getAddrData(
+							accMap[iter]
+						);
 					}
 					res.json(accMap);
 				},
@@ -76,7 +81,10 @@ module.exports.general_info = function(req, res) {
 					u_.forEach(function(elt) {
 						if (id_v == elt._id) {
 							r = tools_service.copydata(m, elt);
-							r.Logo = tools_service.media_url(r.Logo.url, "images");
+							r.Logo = tools_service.media_url(
+								r.Logo.url,
+								"images"
+							);
 							if (r.coverImage) {
 								r.coverImage = tools_service.media_url(
 									r.coverImage.url,
@@ -107,27 +115,27 @@ module.exports.general_info = function(req, res) {
 };
 
 /* handle the get requet about company details info*/
-module.exports.getCompanyDetailsData = function(req, res) {
-	console.log(req.query);
+module.exports.getCompanyDetailsData = async (req, res) => {
 	var m = Object.create(DataForResponse);
 	var populateQuery = [{ path: "Logo" }, { path: "coverImage" }];
-	Account.findOne({ _slug: req.query.company_slug })
-		.populate(populateQuery)
-		.exec((err, elt) => {
-			if (!err) {
-				if (elt) {
-					var cmp = tools_service.copydata(m, elt);
-					cmp.Logo = tools_service.media_url(cmp.Logo.url, "images");
-					if (cmp.coverImage) {
-						cmp.coverImage = tools_service.media_url(cmp.coverImage.url);
-					}
-					cmp.adresse = tools_service.getAddrData(cmp);
-					res.status(200).json(cmp);
-				} else {
-					res.status(404).json({ dtls: "account not Found" });
-				}
+	try {
+		let elt = await Account.findById(req.ACC._id).populate(populateQuery);
+		if (elt) {
+			var cmp = tools_service.copydata(m, elt);
+			cmp.Logo = tools_service.media_url(cmp.Logo.url, "images");
+			if (cmp.coverImage) {
+				cmp.coverImage = tools_service.media_url(cmp.coverImage.url);
 			}
-		});
+			cmp.adresse = tools_service.getAddrData(cmp);
+			res.status(200).json(cmp);
+		} else {
+			res.status(404).json({ dtls: "account not Found" });
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+		res.status(500).json({ dtls: "Erreur serveur" });
+	}
 };
 
 /* Controllers handle  company generale info Update*/
@@ -161,7 +169,10 @@ module.exports.updategeneral_info = async function(req, res) {
 					et.Logo = tools_service.media_url(et.Logo.url, "images");
 					et.adresse = tools_service.getAddrData(et);
 					if (et.coverImage) {
-						et.coverImage = tools_service.media_url(et.coverImage.url, "images");
+						et.coverImage = tools_service.media_url(
+							et.coverImage.url,
+							"images"
+						);
 					}
 					res.status(200).json(et);
 				}
@@ -365,8 +376,6 @@ module.exports.getAdminDataMindset = function(req, res) {
 	);
 };
 
-
-
 module.exports.checkRole_userAdmin = function(req, res) {
 	var currUSERID = req.userDATA._id;
 	var dt = req.query.slug_chk;
@@ -394,24 +403,17 @@ module.exports.checkRole_userAdmin = function(req, res) {
 	});
 };
 
-module.exports.companyDetailsByUserID = async (req, res) => {
+module.exports.companyDetailsByUserID = async (req, res, next) => {
 	let userId = req.userDATA._id;
 	try {
 		let arrComp = await Account.find({ users: userId });
 		if (arrComp.length > 0) {
-			console.log(arrComp);
+			req.ACC = arrComp[0];
+			next();
 		}
 	} catch (e) {
 		// statements
 		console.log(e);
+		res.status(500).json({ st: "erreur serveur" });
 	}
 };
-
-
-/*
-* Helpers to copy data between object 
-*/
-
-
-
-
