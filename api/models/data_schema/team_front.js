@@ -5,11 +5,13 @@ var TeamFrontSchema = new mongoose.Schema({
 	dateAdd: Date,
 	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 	iframe_: String,
-	id_video:String,
+	id_video: String,
 	video_url: String,
 	caption: String,
 	textTeam: String,
 	im_poster: String
 });
+
+TeamFrontSchema.add({ updateDate: Date });
 
 mongoose.model("TeamFront", TeamFrontSchema);
