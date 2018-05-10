@@ -225,6 +225,16 @@ router.delete(
 	req_mid.checkRole,
 	ctrlTeams.deleteTeamsFrontVideoData
 );
+
+/* Get front team video data */
+router.put(
+	"/team_front_video",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.updateTeamsFrontVideoData
+);
+
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
