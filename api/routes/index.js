@@ -20,6 +20,7 @@ var ctrlUploads = require("../controllers/upload_file");
 var ctrlCompanies = require("../controllers/companies");
 var ctrlZones = require("../controllers/zones");
 var ctrlTeams = require("../controllers/team_ctrl");
+var ctrlProject = require("../controllers/projects_ctrl");
 var ctrlPatch = require("../controllers/patchData");
 
 /*
@@ -216,7 +217,6 @@ router.get(
 	ctrlTeams.getTeamsFrontVideoData
 );
 
-
 /* Get front team video data */
 router.delete(
 	"/team_front_video",
@@ -235,6 +235,25 @@ router.put(
 	ctrlTeams.updateTeamsFrontVideoData
 );
 
+/**
+ *
+ *  PROJECTS DATA ROUTES
+ *
+ */
+
+router.post(
+	"/bh-projects",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.saveProjectsDATA
+);
+
+router.get(
+	"/bh-projects",
+	req_mid.accReqSlug,
+	ctrlProject.getAllProjectsCompany
+);
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);

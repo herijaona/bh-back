@@ -9,9 +9,19 @@ var projetSchema = new mongoose.Schema({
 	objectif: String,
 	elementProposition: String,
 	idProjetCCA: String,
-	nom: String,
+	name: String,
 	dateRencontre: Date,
-	dateCloture: Date
+	responseTimeUnit: String,
+	responseTimeValue: Number,
+	dateCloture: Date,
+	account: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Account"
+	},
+	createdByUser: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User"
+	}
 });
 
-mongoose.model("Projet", projetSchema);
+mongoose.model("Project", projetSchema);

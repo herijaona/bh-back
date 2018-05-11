@@ -60,6 +60,7 @@ require('./data_schema/usertoken');
 require('./data_schema/password-reset');
 require('./data_schema/zone');
 require('./data_schema/team_front');
+require('./data_schema/candidature');
 // require('./data_schema/biblioImage');
 
 /* Init value */
