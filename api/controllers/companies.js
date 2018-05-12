@@ -216,35 +216,37 @@ module.exports.updatePageShow = function(req, res) {
 	});
 };
 
-module.exports.getCbiblioImage = function(req, res) {
-	var x_type = req.headers["x-type-data"];
-	var dtype = x_type == "images" ? Image : Video;
-	var ac_id = req.ACC._id;
-	var pr = new Promise((resolve, reject) => {
-		dtype.find({ acc_owner: ac_id }).exec((e, i) => {
-			if (e || i.length == 0) {
-				res.status(400).json({ err: "Not Found or Data Not Valid" });
-			}
-			var l = i.length;
-			var l_ = [];
-			i.forEach(function(el, indx) {
-				var on_ = {
+module.exports.getCbiblioImage = async (req, res) => {
+	let data = req.query["data"];
+	let entity = req.query["entity"];
+	let ac_id = req.ACC._id;
+	let usr_id = req.userDATA._id;
+	let keySearch_ = {};
+
+	if (entity == "user") {
+		keySearch_ = { user_owner: usr_id };
+	} else if (entity == "account") {
+		keySearch_ = { acc_owner: ac_id };
+	}
+
+	try {
+		let imbb = await Image.find(keySearch_);
+		if (imbb) {
+			let l_ = [];
+			await imbb.forEach(function(el, indx) {
+				let on_ = {
 					_id: el._id,
-					url: tools_service.media_url(el.url, x_type.toLowerCase()),
+					url: tools_service.media_url(el.url),
 					mimetype: el.mimetype
 				};
 				l_.push(on_);
-
-				if (l == indx + 1) {
-					resolve(l_);
-				}
 			});
-		});
-	});
-
-	pr.then(iml => {
-		res.status(200).json({ allIm: iml });
-	});
+			res.status(200).json({ allIm: l_ });
+		}
+	} catch (e) {
+		console.log(e);
+		res.status(500).json({ status: "NOK", message: "Not ok" });
+	}
 };
 
 module.exports.updateImageBiblio = function(req, res) {

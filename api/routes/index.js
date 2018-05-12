@@ -254,6 +254,11 @@ router.get(
 	req_mid.accReqSlug,
 	ctrlProject.getAllProjectsCompany
 );
+
+router.get(
+	"/getProjectbyID",
+	ctrlProject.getPrByID
+);
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
