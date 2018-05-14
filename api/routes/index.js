@@ -97,12 +97,28 @@ router.post(
 	ctrlCompanies.updateImageBiblio
 );
 
+router.post(
+	"/updateUserImages",
+	auth,
+	req_mid.validUser,
+	ctrlCompanies.updateUserImageBiblio 
+);
+
+
 router.get(
 	"/biblioImageCompany",
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrlCompanies.getCbiblioImage
+);
+
+
+router.get(
+	"/biblioImageUser",
+	auth,
+	req_mid.validUser,
+	ctrlCompanies.getUserImageBb
 );
 
 /* Save data about mindset zone*/
@@ -161,6 +177,17 @@ router.get(
 	auth,
 	req_mid.validUser,
 	ctrlCompanies.checkRole_userAdmin
+);
+
+/**
+*
+* check Role by User Id
+*/
+router.get(
+	"/Admincheck_role",
+	auth,
+	req_mid.validUser,
+	ctrlCompanies.checkRoleAdmin
 );
 
 /* Get company DATA DETAILS*/
@@ -235,6 +262,17 @@ router.put(
 	ctrlTeams.updateTeamsFrontVideoData
 );
 
+/* Invite others person in the team */
+router.post(
+	"/invite-in-team",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.inviteUserInTeam
+);
+
+
+
 /**
  *
  *  PROJECTS DATA ROUTES
@@ -259,6 +297,43 @@ router.get(
 	"/getProjectbyID",
 	ctrlProject.getPrByID
 );
+
+
+/**
+*
+* SSTR
+*
+**/
+
+router.post(
+	"/success-story-new",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.saveNewSstr
+);
+
+router.get(
+	"/success-story-all",
+	req_mid.accReqSlug,
+	ctrlCompanies.getSstr
+);
+
+router.delete(
+	"/success-story",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.deleteSstr
+);
+router.put(
+	"/success-story",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlCompanies.updateSstr
+);
+
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);

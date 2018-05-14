@@ -5,6 +5,7 @@ var User = mongoose.model("User");
 var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
+var SuccessStorie = mongoose.model("SuccessStorie");
 var Presentation = mongoose.model("Presentation");
 var tools_service = require("../services/app-general");
 var DataForResponse = {
@@ -17,7 +18,13 @@ var DataForResponse = {
 	coverImage: "",
 	_slug: "",
 	website: "",
-	pagetoShow: ""
+	pagetoShow: "",
+	websiteUrl: ""
+};
+
+var sendJSONresponse = function(res, status, content) {
+	res.status(status);
+	res.json(content);
 };
 
 /* Get the list of activated company */
@@ -147,7 +154,6 @@ module.exports.updategeneral_info = async function(req, res) {
 	var loop_ind = true;
 
 	Object.keys(req.body).forEach(function(keyn) {
-		console.log(keyn);
 		acc[keyn] = req.body[keyn];
 		if (keyn == "enseigneCommerciale") {
 			sl_ = req.body[keyn].replace(/ /g, "");
@@ -217,20 +223,21 @@ module.exports.updatePageShow = function(req, res) {
 };
 
 module.exports.getCbiblioImage = async (req, res) => {
-	let data = req.query["data"];
-	let entity = req.query["entity"];
 	let ac_id = req.ACC._id;
+	let keySearch_ = { acc_owner: ac_id };
+	getimage(res, keySearch_);
+};
+
+module.exports.getUserImageBb = async (req, res) => {
 	let usr_id = req.userDATA._id;
-	let keySearch_ = {};
+	let keySearch_ = { user_owner: usr_id };
+	getimage(res, keySearch_);
+};
 
-	if (entity == "user") {
-		keySearch_ = { user_owner: usr_id };
-	} else if (entity == "account") {
-		keySearch_ = { acc_owner: ac_id };
-	}
-
+async function getimage(res, _keySearch_) {
+	// body...
 	try {
-		let imbb = await Image.find(keySearch_);
+		let imbb = await Image.find(_keySearch_);
 		if (imbb) {
 			let l_ = [];
 			await imbb.forEach(function(el, indx) {
@@ -247,7 +254,7 @@ module.exports.getCbiblioImage = async (req, res) => {
 		console.log(e);
 		res.status(500).json({ status: "NOK", message: "Not ok" });
 	}
-};
+}
 
 module.exports.updateImageBiblio = function(req, res) {
 	var data_T = req.body.ty_pe == "images" ? Image : Video;
@@ -257,6 +264,28 @@ module.exports.updateImageBiblio = function(req, res) {
 		ac.forEach(function(ee, ie) {
 			data_T.findById(new mongoose.mongo.ObjectId(ee), function(er, im) {
 				im.acc_owner = req.ACC._id;
+				im.save(function(e, r) {
+					if (l == ie + 1) {
+						resolve();
+					}
+				});
+			});
+		});
+	});
+
+	prom.then(() => {
+		res.status(200).json({ status: "OK", message: "VAlue updated" });
+	});
+};
+
+module.exports.updateUserImageBiblio = function(req, res) {
+	var data_T = req.body.ty_pe == "images" ? Image : Video;
+	var ac = req.body.all_im;
+	var prom = new Promise((resolve, reject) => {
+		var l = ac.length;
+		ac.forEach(function(ee, ie) {
+			data_T.findById(new mongoose.mongo.ObjectId(ee), function(er, im) {
+				im.user_owner = req.userDATA._id;
 				im.save(function(e, r) {
 					if (l == ie + 1) {
 						resolve();
@@ -417,5 +446,122 @@ module.exports.companyDetailsByUserID = async (req, res, next) => {
 		// statements
 		console.log(e);
 		res.status(500).json({ st: "erreur serveur" });
+	}
+};
+
+module.exports.checkRoleAdmin = async (req, res) => {
+	console.log(req.UserDATA);
+	try {
+		let currentUserAccount = await Account.find({
+			userAdmin: req.userDATA._id
+		});
+		if (currentUserAccount.length == 1) {
+			var m = Object.create(DataForResponse);
+			let var_res = tools_service.copydata(m, currentUserAccount[0]);
+			res.status(200).json({ status: "OK", data: var_res });
+		} else {
+			res
+				.status(200)
+				.json({ status: "NOK", message: "User Role Invalide" });
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+		res.status(500).json({ status: "NOK", message: "Erreur Serveur" });
+	}
+};
+
+module.exports.saveNewSstr = async (req, res) => {
+	console.log(req.userDATA);
+	console.log(req.ACC);
+	let nSstr = new SuccessStorie(req.body);
+	nSstr["account"] = req.ACC._id;
+	nSstr["user"] = req.userDATA._id;
+	nSstr["dateAdd"] = Date.now();
+
+	try {
+		let nstr = await nSstr.save();
+		if (nstr) {
+			res
+				.status(200)
+				.json({ status: "OK", message: "Reussi", data: nstr });
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+		if (e.code == 11000) {
+			res
+				.status(409)
+				.json({ status: "NOK", message: "Video deja Presente" });
+		} else {
+			res
+				.status(500)
+				.json({ status: "NOK", message: "Video deja Presente" });
+		}
+	}
+};
+
+module.exports.getSstr = async (req, res) => {
+	console.log(req.ACC);
+
+	try {
+		let all = await SuccessStorie.find({ account: req.ACC._id });
+		if (all.length) {
+			sendJSONresponse(res, 200, {
+				status: "OK",
+				message: "Presente",
+				data: all
+			});
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+		sendJSONresponse(res, 500, { status: "NOK", message: "ServerError" });
+	}
+};
+
+module.exports.deleteSstr = async (req, res) => {
+	let sstr = req.body;
+	let acc = req.ACC;
+	console.info(sstr);
+	if (sstr.account == acc._id) {
+		try {
+			let resDel = await SuccessStorie.findByIdAndRemove(sstr._id);
+			sendJSONresponse(res, 200, { status: "OK", message: "reussi" });
+		} catch (e) {
+			// statements
+			console.log(e);
+			sendJSONresponse(res, 500, {
+				status: "NOK",
+				message: "Error serveur"
+			});
+		}
+	}
+};
+
+module.exports.updateSstr = async (req, res) => {
+	let sstr_id = req.body.id_;
+	let acc_id = req.ACC._id;
+
+	console.log(req.body)
+	try {
+		let resUpdate = await SuccessStorie.findOneAndUpdate(
+			{
+				_id: sstr_id,
+				account: acc_id
+			},
+			req.body.data,
+			{ new: true }
+		);
+
+		sendJSONresponse(res, 200, {
+			status: "OK",
+			message: "reussi",
+			data: resUpdate
+		});
+	} catch (e) {
+		// statements
+		console.log(e);
+		sendJSONresponse(res, 500, { status: "NOK", message: "Error serveur" });
 	}
 };

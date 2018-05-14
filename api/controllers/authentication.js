@@ -49,7 +49,7 @@ var registerAccount = async (rq, rs, usr) => {
   account_.enseigneCommerciale = rq.body.enseigneCommerciale;
   account_.raisonSociale = rq.body.raisonSociale;
   account_.pagetoShow =
-    '{"pMindset":true,"pTeam":false,"pSs":false,"pIdeas":false,"pMeeting":false,"pProjects":false}';
+    '{"pMindset":true,"pTeam":true,"pSs":false,"pIdeas":true,"pMeeting":true,"pProjects":true}';
   account_.typeOrganisation = rq.body.typeOrganisation;
   account_.Logo = new mongoose.mongo.ObjectId(rq.body.Logo);
   account_.adresse.push(rq.body.adresse);

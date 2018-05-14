@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 var User = mongoose.model("User");
-var gen_services = require("../services/app-general");
+var tools_service = require("../services/app-general");
 var Account = mongoose.model("Account");
 var userTosend = {
   _id: "",
@@ -9,7 +9,8 @@ var userTosend = {
   email: "",
   lastname: "",
   firstname: "",
-  isAdmin: false
+  isAdmin: false,
+  imageProfile: ""
 };
 
 module.exports.profileRead = function(req, res) {
@@ -19,29 +20,40 @@ module.exports.profileRead = function(req, res) {
       Error: "Any data for you"
     });
   } else {
-    User.findById(req.payload._id).exec(function(err, user) {
-      var send_data = gen_services.copydata(userTosend, user);
-      Account.find({ userAdmin: send_data._id }, (err, resp) => {
-        if (err) {
-          res.status(200).json(send_data);
-        } else {
-          var ws = [];
-          resp.forEach(function(adm) {
-            var ino = { _id: adm._id, name: adm.enseigneCommerciale };
-            ws.push(ino);
-          });
-          send_data.accountAdmin = ws;
-          /*to delete before pushing*/
-          send_data.isAdmin = true;
-          res.status(200).json(send_data);
-        }
+    User.findById(req.payload._id)
+      .populate([{ path: "imageProfile" }])
+      .exec(function(err, user) {
+        var send_data = tools_service.copydata(userTosend, user);
+        Account.find({ userAdmin: send_data._id }, (err, resp) => {
+          if (err) {
+            res.status(200).json(send_data);
+          } else {
+            var ws = [];
+            resp.forEach(function(adm) {
+              var ino = { _id: adm._id, name: adm.enseigneCommerciale };
+              ws.push(ino);
+            });
+            send_data.accountAdmin = ws;
+            /*to delete before pushing*/
+            if (
+              tools_service.inArray(
+                "imageProfile",
+                Object.keys(JSON.parse(JSON.stringify(user)))
+              )
+            ) {
+              send_data["imageProfile"] = tools_service.media_url(
+                send_data["imageProfile"].url
+              );
+            }
+            send_data.isAdmin = true;
+            res.status(200).json(send_data);
+          }
+        });
       });
-    });
   }
 };
 // Edit Password
 module.exports.editpass = function(req, res) {
-  var paylod = req.payload;
   var _u = new User();
   User.findOne({ email: req.payload.email }, function(err, user) {
     _u = user;
@@ -59,10 +71,9 @@ module.exports.editpass = function(req, res) {
     });
   });
 };
-//Edit Profile
-module.exports.editprofile = function(req, res) {
-  var paylod = req.paylod;
 
+//Edit Profile
+module.exports.editprofile = async function(req, res) {
   if (!req.payload._id) {
     res.status(401).json({
       message: "UnauthorizedError: private profile",
@@ -70,31 +81,33 @@ module.exports.editprofile = function(req, res) {
     });
   }
 
-  // User.updateUser(id, user,{}, function(err, user){
-  User.findOne({ email: req.payload.email }, function(err, user) {
-    user.lastname = req.body.lastname;
-    user.firstname = req.body.firstname;
-    user.function = req.body.function;
-    if (!err) {
-      user.save(function(e_, u_) {
-        if (!e_) {
-          var usr = gen_services.copydata(userTosend, u_);
-          delete usr.isAdmin;
-          /*to delete before pushing*/
-          res.status(200).json(usr);
-        } else {
-          res.status(404).json({
-            message: "save error",
-            Error: "Any data save error"
-          });
-        }
-      });
-    } else {
-      res.status(404).json({
-        message: "User not found",
-        Error: "Any data for you"
+  let bodyData = req.body;
+  try {
+    let usr = await User.findOneAndUpdate(
+      { email: req.payload.email },
+      bodyData,
+      { new: true }
+    );
+    if (usr) {
+      console.log("usr_after ---");
+      console.log(usr);
+      var m = Object.create(userTosend);
+      let send_data = tools_service.copydata(m, usr);
+      if ("imageProfile" in Object.keys(usr)) {
+        send_data["imageProfile"] = tools_service.media_url(
+          send_data["imageProfile"].url
+        );
+      }
+      delete send_data.isAdmin;
+      res.status(200).json({
+        status: "OK",
+        message: "mis a jour reussi",
+        data: send_data
       });
     }
-  });
+  } catch (e) {
+    // statements
+    console.log(e);
+    res.status(500).json({ status: "NOK", message: "Error" });
+  }
 };
-

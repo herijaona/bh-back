@@ -1,5 +1,8 @@
 var mongoose = require("mongoose");
 var TeamFront = mongoose.model("TeamFront");
+var tools_service = require("../services/app-general");
+var User = mongoose.model("User");
+var InvitationSent = mongoose.model("InvitationSent");
 
 var sendJSONresponse = function(res, status, content) {
 	res.status(status);
@@ -73,7 +76,7 @@ module.exports.updateTeamsFrontVideoData = async (req, res) => {
 		if (tmvUpdate) {
 			sendJSONresponse(res, 200, {
 				status: "OK",
-				massage: "modifivation reussi"
+				massage: "modification reussi"
 			});
 		} else {
 			sendJSONresponse(res, 500, {
@@ -88,6 +91,63 @@ module.exports.updateTeamsFrontVideoData = async (req, res) => {
 			status: "NOK",
 			message: "Erreur survenue au cous de l'operation",
 			data: e.error
+		});
+	}
+};
+
+module.exports.inviteUserInTeam = async (req, res) => {
+	let dataInvitation = req.body;
+	let userData = req.userDATA;
+	let userACC = req.ACC;
+
+	try {
+		// statements
+		let usrOwnerMail = await User.find({ email: req.body.email });
+		console.log(usrOwnerMail);
+		if (usrOwnerMail.length > 0) {
+			sendJSONresponse(res, 409, {
+				status: "NOK",
+				message: "User already registered"
+			});
+		} else {
+			let usrOwnerMailI = await InvitationSent.find({
+				email: req.body.email,
+				status: "SENT"
+			});
+			if (usrOwnerMailI.length > 0) {
+				sendJSONresponse(res, 409, {
+					status: "NOK",
+					message: "User already Invited"
+				});
+			} else {
+				let invtation = new InvitationSent(dataInvitation);
+				invtation["account"] = userACC._id;
+				invtation["invintedbyUser"] = userACC._id;
+				invtation["status"] = "SENT";
+				invtation["DateAdd"] = Date.now();
+
+				let yu = await invtation.save();
+				if (yu) {
+					let m = await tools_service.mailInvitations(
+						yu,
+						userData,
+						userACC
+					);
+					if (m.body.Messages[0].Status == "success") {
+						sendJSONresponse(res, 200, {
+							status: "OK",
+							message: "Email d'invitation envoyE"
+						});
+					}
+				}
+			}
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+		sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: "Erreur serveur"
 		});
 	}
 };

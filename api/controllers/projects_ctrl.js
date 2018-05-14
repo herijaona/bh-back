@@ -1,5 +1,6 @@
-var tools_service = require("../services/app-general");
 var mongoose = require("mongoose");
+var User = mongoose.model("User");
+var tools_service = require("../services/app-general");
 var TeamFront = mongoose.model("TeamFront");
 var Project = mongoose.model("Project");
 

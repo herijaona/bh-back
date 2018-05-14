@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+Hi {{invitedName}} <br>
+{{userSender}} like to invite you on {{sitename}} to paricipe as {{ role }}.
+click <a href="{{invitationUrl}}"> <b>Here</b> </a> to create your Account.
+</body>
+</html>

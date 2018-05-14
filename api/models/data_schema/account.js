@@ -59,6 +59,10 @@ accountSchema.add({
 });
 
 accountSchema.add({
+  websiteUrl: { type: String }
+});
+
+accountSchema.add({
   website: { type: String }
 }); 
 

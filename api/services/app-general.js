@@ -3,6 +3,10 @@ var Hogan = require("hogan.js");
 var fs = require("fs");
 var app_const = require(path.join(global.basedir, "/api/config/constant"));
 
+var templateInvitation = fs.readFileSync(
+	app_const.templatesPath + "/mails/invitationBH.hjs",
+	"utf-8"
+);
 var templateActivation = fs.readFileSync(
 	app_const.templatesPath + "/mails/activation.hjs",
 	"utf-8"
@@ -24,6 +28,7 @@ const mailjet = require("node-mailjet").connect(
 var activationTemplate = Hogan.compile(templateActivation);
 var resetPassTemplate = Hogan.compile(templateResetpass);
 var notifresetPassTemplate = Hogan.compile(notifResetpass);
+var invitationTemplate = Hogan.compile(templateInvitation);
 
 module.exports.sendActivationMail = function(argMail) {
 	var subj = "Active votre compte";
@@ -78,6 +83,34 @@ module.exports.sendEmailPassResetednotif = function(u) {
 	return deliverEmail(subj, templ, data_m, dest);
 };
 
+module.exports.mailInvitations = (inv, usr, usAcc) => {
+	var subj = "Invitation sur Business Haven";
+	var role = "";
+	if (inv.invAsTeam && inv.invAsComm) {
+		role = "Team & Commitee";
+	} else {
+		if (inv.invAsTeam) {
+			role = "Team";
+		}
+		if (inv.invAsComm) {
+			role = "Commitee";
+		}
+	}
+	var templ = invitationTemplate;
+	var data_m = {
+		userSender: titleCase(usr.firstname) + " " + titleCase(usr.lastname),
+		invitedName: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
+		sitename: app_const.name, 
+		role : role,
+		invitationUrl: app_const.url_front + "/invitation_response/"+usAcc._slug+"/invitation/"+inv._id
+	};
+	var dest = {
+		name: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
+		email: inv.email
+	};
+	return deliverEmail(subj, templ, data_m, dest);
+};
+
 /* Capitalize all word in string */
 function titleCase(str) {
 	var splitStr = str.toLowerCase().split(" ");
@@ -96,7 +129,7 @@ function deliverEmail(subject, template, data_email, to_) {
 			{
 				From: {
 					Email: app_const.emails.contact,
-					Name: "Team Vitasoft"
+					Name: "Business Haven"
 				},
 				To: [
 					{
@@ -144,7 +177,7 @@ module.exports.getAddrData = ac => {
 	var adrText = "";
 	for (var itern = 0; itern < li; itern++) {
 		if (formt.test(el[itern])) {
-			var sd = JSON.parse(el[itern]).data.vicinity;
+			var sd = JSON.parse(el[itern]).vicinity;
 			adrText += " " + sd;
 		} else {
 			adrText += el[itern];
