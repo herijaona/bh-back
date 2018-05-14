@@ -102,3 +102,49 @@ module.exports.getPrByID = async (req, res) => {
 		}
 	}
 };
+module.exports.updateProjects = async (req, res) => {
+	let pr_id = req.body.id_;
+	let acc_id = req.ACC._id;
+
+	console.log(req.body);
+	try {
+		let resUpdate = await Project.findOneAndUpdate(
+			{
+				_id: pr_id,
+				account: acc_id
+			},
+			req.body.edited,
+			{ new: true }
+		);
+		if (resUpdate) {
+			sendJSONresponse(res, 200, {
+				status: "OK",
+				message: "Reussi",
+				data: resUpdate
+			});
+		}
+	} catch (e) {
+		console.log(e);
+		sendJSONresponse(res, 500, { status: "NOK", message: "Error server" });
+	}
+};
+
+module.exports.deleteProjects = async (req, res) => {
+	let prDel = req.body;
+	let acc = req.ACC;
+
+	try {
+		let resDel = await Project.findOneAndRemove({
+			_id: prDel._id,
+			account: acc._id
+		});
+		sendJSONresponse(res, 200, { status: "OK", message: "reussi" });
+	} catch (e) {
+		// statements
+		console.log(e);
+		sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: "Error serveur"
+		});
+	}
+};

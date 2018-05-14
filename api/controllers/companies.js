@@ -543,7 +543,7 @@ module.exports.updateSstr = async (req, res) => {
 	let sstr_id = req.body.id_;
 	let acc_id = req.ACC._id;
 
-	console.log(req.body)
+	console.log(req.body);
 	try {
 		let resUpdate = await SuccessStorie.findOneAndUpdate(
 			{

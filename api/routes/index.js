@@ -293,6 +293,22 @@ router.get(
 	ctrlProject.getAllProjectsCompany
 );
 
+router.put(
+	"/bh-projects",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.updateProjects
+);
+
+router.delete(
+	"/bh-projects",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.deleteProjects
+);
+
 router.get(
 	"/getProjectbyID",
 	ctrlProject.getPrByID
