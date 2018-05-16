@@ -122,7 +122,7 @@ module.exports.inviteUserInTeam = async (req, res) => {
 			} else {
 				let invtation = new InvitationSent(dataInvitation);
 				invtation["account"] = userACC._id;
-				invtation["invintedbyUser"] = userACC._id;
+				invtation["invintedbyUser"] = userData._id;
 				invtation["status"] = "SENT";
 				invtation["DateAdd"] = Date.now();
 

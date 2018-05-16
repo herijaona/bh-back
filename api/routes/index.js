@@ -101,9 +101,8 @@ router.post(
 	"/updateUserImages",
 	auth,
 	req_mid.validUser,
-	ctrlCompanies.updateUserImageBiblio 
+	ctrlCompanies.updateUserImageBiblio
 );
-
 
 router.get(
 	"/biblioImageCompany",
@@ -112,7 +111,6 @@ router.get(
 	req_mid.checkRole,
 	ctrlCompanies.getCbiblioImage
 );
-
 
 router.get(
 	"/biblioImageUser",
@@ -180,9 +178,9 @@ router.get(
 );
 
 /**
-*
-* check Role by User Id
-*/
+ *
+ * check Role by User Id
+ */
 router.get(
 	"/Admincheck_role",
 	auth,
@@ -271,8 +269,6 @@ router.post(
 	ctrlTeams.inviteUserInTeam
 );
 
-
-
 /**
  *
  *  PROJECTS DATA ROUTES
@@ -293,17 +289,29 @@ router.get(
 	ctrlProject.getAllProjectsCompany
 );
 
-router.get(
-	"/getProjectbyID",
-	ctrlProject.getPrByID
+router.put(
+	"/bh-projects",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.updateProjects
 );
 
+router.delete(
+	"/bh-projects",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.deleteProjects
+);
+
+router.get("/getProjectbyID", ctrlProject.getPrByID);
 
 /**
-*
-* SSTR
-*
-**/
+ *
+ * SSTR
+ *
+ **/
 
 router.post(
 	"/success-story-new",
@@ -313,11 +321,7 @@ router.post(
 	ctrlCompanies.saveNewSstr
 );
 
-router.get(
-	"/success-story-all",
-	req_mid.accReqSlug,
-	ctrlCompanies.getSstr
-);
+router.get("/success-story-all", req_mid.accReqSlug, ctrlCompanies.getSstr);
 
 router.delete(
 	"/success-story",
@@ -333,6 +337,15 @@ router.put(
 	req_mid.checkRole,
 	ctrlCompanies.updateSstr
 );
+
+/**
+ *
+ * Invitation team responsr
+ *
+ */
+
+router.get("/cInvitationValData", ctrlProfile.checkInvitationVal);
+router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);

@@ -61,6 +61,8 @@ require('./data_schema/password-reset');
 require('./data_schema/zone');
 require('./data_schema/team_front');
 require('./data_schema/candidature');
+require('./data_schema/team_commitee');
+require('./data_schema/team_account');
 require('./data_schema/invitation_sent');
 // require('./data_schema/biblioImage');
 

@@ -21,10 +21,15 @@ var registerUser = async (rq, rs) => {
   user.lastname = rq.body.lastname;
   user.email = rq.body.email;
   user.function = rq.body.function;
+
   user.generateActivationCode();
   user.active = false;
   user.setPassword(rq.body.password);
   try {
+    let imageDF = await Image.findOne({ name: "DefaultsprofileImage" });
+    if (imageDF) {
+      user.imageProfile = imageDF._id;
+    }
     let usr = await user.save();
     if (usr) {
       return usr;
@@ -100,15 +105,29 @@ var defaultDATAAcc = async (rs, ac) => {
   zn.canDeleted = false;
   zn.rang = 100;
 
+  dtz = {
+    dtype: 3,
+    canDeleted: false,
+    caption: "_chiffres",
+    data_suppl:
+      '{"createdYear":0,"ageMoyen":0,"collabor":0,"createdOpportinuite":"0","turnOver":0,"pariteFemme":0,"pariteHomme":0}',
+    account: ac._id,
+    __v: 0
+  };
+
+  var znc = new Zone(dtz);
+
   try {
     let imageDF = await Image.findOne({ name: "DefaultsZone" });
     if (imageDF) {
       zn.image = imageDF._id;
       let znD = await zn.save();
       let pre = await pr.save();
+      let zne = await znc.save();
       console.log(znD);
       console.log(pre);
-      return Promise.all([pre, znD]);
+      console.log(zne);
+      return Promise.all([pre, znD, zne]);
     }
   } catch (e) {
     // statements
@@ -120,7 +139,7 @@ module.exports.register = async (req, res) => {
   let user = await registerUser(req, res);
   let acc = await registerAccount(req, res, user);
   let createDefaultData = await defaultDATAAcc(res, acc);
-  if (createDefaultData.length == 2) {
+  if (createDefaultData.length == 3) {
     let resEmail = gen_services
       .sendActivationMail({
         user: user,
