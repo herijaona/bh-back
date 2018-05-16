@@ -108,6 +108,7 @@ module.exports.mailInvitations = (inv, usr, usAcc) => {
 		name: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
 		email: inv.email
 	};
+	console.log(data_m.invitationUrl);
 	return deliverEmail(subj, templ, data_m, dest);
 };
 
