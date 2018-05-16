@@ -410,28 +410,34 @@ module.exports.getAdminDataMindset = function(req, res) {
 module.exports.checkRole_userAdmin = function(req, res) {
 	var currUSERID = req.userDATA._id;
 	var dt = req.query.slug_chk;
-	Account.findOne({ _slug: dt }).exec((er, elts) => {
-		if (!er) {
-			if (elts) {
-				var usersAdm = elts.userAdmin;
-				var existIN = false;
-				for (i_d in usersAdm) {
-					if (currUSERID.toString() == usersAdm[i_d].toString()) {
-						existIN = true;
-						break;
+	if (req.userDATA.active) {
+		Account.findOne({ _slug: dt }).exec((er, elts) => {
+			if (!er) {
+				if (elts) {
+					var usersAdm = elts.userAdmin;
+					var existIN = false;
+					for (i_d in usersAdm) {
+						if (currUSERID.toString() == usersAdm[i_d].toString()) {
+							existIN = true;
+							break;
+						}
 					}
+					res.status(200).json({
+						data_check_response: existIN,
+						_id_check: elts._id
+					});
+				} else {
+					res.status(200).json({
+						data_check_response: false
+					});
 				}
-				res.status(200).json({
-					data_check_response: existIN,
-					_id_check: elts._id
-				});
-			} else {
-				res.status(200).json({
-					data_check_response: false
-				});
 			}
-		}
-	});
+		});
+	} else {
+		res.status(200).json({
+			data_check_response: false
+		});
+	}
 };
 
 module.exports.companyDetailsByUserID = async (req, res, next) => {

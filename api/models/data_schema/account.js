@@ -55,7 +55,7 @@ accountSchema.add({
 });
 
 accountSchema.add({
-  _slug: { type: String , unique: true}
+  _slug: { type: String, unique: true }
 });
 
 accountSchema.add({
@@ -63,8 +63,21 @@ accountSchema.add({
 });
 
 accountSchema.add({
-  website: { type: String }
-}); 
+  usersTeam: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ]
+});
+accountSchema.add({
+  usersCommetee: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ]
+});
 
 accountSchema.add({
   coverImage: {
