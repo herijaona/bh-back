@@ -5,6 +5,15 @@ var questionsFrontSchema = new mongoose.Schema({
 	userAsk: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 	addDate: Date,
 	question_content: String,
-	dataQuestion: { type: mongoose.Schema.Types.Mixed }
+	objectRefID: { type: mongoose.Schema.Types.ObjectId },
+	responseAll: [
+		{
+			rDate: Date,
+			user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+			respText: String,
+			numbr: Number
+		}
+	],
+	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" }
 });
 mongoose.model("Question", questionsFrontSchema);
