@@ -367,7 +367,7 @@ router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
 *
 */
 
-router.post('/post_questions', auth, req_mid.validUser, ctrlQuestions.postQuestions )
+router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions )
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
