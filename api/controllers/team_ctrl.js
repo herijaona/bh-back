@@ -3,6 +3,7 @@ var TeamFront = mongoose.model("TeamFront");
 var tools_service = require("../services/app-general");
 var User = mongoose.model("User");
 var InvitationSent = mongoose.model("InvitationSent");
+var Account = mongoose.model("Account");
 
 var sendJSONresponse = function(res, status, content) {
 	res.status(status);
@@ -149,5 +150,51 @@ module.exports.inviteUserInTeam = async (req, res) => {
 			status: "NOK",
 			message: "Erreur serveur"
 		});
+	}
+};
+
+module.exports.getTeamUsers = async (req, res) => {
+	let a = req.ACC;
+	try {
+		let acc = await Account.populate(a, { path: "users" });
+		if (acc) {
+			let ll = [];
+			for (eo of acc.users) {
+				if (eo.active) {
+					let s = {};
+					s["name_"] = eo.lastname + " " + eo.firstname;
+					s["_id"] = eo._id;
+					s["fn"] = eo.function != undefined ? eo.function : "";
+					ll.push(s);
+				}
+			}
+			sendJSONresponse(res, 200, { status: "OK", data: ll });
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+};
+
+module.exports.getTeamUsersDetails = async (req, res) => {
+	let i = req.query.id_user;
+	try {
+		let u = await User.findOne({ _id: i });
+		if (u) {
+
+			let detl = {
+				usr: u.firstname + " " + u.lastname,
+				fn: u["function"]
+			};
+
+			sendJSONresponse(res, 200, {
+				status: "OK",
+				message: "valid",
+				data: detl
+			});
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
 	}
 };

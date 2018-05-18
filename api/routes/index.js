@@ -21,6 +21,7 @@ var ctrlCompanies = require("../controllers/companies");
 var ctrlZones = require("../controllers/zones");
 var ctrlTeams = require("../controllers/team_ctrl");
 var ctrlProject = require("../controllers/projects_ctrl");
+var ctrlQuestions = require("../controllers/questions_ctrl");
 var ctrlPatch = require("../controllers/patchData");
 
 /*
@@ -36,7 +37,7 @@ router.post("/profile/edit", auth, req_mid.validUser, ctrlProfile.editprofile);
 router.post("/profile/editpass", auth, req_mid.validUser, ctrlProfile.editpass);
 
 // authentication
-router.post("/register", ctrlAuth.register);
+router.post("/register", ctrlAuth.registerOrganisation);
 router.post("/login", ctrlAuth.login);
 router.post("/activate", ctrlAuth.activate_user);
 router.post("/reset-password-request", ctrlAuth.requestResetPass);
@@ -269,6 +270,18 @@ router.post(
 	ctrlTeams.inviteUserInTeam
 );
 
+router.get(
+	"/teams-users",
+	req_mid.accReqSlug,
+	ctrlTeams.getTeamUsers
+);
+
+
+router.get(
+	"/team-details",
+	ctrlTeams.getTeamUsersDetails
+);
+
 /**
  *
  *  PROJECTS DATA ROUTES
@@ -346,6 +359,15 @@ router.put(
 
 router.get("/cInvitationValData", ctrlProfile.checkInvitationVal);
 router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
+
+
+/*
+*
+* Questions 
+*
+*/
+
+router.post('/post_questions', auth, req_mid.validUser, ctrlQuestions.postQuestions )
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
