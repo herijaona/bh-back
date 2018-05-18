@@ -63,6 +63,7 @@ require('./data_schema/team_front');
 require('./data_schema/candidature');
 require('./data_schema/team_commitee');
 require('./data_schema/team_account');
+require('./data_schema/questions');
 require('./data_schema/invitation_sent');
 // require('./data_schema/biblioImage');
 
