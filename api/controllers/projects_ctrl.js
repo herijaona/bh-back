@@ -82,7 +82,8 @@ module.exports.getPrByID = async (req, res) => {
 		contexte: "0",
 		elementProposition: "",
 		listeCandidatures: "",
-		objectif: ""
+		objectif: "",
+		account:""
 	};
 
 	if (prID) {
