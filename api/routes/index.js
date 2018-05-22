@@ -318,6 +318,14 @@ router.delete(
 	ctrlProject.deleteProjects
 );
 
+
+router.post(
+	"/bh-projects-apply",
+	auth,
+	req_mid.validUser,
+	ctrlProject.applyToProjects
+);
+
 router.get("/getProjectbyID", ctrlProject.getPrByID);
 
 /**
