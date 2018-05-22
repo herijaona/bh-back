@@ -2,6 +2,8 @@ var mongoose = require("mongoose");
 var User = mongoose.model("User");
 var tools_service = require("../services/app-general");
 var TeamFront = mongoose.model("TeamFront");
+var Candidature = mongoose.model("Candidature");
+var Account = mongoose.model("Account");
 var Project = mongoose.model("Project");
 
 var sendJSONresponse = function(res, status, content) {
@@ -83,7 +85,7 @@ module.exports.getPrByID = async (req, res) => {
 		elementProposition: "",
 		listeCandidatures: "",
 		objectif: "",
-		account:""
+		account: ""
 	};
 
 	if (prID) {
@@ -147,5 +149,50 @@ module.exports.deleteProjects = async (req, res) => {
 			status: "NOK",
 			message: "Error serveur"
 		});
+	}
+};
+
+module.exports.applyToProjects = async (req, res) => {
+	console.log(req.userDATA);
+	console.log(req.body);
+	let dataPr = req.body.currObj;
+	let applData = req.body.data;
+	try {
+		let cndt = new Candidature(applData);
+		cndt.accountID = dataPr["account"];
+		cndt.createdAt = Date.now();
+		cndt.userID = req.userDATA._id;
+		cndt.status = "NEW";
+		let cndt_appl = await cndt.save();
+		if (cndt_appl) {
+			sendApplyEmail(req.userDATA, dataPr);
+			sendJSONresponse(res, 200, {
+				status: "OK",
+				message: "saved",
+				data: {}
+			});
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+};
+
+var sendApplyEmail = async (userDATA, dataPr) => {
+	try {
+		let acc = await Account.findById(dataPr.account);
+		if (acc) {
+			tools_service.userEmailAfterApply(userDATA, {
+				ens: acc.enseigneCommerciale,
+				t: dataPr.name
+			});
+
+			let Accuser = await acc.populate({ path: "userAdmin" });
+			console.log(Accuser);
+		} else {
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
 	}
 };

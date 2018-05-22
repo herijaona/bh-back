@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bhaven</title>
+</head>
+<body>
+<h1>Bhaven</h1>
+{{username}}
+<div>
+	<div class=""> Your Appliction has been sent:</div> <br>
+	<span>Project : </span> {{title}} <br>
+	<span>Organisation: </span> {{org}} <br>
+	You'll be conctacted soon
+</div>
+</body>
+</html>

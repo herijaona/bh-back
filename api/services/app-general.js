@@ -12,6 +12,11 @@ var templateActivation = fs.readFileSync(
 	"utf-8"
 );
 
+var templateAfterUserApply = fs.readFileSync(
+	app_const.templatesPath + "/mails/afterUserApply.hjs",
+	"utf-8"
+);
+
 var templateResetpass = fs.readFileSync(
 	app_const.templatesPath + "/mails/resetpass.hjs",
 	"utf-8"
@@ -29,6 +34,7 @@ var activationTemplate = Hogan.compile(templateActivation);
 var resetPassTemplate = Hogan.compile(templateResetpass);
 var notifresetPassTemplate = Hogan.compile(notifResetpass);
 var invitationTemplate = Hogan.compile(templateInvitation);
+var afterUserApplyTemplate = Hogan.compile(templateAfterUserApply);
 
 module.exports.sendActivationMail = function(argMail) {
 	var subj = "Active votre compte";
@@ -100,15 +106,35 @@ module.exports.mailInvitations = (inv, usr, usAcc) => {
 	var data_m = {
 		userSender: titleCase(usr.firstname) + " " + titleCase(usr.lastname),
 		invitedName: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
-		sitename: app_const.name, 
-		role : role,
-		invitationUrl: app_const.url_front + "/invitation_response/"+usAcc._slug+"/invitation/"+inv._id
+		sitename: app_const.name,
+		role: role,
+		invitationUrl:
+			app_const.url_front +
+			"/invitation_response/" +
+			usAcc._slug +
+			"/invitation/" +
+			inv._id
 	};
 	var dest = {
 		name: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
 		email: inv.email
 	};
 	console.log(data_m.invitationUrl);
+	return deliverEmail(subj, templ, data_m, dest);
+};
+
+module.exports.userEmailAfterApply = (usr, data) => {
+	var subj = "applicationSent";
+	var templ = afterUserApplyTemplate;
+	var data_m = {
+		username: titleCase(usr.firstname) + " " + titleCase(usr.lastname),
+		title: data.t ,
+		org: data.ens
+	};
+	var dest = {
+		name: titleCase(usr.firstname) + " " + titleCase(usr.lastname),
+		email: usr.email
+	};
 	return deliverEmail(subj, templ, data_m, dest);
 };
 
