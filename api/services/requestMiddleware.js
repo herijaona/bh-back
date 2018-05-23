@@ -50,8 +50,6 @@ module.exports.checkRole = async (req, res, next) => {
             let inAdmin = false;
             let inCommAcc;
             let inComm = false;
-            console.log(accDoc);
-            console.log(accDoc2);
             for (x in accDoc) {
                 if (accDoc[x]._id == id_comp) {
                     inAdmin = true;

@@ -24,7 +24,6 @@ module.exports.postQuestions = async (req, res) => {
 	try {
 		let d_ = await qst.save();
 		if (d_) {
-			
 			return sendJSONresponse(res, 200, {
 				status: "OK",
 				message: " Saved",
@@ -36,8 +35,4 @@ module.exports.postQuestions = async (req, res) => {
 		console.log(e);
 		return sendJSONresponse(res, 500, { status: "NOK" });
 	}
-
-	console.log(dq);
-
-	console.log(req.body);
 };

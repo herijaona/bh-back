@@ -307,10 +307,8 @@ module.exports.updatePresentation = async (req, res) => {
                 return elem;
             });
             if (k) {
-                console.log(k);
                 let sav_ = await pr_.save();
                 if (sav_) {
-                    console.log(sav_);
                     res.status(200).json({
                         status: "OK",
                         message: "Element mis a jour avec succes"
@@ -324,7 +322,6 @@ module.exports.updatePresentation = async (req, res) => {
     }
 };
 module.exports.getCompanyPresentation = async (req, res) => {
-    console.log(req.ACC);
     try {
         let pr = await Presentation.findOne({
             account: req.ACC._id
@@ -469,7 +466,6 @@ module.exports.companyDetailsByUserID = async (req, res, next) => {
     }
 };
 module.exports.checkRoleAdmin = async (req, res) => {
-    console.log(req.UserDATA);
     try {
         let currentUserAccount = await Account.find({
             userAdmin: req.userDATA._id
@@ -497,8 +493,6 @@ module.exports.checkRoleAdmin = async (req, res) => {
     }
 };
 module.exports.saveNewSstr = async (req, res) => {
-    console.log(req.userDATA);
-    console.log(req.ACC);
     let nSstr = new SuccessStorie(req.body);
     nSstr["account"] = req.ACC._id;
     nSstr["user"] = req.userDATA._id;
@@ -529,7 +523,6 @@ module.exports.saveNewSstr = async (req, res) => {
     }
 };
 module.exports.getSstr = async (req, res) => {
-    console.log(req.ACC);
     try {
         let all = await SuccessStorie.find({
             account: req.ACC._id
@@ -574,7 +567,6 @@ module.exports.deleteSstr = async (req, res) => {
 module.exports.updateSstr = async (req, res) => {
     let sstr_id = req.body.id_;
     let acc_id = req.ACC._id;
-    console.log(req.body);
     try {
         let resUpdate = await SuccessStorie.findOneAndUpdate({
             _id: sstr_id,

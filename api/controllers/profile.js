@@ -88,8 +88,6 @@ module.exports.editprofile = async function(req, res) {
             new: true
         });
         if (usr) {
-            console.log("usr_after ---");
-            console.log(usr);
             var m = Object.create(userTosend);
             let send_data = tools_service.copydata(m, usr);
             if ("imageProfile" in Object.keys(usr)) {
@@ -121,7 +119,6 @@ module.exports.checkInvitationVal = async (req, res) => {
     }];
     try {
         let invt = await InvitationSent.findById(invtID).populate(populateQuery);
-        console.log(invt);
         if (invt) {
             if (invt.status == "SENT") {
                 var a = invt.account;
@@ -169,8 +166,6 @@ module.exports.checkInvitationVal = async (req, res) => {
 module.exports.PostInvitationVal = async (req, res) => {
     let dtaInvt = req.body.user_new;
     let dtaPass = req.body.new_pass;
-    console.log(req.body);
-    console.log("opopopo - 1 - popopopopopop");
     let user_dat = {
         lastname: dtaInvt.lastname,
         firstname: dtaInvt.firstname,
