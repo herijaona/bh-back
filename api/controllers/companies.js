@@ -26,39 +26,33 @@ var sendJSONresponse = function(res, status, content) {
     res.json(content);
 };
 /* Get the list of activated company */
-module.exports.listall = function(req, res) {
-    Account.find().populate("Logo").exec(function(err, acc) {
-        var accMap = [];
-        var l = acc.length,
-            li = 1;
-        waitData = new Promise((resolve, reject) => {
-            acc.forEach(function(acc_) {
-                var userAdmin = acc_.userAdmin[0];
-                var m = Object.create(DataForResponse);
-                User.findById(userAdmin, function(er_r, _doc) {
-                    if (!er_r) {
-                        if (_doc.active) {
-                            var c = tools_service.copydata(m, acc_);
-                            c.Logo = tools_service.media_url(c.Logo.url, "images");
-                            accMap.push(c);
-                        }
-                        if (l == li) {
-                            resolve();
-                        }
+module.exports.listall = async (req, res) => {
+    try {
+        let allAcc = await Account.find().populate("Logo");
+        if (allAcc) {
+            let accMap = [];
+            let l = allAcc.length;
+            for (acc_ of allAcc) {
+                let userAdmin = acc_.userAdmin[0];
+                let m = Object.create(DataForResponse);
+                let _u = await User.findById(userAdmin);
+                if (_u) {
+                    if (_u.active) {
+                        let c = tools_service.copydata(m, acc_);
+                        c.Logo = tools_service.media_url(c.Logo.url, "images");
+                        accMap.push(c);
                     }
-                    li++;
-                });
-            });
-        });
-        waitData.then(
-            () => {
-                var l = accMap.length;
-                for (var iter = 0; iter < l; iter++) {
-                    accMap[iter].adresse = tools_service.getAddrData(accMap[iter]);
                 }
-                res.json(accMap);
-            }, () => {});
-    });
+            }
+            let ee = accMap.length;
+            for (let iter = 0; iter < ee; iter++) {
+                accMap[iter].adresse = tools_service.getAddrData(accMap[iter]);
+            }
+            return sendJSONresponse(res, 200, accMap);
+        }
+    } catch (e) {
+        console.log(e);
+    }
 };
 /* Controllers handle request on  company generale info */
 module.exports.general_info = function(req, res) {

@@ -270,6 +270,32 @@ router.post(
 	ctrlTeams.inviteUserInTeam
 );
 
+
+router.get(
+	"/teamsUsers",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.getteamsUsersData
+);
+
+
+router.put(
+	"/change_roleAdm",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.changeAdmRole
+);
+
+router.delete(
+	"/delete-from-team",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.deleteUserFromTeam
+);
+
 router.get(
 	"/teams-users",
 	req_mid.accReqSlug,
@@ -351,6 +377,7 @@ router.delete(
 	req_mid.checkRole,
 	ctrlCompanies.deleteSstr
 );
+
 router.put(
 	"/success-story",
 	auth,
