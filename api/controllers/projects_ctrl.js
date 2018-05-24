@@ -95,7 +95,6 @@ module.exports.getPrByID = async (req, res) => {
 				populateQuery
 			);
 			if (prJ) {
-				console.log(prJ);
 				let pp = tools_service.copydata(datSendModel, prJ);
 				pp.listeCandidatures = pp.listeCandidatures.length;
 				sendJSONresponse(res, 200, { status: "OK", data: pp });
@@ -110,7 +109,6 @@ module.exports.updateProjects = async (req, res) => {
 	let pr_id = req.body.id_;
 	let acc_id = req.ACC._id;
 
-	console.log(req.body);
 	try {
 		let resUpdate = await Project.findOneAndUpdate(
 			{
@@ -154,8 +152,6 @@ module.exports.deleteProjects = async (req, res) => {
 };
 
 module.exports.applyToProjects = async (req, res) => {
-	console.log(req.userDATA);
-	console.log(req.body);
 	let dataPr = req.body.currObj;
 	let applData = req.body.data;
 	try {
@@ -189,7 +185,6 @@ var sendApplyEmail = async (userDATA, dataPr) => {
 			});
 
 			let Accuser = await acc.populate({ path: "userAdmin" });
-			console.log(Accuser);
 		} else {
 		}
 	} catch (e) {

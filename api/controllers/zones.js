@@ -41,7 +41,6 @@ module.exports.getAllZoneData = async (req, res) => {
 						}
 					}
 				});
-				console.log(znData);
 				res.status(200).json(znData);
 			}
 		}
@@ -93,13 +92,11 @@ module.exports.deleteZoneDATA = function(req, res) {
 
 /* getZoneData*/
 module.exports.getZoneDATA = function(req, res) {
-	console.log(req.query.idzone);
 	var dt = req.query.idzone;
 	Zone.findById(dt)
 		.populate([{ path: "image" }, { path: "video" }])
 		.exec((e, el) => {
 			if (!e) {
-				console.log(el);
 				if (el.dtype == 1) {
 					el.image.url =
 						app_const.url +

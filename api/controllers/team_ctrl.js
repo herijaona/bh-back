@@ -26,7 +26,6 @@ module.exports.saveTeamsFrontVideoData = async (req, res) => {
 };
 
 module.exports.getTeamsFrontVideoData = async (req, res) => {
-	console.log(req.ACC);
 	try {
 		let allmyVideoTeamFrom = await TeamFront.find({ account: req.ACC._id });
 		if (allmyVideoTeamFrom) {
@@ -48,7 +47,6 @@ module.exports.deleteTeamsFrontVideoData = async (req, res) => {
 	try {
 		let tmv_rem = await TeamFront.findById(tmv).remove();
 		if (tmv_rem) {
-			console.log(tmv_rem);
 			sendJSONresponse(res, 200, { status: "OK", message: "Reussi" });
 		} else {
 			sendJSONresponse(res, 500, {
@@ -68,7 +66,6 @@ module.exports.deleteTeamsFrontVideoData = async (req, res) => {
 };
 
 module.exports.updateTeamsFrontVideoData = async (req, res) => {
-	console.log(req.body);
 	try {
 		let tmvUpdate = await TeamFront.findOneAndUpdate(
 			{ _id: req.body.id_ },
@@ -104,7 +101,6 @@ module.exports.inviteUserInTeam = async (req, res) => {
 	try {
 		// statements
 		let usrOwnerMail = await User.find({ email: req.body.email });
-		console.log(usrOwnerMail);
 		if (usrOwnerMail.length > 0) {
 			sendJSONresponse(res, 409, {
 				status: "NOK",

@@ -118,9 +118,6 @@ var defaultDATAAcc = async (rs, ac) => {
       let znD = await zn.save();
       let pre = await pr.save();
       let zne = await znc.save();
-      console.log(znD);
-      console.log(pre);
-      console.log(zne);
       return Promise.all([pre, znD, zne]);
     }
   } catch (e) {
