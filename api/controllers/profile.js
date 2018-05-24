@@ -2,8 +2,6 @@ var mongoose = require("mongoose");
 var User = mongoose.model("User");
 var tools_service = require("../services/app-general");
 var Account = mongoose.model("Account");
-var TeamCommitee = mongoose.model("TeamCommitee");
-var TeamAccount = mongoose.model("TeamAccount");
 var InvitationSent = mongoose.model("InvitationSent");
 var userTosend = {
     _id: "",

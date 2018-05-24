@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 var Question = mongoose.model("Question");
+var Account = mongoose.model("Account");
 
 var sendJSONresponse = function(res, status, content) {
 	res.status(status);
@@ -24,6 +25,7 @@ module.exports.postQuestions = async (req, res) => {
 	try {
 		let d_ = await qst.save();
 		if (d_) {
+			addToComminity(d_['account']);
 			return sendJSONresponse(res, 200, {
 				status: "OK",
 				message: " Saved",
@@ -36,3 +38,15 @@ module.exports.postQuestions = async (req, res) => {
 		return sendJSONresponse(res, 500, { status: "NOK" });
 	}
 };
+
+var addToComminity = async  (_i)=>{
+	try {
+		let e = await Account.findById(_i);
+		if (e) {
+			console.info(e)
+		}
+	} catch(e) {
+		// statements
+		console.log(e);
+	}
+}
