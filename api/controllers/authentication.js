@@ -8,6 +8,7 @@ var Account = mongoose.model("Account");
 var ResetPassword = mongoose.model("ResetPassword");
 var gen_services = require("../services/app-general");
 var CryptoJS = require("crypto-js");
+/* response sender */
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
@@ -55,7 +56,10 @@ var registerAccount = async (rq, rs, usr) => {
     account_.typeOrganisation = rq.body.typeOrganisation;
     account_.Logo = new mongoose.mongo.ObjectId(rq.body.Logo);
     account_.adresse.push(rq.body.adresse);
+    account_.isActive = false;
     account_.userAdmin.push(usr.id);
+    account_.usersTeam.push(usr.id);
+    account_.usersCommetee.push(usr.id);
     account_.users.push(usr.id);
     sl_ = rq.body.enseigneCommerciale.replace(/ /g, "");
     account_["_slug"] = sl_;
@@ -100,7 +104,7 @@ var defaultDATAAcc = async (rs, ac) => {
         dtype: 3,
         canDeleted: false,
         caption: "_chiffres",
-        data_suppl: '{"createdYear":0,"ageMoyen":0,"collabor":0,"createdOpportinuite":"0","turnOver":0,"pariteFemme":0,"pariteHomme":0}',
+        data_suppl: '{"createdYear":0,"ageMoyen":0,"collabor":0,"createdOpportinuite":"0","turnOver":0,"pariteFemme":0,"pariteHomme":0, "curr":"default"}',
         account: ac._id,
         __v: 0
     };
@@ -169,39 +173,64 @@ module.exports.login = function(req, res) {
         }
     })(req, res);
 };
-module.exports.activate_user = function(req, res) {
-    // var User_ = new User();
-    User.findOne({
-        activation_text: req.body.activation_code
-    }, function(err, doc) {
-        if (!err) {
-            // var u_ = new User(doc);
-            if (!doc.active) {
-                doc.activate();
-                doc.save(function(err) {
-                    res.status(200);
-                    res.json({
-                        status: "OK",
-                        message: "Activation successful",
-                        _id: doc._id
+module.exports.activate_user = async (req, res) => {
+    let activate_txt = req.body.activation_code;
+    try {
+        let usr = await User.findOne({
+            activation_text: activate_txt
+        });
+        console.log(usr);
+        if (usr) {
+            if (!usr["active"]) {
+                usr.activate();
+                let activeUsr = await usr.save();
+                if (usr.admin_defaults) {
+                    let acc = await Account.find({
+                        userAdmin: usr._id
                     });
-                });
+                    if (acc) {
+                        let o = [];
+                        for (a_ of acc) {
+                            let w = await Account.findByIdAndUpdate({
+                                _id: a_._id
+                            }, {
+                                $set: {
+                                    isActive: true
+                                }
+                            }, {
+                                new: true
+                            });
+                            o.push(w);
+                        }
+                        if (o) {
+                            return sendJSONresponse(res, 200, {
+                                status: "OK",
+                                message: "Activation successful",
+                                _id: usr._id
+                            });
+                        }
+                    }
+                }
             } else {
-                res.status(200);
-                res.json({
+                return sendJSONresponse(res, 200, {
                     status: "_OK",
                     message: "User already Active",
-                    _id: doc._id
+                    _id: usr._id
                 });
             }
         } else {
-            res.status(200);
-            res.json({
+            return sendJSONresponse(res, 200, {
                 status: "NOK",
                 message: "User Not Found"
             });
         }
-    });
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: "Erreur Server"
+        });
+    }
 };
 module.exports.requestResetPass = function(req, res) {
     if (!req.body.email) {
@@ -337,4 +366,62 @@ module.exports.submitNewPass = function(req, res) {
             });
         });
     });
+};
+/* Register Member*/
+module.exports.registerMember = async (req, res) => {
+    let usr = await this.regUser(req, res);
+    if (usr) {
+        let resEmail = gen_services.sendActivationMail({
+            user: usr,
+            account: {}
+        }).then(reslt => {
+            if (reslt.body.Messages[0].Status == "success") {
+                sendJSONresponse(res, 200, {
+                    status: "OK",
+                    message: "email sent",
+                    user_email: usr.email
+                });
+            }
+        }, err => {
+            console.log(err);
+            sendJSONresponse(res, 500, {
+                error: true,
+                text: "Erreur Serveur"
+            });
+        });
+    }
+};
+module.exports.regUser = async (req, res) => {
+    let reqDAta = req.body;
+    let pass_ = reqDAta.password;
+    delete reqDAta.password;
+    let newUser = new User(reqDAta);
+    newUser.generateActivationCode();
+    newUser.active = false;
+    newUser.admin_defaults = false;
+    newUser.setPassword(pass_);
+    try {
+        let imageDF = await Image.findOne({
+            name: "DefaultsprofileImage"
+        });
+        if (imageDF) {
+            newUser.imageProfile = imageDF._id;
+        }
+        let usr = await newUser.save();
+        if (usr) {
+            return usr;
+        }
+    } catch (e) {
+        if (e.code == 11000) {
+            sendJSONresponse(res, 409, {
+                error: true,
+                text: "Email deja Utilisee"
+            });
+        } else {
+            sendJSONresponse(res, 500, {
+                error: true,
+                text: "Erreur Serveur"
+            });
+        }
+    }
 };

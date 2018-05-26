@@ -28,20 +28,16 @@ var sendJSONresponse = function(res, status, content) {
 /* Get the list of activated company */
 module.exports.listall = async (req, res) => {
     try {
-        let allAcc = await Account.find().populate("Logo");
+        let allAcc = await Account.find().populate([{path: "Logo"}]);
         if (allAcc) {
             let accMap = [];
             let l = allAcc.length;
             for (acc_ of allAcc) {
-                let userAdmin = acc_.userAdmin[0];
-                let m = Object.create(DataForResponse);
-                let _u = await User.findById(userAdmin);
-                if (_u) {
-                    if (_u.active) {
-                        let c = tools_service.copydata(m, acc_);
-                        c.Logo = tools_service.media_url(c.Logo.url, "images");
-                        accMap.push(c);
-                    }
+                if (acc_.isActive) {
+                    let m = Object.create(DataForResponse);
+                    let c = tools_service.copydata(m, acc_);
+                    c.Logo = tools_service.media_url(c.Logo.url, "images");
+                    accMap.push(c);
                 }
             }
             let ee = accMap.length;
@@ -52,6 +48,10 @@ module.exports.listall = async (req, res) => {
         }
     } catch (e) {
         console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: "Error server"
+        });
     }
 };
 /* Controllers handle request on  company generale info */

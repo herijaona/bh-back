@@ -1,17 +1,6 @@
 var mongoose = require("mongoose");
 var crypto = require("crypto");
 
-var communitySchema = new mongoose.Schema({
-    userComminity: [{
-        us: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        },
-        act: [String]
-    }]
-});
-
-
 var accountSchema = new mongoose.Schema({
     enseigneCommerciale: String,
     raisonSociale: String,
@@ -30,36 +19,42 @@ var accountSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Member"
     },
-    users: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }],
-    projets: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Project"
-    }],
-    successStories: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SuccessStorie"
-    }],
-    meetings: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Meeting"
-    }]
+    users: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+    projets: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Project"
+        }
+    ],
+    successStories: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "SuccessStorie"
+        }
+    ],
+    meetings: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Meeting"
+        }
+    ]
 });
 accountSchema.add({
     pagetoShow: String
 });
 
 accountSchema.add({
-    community: communitySchema
-});
-
-accountSchema.add({
-    userAdmin: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }]
+    userAdmin: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 });
 accountSchema.add({
     presentation: {
@@ -79,16 +74,20 @@ accountSchema.add({
     }
 });
 accountSchema.add({
-    usersTeam: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }]
+    usersTeam: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 });
 accountSchema.add({
-    usersCommetee: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }]
+    usersCommetee: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 });
 accountSchema.add({
     coverImage: {
@@ -96,6 +95,20 @@ accountSchema.add({
         ref: "Image"
     }
 });
+
+accountSchema.add({
+    isActive: {
+        type: Boolean,
+        default: false
+    }
+});
+
+accountSchema.add({
+    signinDate: {
+        type: Date
+    }
+});
+
 mongoose.model("Account", accountSchema);
 /*
 typeOrganisation: {
