@@ -36,12 +36,12 @@ var registerUser = async (rq, rs) => {
         }
     } catch (e) {
         if (e.code == 11000) {
-            sendJSONresponse(res, 409, {
+            sendJSONresponse(rs, 409, {
                 error: true,
                 text: "Email deja Utilisee"
             });
         } else {
-            sendJSONresponse(res, 500, {
+            sendJSONresponse(rs, 500, {
                 error: true,
                 text: "Erreur Serveur"
             });
