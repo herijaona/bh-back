@@ -439,6 +439,14 @@ router.get(
 	ctrlQuestions.getallquestionsCompany
 );
 
+router.get(
+	"/getDetailOnQuestion",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlQuestions.getDetailOnQuestion
+);
+
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
