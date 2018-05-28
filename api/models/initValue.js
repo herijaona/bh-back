@@ -1,5 +1,12 @@
 var mongoose = require("mongoose");
+const path = require("path");
 var Image = mongoose.model("Image");
+var OrganisationType = mongoose.model("OrganisationType");
+var fs = require("fs");
+var orgTypeDefaults = fs.readFileSync(
+	path.join(global.basedir, "/api/templates/organisationtype.json"),
+	"utf8"
+);
 
 var initImage = async () => {
 	try {
@@ -36,8 +43,26 @@ var initImage = async () => {
 	}
 };
 
+var initOrganistationType = async () => {
+	let orgJson = JSON.parse(orgTypeDefaults);
+	try {
+		for (defOrg of orgJson.default_type) {
+			let cSlug = defOrg.text.toLowerCase().replace(/ /g, "");
+			let txt = defOrg.text;
+			let orgType = await OrganisationType.find({ slug: cSlug });
+			if (orgType.length == 0) {
+				let nOrgtype = new OrganisationType({ text: txt, slug: cSlug });
+				let newotype = await nOrgtype.save();
+			}
+		}
+	} catch (e) {
+		console.log(e);
+	}
+};
+
 var allDefaultsCall = () => {
 	initImage();
+	initOrganistationType();
 };
 
 allDefaultsCall();

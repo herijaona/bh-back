@@ -9,7 +9,10 @@ var accountSchema = new mongoose.Schema({
         ref: "Image"
     },
     idCompteCCA: String,
-    typeOrganisation: String,
+    typeOrganisation: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "OrganisationType"
+    },
     adresse: [String],
     presentation: {
         type: mongoose.Schema.Types.ObjectId,
@@ -111,8 +114,5 @@ accountSchema.add({
 
 mongoose.model("Account", accountSchema);
 /*
-typeOrganisation: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "OrganisationType"
-  },
+
 */

@@ -6,6 +6,7 @@ var Image = mongoose.model("Image");
 var Video = mongoose.model("Video");
 var Zone = mongoose.model("Zone");
 var SuccessStorie = mongoose.model("SuccessStorie");
+var OrganisationType = mongoose.model("OrganisationType");
 var Presentation = mongoose.model("Presentation");
 var tools_service = require("../services/app-general");
 var DataForResponse = {
@@ -28,15 +29,21 @@ var sendJSONresponse = function(res, status, content) {
 /* Get the list of activated company */
 module.exports.listall = async (req, res) => {
     try {
-        let allAcc = await Account.find().populate([{path: "Logo"}]);
+        let allAcc = await Account.find().populate([{
+            path: "Logo"
+        }, {
+            path: "typeOrganisation"
+        }]);
         if (allAcc) {
             let accMap = [];
             let l = allAcc.length;
             for (acc_ of allAcc) {
                 if (acc_.isActive) {
+                    console.log(acc_);
                     let m = Object.create(DataForResponse);
                     let c = tools_service.copydata(m, acc_);
                     c.Logo = tools_service.media_url(c.Logo.url, "images");
+                    c.typeOrganisation = c.typeOrganisation.text;
                     accMap.push(c);
                 }
             }
@@ -104,12 +111,15 @@ module.exports.getCompanyDetailsData = async (req, res) => {
         path: "Logo"
     }, {
         path: "coverImage"
+    }, {
+        path: "typeOrganisation"
     }];
     try {
         let elt = await Account.findById(req.ACC._id).populate(populateQuery);
         if (elt) {
             var cmp = tools_service.copydata(m, elt);
             cmp.Logo = tools_service.media_url(cmp.Logo.url, "images");
+            cmp.typeOrganisation = cmp.typeOrganisation.text;
             if (cmp.coverImage) {
                 cmp.coverImage = tools_service.media_url(cmp.coverImage.url);
             }
@@ -579,6 +589,27 @@ module.exports.updateSstr = async (req, res) => {
         sendJSONresponse(res, 500, {
             status: "NOK",
             message: "Error serveur"
+        });
+    }
+};
+module.exports.getOrgTypes = async (req, res) => {
+    try {
+        let orgtype = await OrganisationType.find({}, '', {
+            sort: {
+                slug: 1
+            }
+        });
+        if (orgtype.length) {
+            return sendJSONresponse(res, 200, {
+                status: "OK",
+                data: orgtype
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "OK",
+            message: "error Serveur"
         });
     }
 };

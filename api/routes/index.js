@@ -447,6 +447,11 @@ router.get(
 	ctrlQuestions.getDetailOnQuestion
 );
 
+router.get(
+	"/org_types",
+	ctrlCompanies.getOrgTypes
+);
+
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
 // router.get("/patchDATA_RESET", ctrlPatch.DeleteCollections);
