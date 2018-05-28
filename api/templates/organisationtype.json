@@ -1,0 +1,32 @@
+{
+	"obj": "organisation",
+	"default_type": [
+		{ "idDump": 0, "text": "Agribusiness" },
+		{ "idDump": 1, "text": "Auto Distribution" },
+		{ "idDump": 2, "text": "Medical devices" },
+		{ "idDump": 3, "text": "Agriculture" },
+		{ "idDump": 4, "text": "Renewable Energy" },
+		{ "idDump": 5, "text": "Customer Relationship Management" },
+		{
+			"idDump": 6,
+			"text": "Industrials / Building products / Building products"
+		},
+		{ "idDump": 7, "text": "Plastics and Packaging" },
+		{ "idDump": 8, "text": "Rental of Lifting and Handling Equipment" },
+		{ "idDump": 9, "text": "Construiction and construction materials" },
+		{ "idDump": 10, "text": "Dustribution & Retailing" },
+		{ "idDump": 11, "text": "Education " },
+		{ "idDump": 12, "text": "Financial Services" },
+		{ "idDump": 13, "text": "Hotels/Leisure" },
+		{ "idDump": 14, "text": "Health Care" },
+		{ "idDump": 15, "text": "Infrastructure" },
+		{ "idDump": 16, "text": "IT, Telecom and Electronics" },
+		{ "idDump": 17, "text": "Manufacturing" },
+		{ "idDump": 18, "text": "Oil and Gas" },
+		{ "idDump": 19, "text": "Packaging" },
+		{ "idDump": 20, "text": "Services" },
+		{ "idDump": 21, "text": "Textile" },
+		{ "idDump": 22, "text": "Transport and logistics" },
+		{ "idDump": 23, "text": "Electrical Equipment" }
+	]
+}

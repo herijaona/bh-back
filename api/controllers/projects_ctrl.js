@@ -6,6 +6,8 @@ var Candidature = mongoose.model("Candidature");
 var Account = mongoose.model("Account");
 var Project = mongoose.model("Project");
 
+var ctrlQuestions = require("./questions_ctrl");
+
 var sendJSONresponse = function(res, status, content) {
 	res.status(status);
 	res.json(content);
@@ -45,7 +47,7 @@ module.exports.getAllProjectsCompany = async (req, res) => {
 			let datSendModel = {
 				name: "",
 				_id: "",
-				contexte:"",
+				contexte: "",
 				responseTimeUnit: "",
 				responseTimeValue: 0
 			};
@@ -153,12 +155,14 @@ module.exports.deleteProjects = async (req, res) => {
 
 module.exports.applyToProjects = async (req, res) => {
 	let dataPr = req.body.currObj;
+	console.log(dataPr);
 	let applData = req.body.data;
 	try {
 		let cndt = new Candidature(applData);
 		cndt.accountID = dataPr["account"];
 		cndt.createdAt = Date.now();
 		cndt.userID = req.userDATA._id;
+		cndt.projectID = dataPr._id;
 		cndt.status = "NEW";
 		let cndt_appl = await cndt.save();
 		if (cndt_appl) {
@@ -168,6 +172,11 @@ module.exports.applyToProjects = async (req, res) => {
 				message: "saved",
 				data: {}
 			});
+			ctrlQuestions.addToComminity(
+				dataPr["account"],
+				req.userDATA._id,
+				"application"
+			);
 		}
 	} catch (e) {
 		// statements
@@ -186,6 +195,115 @@ var sendApplyEmail = async (userDATA, dataPr) => {
 
 			let Accuser = await acc.populate({ path: "userAdmin" });
 		} else {
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+};
+
+module.exports.getAllCompanyProjectApplication = async (req, res) => {
+	let accId = req.ACC._id;
+	try {
+		let allApplication = await Candidature.find({
+			accountID: accId
+		}).populate([{ path: "userID" }, { path: "projectID" }]);
+		let applresp = [];
+		if (allApplication) {
+			for (aa of allApplication) {
+				let d = new Date(aa.createdAt);
+				let ensc = "";
+				let enseigneCommercialeOrg = await Account.findOne(
+					{ users: aa.userID._id },
+					"enseigneCommerciale"
+				);
+				if (enseigneCommercialeOrg) {
+					ensc = enseigneCommercialeOrg["enseigneCommerciale"];
+				}
+				let appl_ = {
+					_id: aa._id,
+					hour: d.toTimeString().split(" ")[0],
+					date: d.toDateString(),
+					usr: {
+						name: aa.userID.lastname + " " + aa.userID.firstname,
+						email: aa.userID.email,
+						org: ensc
+					},
+					prjt: {
+						_id: aa.projectID._id,
+						name: aa.projectID.name
+					}
+				};
+
+				applresp.push(appl_);
+			}
+		}
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: applresp
+		});
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+};
+
+module.exports.getProjectApplicationDetails = async (req, res) => {
+	let applID = req.query.applID;
+	try {
+		let allApplDetails = await Candidature.findById(applID).populate([
+			{ path: "userID", populate: { path: "imageProfile" } },
+			{
+				path: "projectID",
+				populate: [{ path: "createdByUser" }, { path: "account" }]
+			}
+		]);
+		if (allApplDetails) {
+			let d = new Date(allApplDetails.createdAt);
+			let ensc = "";
+			let enseigneCommercialeOrg = await Account.findOne(
+				{ users: allApplDetails.userID._id },
+				"enseigneCommerciale"
+			);
+			if (enseigneCommercialeOrg) {
+				ensc = enseigneCommercialeOrg["enseigneCommerciale"];
+			}
+			let retDetails = {
+				_id: allApplDetails._id,
+				hour: d.toTimeString().split(" ")[0],
+				date: d.toDateString(),
+				usr: {
+					_id: allApplDetails.userID._id,
+					name:
+						allApplDetails.userID.lastname +
+						" " +
+						allApplDetails.userID.firstname,
+					email: allApplDetails.userID.email,
+					org: ensc,
+					function: allApplDetails.userID.function,
+					imageProfile : tools_service.media_url(allApplDetails.userID.imageProfile.url)
+				},
+				projet: {
+					_id: allApplDetails.projectID._id,
+					name: allApplDetails.projectID.name,
+					accSlug: allApplDetails.projectID.account._slug,
+					byUser: allApplDetails.projectID.createdByUser.lastname+' '+allApplDetails.projectID.createdByUser.firstname
+				},
+				applDetail: {
+					mainActivityDomain: allApplDetails.mainActivityDomain,
+					secondaryActivityDomain:
+						allApplDetails.secondaryActivityDomain,
+					skillnCompent: allApplDetails.skillnCompent,
+					userActivityDescrib: allApplDetails.userActivityDescrib,
+					dataSuppl: allApplDetails.dataSuppl
+				}
+			};
+
+			return sendJSONresponse(res, 200, {
+				status: "OK",
+				data: retDetails,
+				v: allApplDetails
+			});
 		}
 	} catch (e) {
 		// statements

@@ -38,6 +38,7 @@ router.post("/profile/editpass", auth, req_mid.validUser, ctrlProfile.editpass);
 
 // authentication
 router.post("/register", ctrlAuth.registerOrganisation);
+router.post("/register-member", ctrlAuth.registerMember);
 router.post("/login", ctrlAuth.login);
 router.post("/activate", ctrlAuth.activate_user);
 router.post("/reset-password-request", ctrlAuth.requestResetPass);
@@ -296,6 +297,16 @@ router.delete(
 	ctrlTeams.deleteUserFromTeam
 );
 
+
+router.get(
+	"/getAccountCommunity",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlTeams.getTeamCommunity
+);
+
+
 router.get(
 	"/teams-users",
 	req_mid.accReqSlug,
@@ -342,6 +353,23 @@ router.delete(
 	req_mid.validUser,
 	req_mid.checkRole,
 	ctrlProject.deleteProjects
+);
+
+router.get(
+	"/bh-projects/allCompanyApplication",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.getAllCompanyProjectApplication
+);
+
+
+router.get(
+	"/bh-projects/ApplicationDetails",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.getProjectApplicationDetails
 );
 
 
@@ -403,6 +431,26 @@ router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
 */
 
 router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions )
+router.get(
+	"/getallCompanyQuestions",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlQuestions.getallquestionsCompany
+);
+
+router.get(
+	"/getDetailOnQuestion",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlQuestions.getDetailOnQuestion
+);
+
+router.get(
+	"/org_types",
+	ctrlCompanies.getOrgTypes
+);
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);
