@@ -381,6 +381,7 @@ router.post(
 );
 
 router.get("/getProjectbyID", ctrlProject.getPrByID);
+router.get("/bh-projects/getAllCollabtype", ctrlProject.getAllCollaborationType);
 
 /**
  *

@@ -4,6 +4,7 @@ var tools_service = require("../services/app-general");
 var TeamFront = mongoose.model("TeamFront");
 var Candidature = mongoose.model("Candidature");
 var Account = mongoose.model("Account");
+var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
 
 var ctrlQuestions = require("./questions_ctrl");
@@ -281,13 +282,18 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
 					email: allApplDetails.userID.email,
 					org: ensc,
 					function: allApplDetails.userID.function,
-					imageProfile : tools_service.media_url(allApplDetails.userID.imageProfile.url)
+					imageProfile: tools_service.media_url(
+						allApplDetails.userID.imageProfile.url
+					)
 				},
 				projet: {
 					_id: allApplDetails.projectID._id,
 					name: allApplDetails.projectID.name,
 					accSlug: allApplDetails.projectID.account._slug,
-					byUser: allApplDetails.projectID.createdByUser.lastname+' '+allApplDetails.projectID.createdByUser.firstname
+					byUser:
+						allApplDetails.projectID.createdByUser.lastname +
+						" " +
+						allApplDetails.projectID.createdByUser.firstname
 				},
 				applDetail: {
 					mainActivityDomain: allApplDetails.mainActivityDomain,
@@ -308,5 +314,22 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
 	} catch (e) {
 		// statements
 		console.log(e);
+	}
+};
+
+module.exports.getAllCollaborationType = async (req, res) => {
+	try {
+		let allCollab = await CollaborationType.find({});
+		if (allCollab.length) {
+			return sendJSONresponse(res, 200, {
+				status: "OK",
+				data: allCollab
+			});
+		} else {
+			return sendJSONresponse(res, 200, { status: "NOK" });
+		}
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, { status: "NOK" });
 	}
 };
