@@ -1,0 +1,21 @@
+{
+	"obj": "collaboration",
+	"default_type": [
+		{
+			"idDump": 1,
+			"text": "Innovation project"
+		},
+		{
+			"idDump": 2,
+			"text": "Innovation subject"
+		},
+		{
+			"idDump": 3,
+			"text": "Incubation"
+		},
+		{
+			"idDump": 4,
+			"text": "Investissement"
+		}
+	]
+}

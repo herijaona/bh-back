@@ -2,9 +2,14 @@ var mongoose = require("mongoose");
 const path = require("path");
 var Image = mongoose.model("Image");
 var OrganisationType = mongoose.model("OrganisationType");
+var CollaborationType = mongoose.model("CollaborationType");
 var fs = require("fs");
 var orgTypeDefaults = fs.readFileSync(
 	path.join(global.basedir, "/api/templates/organisationtype.json"),
+	"utf8"
+);
+var collaborationDefaultsType = fs.readFileSync(
+	path.join(global.basedir, "/api/templates/collaboration_Type_Default.json"),
 	"utf8"
 );
 
@@ -60,9 +65,27 @@ var initOrganistationType = async () => {
 	}
 };
 
+var initCollaborationDefaultType = async () => {
+	let collborationDf= JSON.parse(collaborationDefaultsType);
+	try {
+		for (defCollab of collborationDf.default_type) {
+			let colSlug = defCollab.text.toLowerCase().replace(/ /g, "");
+			let txt = defCollab.text;
+			let colType = await CollaborationType.find({ slug: colSlug });
+			if (colType.length == 0) {
+				let ncolType = new CollaborationType({ text: txt, slug: colSlug });
+				let newctype = await ncolType.save();
+			}
+		}
+	} catch (e) {
+		console.log(e);
+	}
+};
+
 var allDefaultsCall = () => {
 	initImage();
 	initOrganistationType();
+	initCollaborationDefaultType();
 };
 
 allDefaultsCall();
