@@ -19,7 +19,7 @@ module.exports.saveProjectsDATA = async (req, res) => {
 	let prDATA = req.body;
 	prDATA["account"] = req.ACC._id;
 	prDATA["createdByUser"] = req.userDATA._id;
-
+	prDATA["vue"] = 0;
 	try {
 		let pr = new Project(prDATA);
 		let sv = await pr.save();

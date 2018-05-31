@@ -4,16 +4,8 @@ var projetSchema = new mongoose.Schema({
 	listeCandidatures: [
 		{ type: mongoose.Schema.Types.ObjectId, ref: "Candidature" }
 	],
-	contexte: String,
-	dateFinCandidature: Date,
-	objectif: String,
-	elementProposition: String,
 	idProjetCCA: String,
-	name: String,
-	dateRencontre: Date,
-	responseTimeUnit: String,
-	responseTimeValue: Number,
-	dateCloture: Date,
+	view: Number,
 	account: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Account"
@@ -21,7 +13,9 @@ var projetSchema = new mongoose.Schema({
 	createdByUser: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User"
-	}
+	},
+	typeCollab: String,
+	dataDetails: {}
 });
 
 mongoose.model("Project", projetSchema);
