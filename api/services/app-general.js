@@ -128,7 +128,7 @@ module.exports.userEmailAfterApply = (usr, data) => {
 	var templ = afterUserApplyTemplate;
 	var data_m = {
 		username: titleCase(usr.firstname) + " " + titleCase(usr.lastname),
-		title: data.t ,
+		title: data.t,
 		org: data.ens
 	};
 	var dest = {
@@ -215,4 +215,13 @@ module.exports.getAddrData = ac => {
 
 module.exports.media_url = img_ => {
 	return app_const.url + "/" + img_.replace("uploads", "files");
+};
+
+/* get country from json */
+var allCountry = fs.readFileSync(
+	path.join(global.basedir, "/api/templates/country.json"),
+	"utf8"
+);
+module.exports.getcountry = () => {
+	return JSON.parse(allCountry);
 };
