@@ -333,3 +333,10 @@ module.exports.getAllCollaborationType = async (req, res) => {
 		return sendJSONresponse(res, 500, { status: "NOK" });
 	}
 };
+
+module.exports.getCountryAll = async (req, res) => {
+	return sendJSONresponse(res, 200, {
+		status: "OK",
+		data: tools_service.getcountry()
+	});
+};
