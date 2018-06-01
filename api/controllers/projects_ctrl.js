@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var User = mongoose.model("User");
 var tools_service = require("../services/app-general");
+var const_data = require("../config/constantData");
 var TeamFront = mongoose.model("TeamFront");
 var Candidature = mongoose.model("Candidature");
 var Account = mongoose.model("Account");
@@ -39,8 +40,8 @@ module.exports.saveProjectsDATA = async (req, res) => {
 module.exports.getAllProjectsCompany = async (req, res) => {
     let acc_curr = req.ACC;
     /*var populateQuery = [
-    	{ path: "listeCandidatures" },
-    	{ path: "createdByUser" }
+        { path: "listeCandidatures" },
+        { path: "createdByUser" }
     ];*/
     try {
         let all_ = await Project.find({
@@ -62,9 +63,16 @@ module.exports.getAllProjectsCompany = async (req, res) => {
                 if (pr0["typeCollab"] == "COLLABPROJINNOV") {
                     m.name = pr0["dataDetails"]["collabDescribData"].name;
                     m._id = pr0._id;
-                    m.contexte = pr0["dataDetails"]["collabDescribData"].contexte;
-                    m.responseTimeUnit = pr0["dataDetails"]["collabDescribData"].responseTimeUnit;
-                    m.responseTimeValue = pr0["dataDetails"]["collabDescribData"].responseTimeValue;
+                    m.contexte =
+                        pr0["dataDetails"]["collabDescribData"].contexte;
+                    m.responseTimeUnit =
+                        pr0["dataDetails"][
+                            "collabDescribData"
+                        ].responseTimeUnit;
+                    m.responseTimeValue =
+                        pr0["dataDetails"][
+                            "collabDescribData"
+                        ].responseTimeValue;
                 }
                 var m1 = Object.create(datSendModel);
                 var send_data = tools_service.copydata(m1, m);
@@ -86,11 +94,14 @@ module.exports.getAllProjectsCompany = async (req, res) => {
 };
 module.exports.getPrByID = async (req, res) => {
     let prID = req.query["projectID"];
-    var populateQuery = [{
-        path: "listeCandidatures"
-    }, {
-        path: "createdByUser"
-    }];
+    var populateQuery = [
+        {
+            path: "listeCandidatures"
+        },
+        {
+            path: "createdByUser"
+        }
+    ];
     let datSendModel = {
         name: "",
         _id: "",
@@ -109,8 +120,11 @@ module.exports.getPrByID = async (req, res) => {
             }).populate(populateQuery);
             if (prJ) {
                 console.log(prJ);
-                if (prJ["typeCollab"] == "COLLABPROJINNOV") {
-                    let pp = tools_service.copydata(datSendModel, prJ["dataDetails"]["collabDescribData"]);
+                if (prJ["typeCollab"] == const_data.collabType.type1) {
+                    let pp = tools_service.copydata(
+                        datSendModel,
+                        prJ["dataDetails"]["collabDescribData"]
+                    );
                     pp.listeCandidatures = pp.listeCandidatures.length;
                     pp._id = prJ._id;
                     return sendJSONresponse(res, 200, {
@@ -141,12 +155,16 @@ module.exports.updateProjects = async (req, res) => {
     let pr_id = req.body.id_;
     let acc_id = req.ACC._id;
     try {
-        let resUpdate = await Project.findOneAndUpdate({
-            _id: pr_id,
-            account: acc_id
-        }, req.body.edited, {
-            new: true
-        });
+        let resUpdate = await Project.findOneAndUpdate(
+            {
+                _id: pr_id,
+                account: acc_id
+            },
+            req.body.edited,
+            {
+                new: true
+            }
+        );
         if (resUpdate) {
             sendJSONresponse(res, 200, {
                 status: "OK",
@@ -202,7 +220,11 @@ module.exports.applyToProjects = async (req, res) => {
                 message: "saved",
                 data: {}
             });
-            ctrlQuestions.addToComminity(dataPr["account"], req.userDATA._id, "application");
+            ctrlQuestions.addToComminity(
+                dataPr["account"],
+                req.userDATA._id,
+                "application"
+            );
         }
     } catch (e) {
         // statements
@@ -221,7 +243,8 @@ var sendApplyEmail = async (userDATA, dataPr) => {
             let Accuser = await acc.populate({
                 path: "userAdmin"
             });
-        } else {}
+        } else {
+        }
     } catch (e) {
         // statements
         console.log(e);
@@ -232,19 +255,25 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
     try {
         let allApplication = await Candidature.find({
             accountID: accId
-        }).populate([{
-            path: "userID"
-        }, {
-            path: "projectID"
-        }]);
+        }).populate([
+            {
+                path: "userID"
+            },
+            {
+                path: "projectID"
+            }
+        ]);
         let applresp = [];
         if (allApplication) {
             for (aa of allApplication) {
                 let d = new Date(aa.createdAt);
                 let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne({
-                    users: aa.userID._id
-                }, "enseigneCommerciale");
+                let enseigneCommercialeOrg = await Account.findOne(
+                    {
+                        users: aa.userID._id
+                    },
+                    "enseigneCommerciale"
+                );
                 if (enseigneCommercialeOrg) {
                     ensc = enseigneCommercialeOrg["enseigneCommerciale"];
                 }
@@ -277,25 +306,34 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
 module.exports.getProjectApplicationDetails = async (req, res) => {
     let applID = req.query.applID;
     try {
-        let allApplDetails = await Candidature.findById(applID).populate([{
-            path: "userID",
-            populate: {
-                path: "imageProfile"
+        let allApplDetails = await Candidature.findById(applID).populate([
+            {
+                path: "userID",
+                populate: {
+                    path: "imageProfile"
+                }
+            },
+            {
+                path: "projectID",
+                populate: [
+                    {
+                        path: "createdByUser"
+                    },
+                    {
+                        path: "account"
+                    }
+                ]
             }
-        }, {
-            path: "projectID",
-            populate: [{
-                path: "createdByUser"
-            }, {
-                path: "account"
-            }]
-        }]);
+        ]);
         if (allApplDetails) {
             let d = new Date(allApplDetails.createdAt);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne({
-                users: allApplDetails.userID._id
-            }, "enseigneCommerciale");
+            let enseigneCommercialeOrg = await Account.findOne(
+                {
+                    users: allApplDetails.userID._id
+                },
+                "enseigneCommerciale"
+            );
             if (enseigneCommercialeOrg) {
                 ensc = enseigneCommercialeOrg["enseigneCommerciale"];
             }
@@ -305,21 +343,30 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 date: d.toDateString(),
                 usr: {
                     _id: allApplDetails.userID._id,
-                    name: allApplDetails.userID.lastname + " " + allApplDetails.userID.firstname,
+                    name:
+                        allApplDetails.userID.lastname +
+                        " " +
+                        allApplDetails.userID.firstname,
                     email: allApplDetails.userID.email,
                     org: ensc,
                     function: allApplDetails.userID.function,
-                    imageProfile: tools_service.media_url(allApplDetails.userID.imageProfile.url)
+                    imageProfile: tools_service.media_url(
+                        allApplDetails.userID.imageProfile.url
+                    )
                 },
                 projet: {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,
                     accSlug: allApplDetails.projectID.account._slug,
-                    byUser: allApplDetails.projectID.createdByUser.lastname + " " + allApplDetails.projectID.createdByUser.firstname
+                    byUser:
+                        allApplDetails.projectID.createdByUser.lastname +
+                        " " +
+                        allApplDetails.projectID.createdByUser.firstname
                 },
                 applDetail: {
                     mainActivityDomain: allApplDetails.mainActivityDomain,
-                    secondaryActivityDomain: allApplDetails.secondaryActivityDomain,
+                    secondaryActivityDomain:
+                        allApplDetails.secondaryActivityDomain,
                     skillnCompent: allApplDetails.skillnCompent,
                     userActivityDescrib: allApplDetails.userActivityDescrib,
                     dataSuppl: allApplDetails.dataSuppl
@@ -375,12 +422,14 @@ module.exports.getAllCollabList = async (req, res) => {
     try {
         let my_collab = await Project.find({
             account: account_id
-        }).populate([{
-            path: "createdByUser",
-            select: "firstname lastname"
-        }]).sort([
-            ["addDate", "descending"]
-        ]);
+        })
+            .populate([
+                {
+                    path: "createdByUser",
+                    select: "firstname lastname"
+                }
+            ])
+            .sort([["addDate", "descending"]]);
         if (my_collab) {
             let retVal = [];
             for (col1 of my_collab) {
@@ -407,6 +456,51 @@ module.exports.getAllCollabList = async (req, res) => {
         return sendJSONresponse(res, 500, {
             status: "NOK",
             message: "Server Error"
+        });
+    }
+};
+
+module.exports.getDataForApplication = async (req, res) => {
+    let pID = req.query["projectID"];
+    let userID = req.userDATA._id;
+
+    try {
+        let currUsrAcc = await Account.find(
+            { users: userID },
+            "enseigneCommerciale "
+        );
+        let prObj = await Project.findById(pID);
+        if (prObj) {
+            let retData = {};
+            if (prObj["typeCollab"] == const_data.collabType.type1) {
+                retData = {
+                    _id: prObj._id,
+                    name: prObj.dataDetails.collabDescribData["name"],
+                    type: tools_service.getCollabTypeText(prObj["typeCollab"]),
+                    typeSelect: "type1"
+                };
+                if (currUsrAcc.length) {
+                    retData["hasAcc"] = true;
+                    retData["userACC"] = currUsrAcc;
+                } else {
+                    retData["hasAcc"] = false;
+                    retData["userACC"] = {
+                        enseigneCommerciale:
+                            req.userDATA.lastname + " " + req.userDATA.firstname
+                    };
+                }
+            }
+            return sendJSONresponse(res, 200, {
+                status: "OK",
+                data: retData
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: "Error server",
+            e: e
         });
     }
 };
