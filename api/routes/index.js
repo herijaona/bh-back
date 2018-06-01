@@ -366,6 +366,14 @@ router.post(
 	ctrlProject.applyToProjects
 );
 
+
+router.get(
+	"/getDataForApplication",
+	auth,
+	req_mid.validUser,
+	ctrlProject.getDataForApplication
+);
+
 router.get("/getProjectbyID", ctrlProject.getPrByID);
 router.get("/countryList", ctrlProject.getCountryAll);
 router.get(
