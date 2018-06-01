@@ -225,3 +225,19 @@ var allCountry = fs.readFileSync(
 module.exports.getcountry = () => {
 	return JSON.parse(allCountry);
 };
+
+/* get collab type from json */
+var collabfile = fs.readFileSync(
+	path.join(global.basedir, "/api/templates/collaboration_Type_Default.json"),
+	"utf8"
+);
+module.exports.getCollabTypeText = type => {
+	let allCollab = JSON.parse(collabfile)["default_type"];
+	let curr = allCollab.filter(el => el.code == type);
+	console.log(curr);
+	if (curr.length) {
+		if (curr[0].hasOwnProperty("text")) return curr[0].text;
+		else return "no typed";
+	}
+	return "no";
+};
