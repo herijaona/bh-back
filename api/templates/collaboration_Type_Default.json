@@ -3,19 +3,23 @@
 	"default_type": [
 		{
 			"idDump": 1,
-			"text": "Innovation project"
+			"text": "Innovation project",
+			"code": "COLLABPROJINNOV"
 		},
 		{
 			"idDump": 2,
-			"text": "Innovation subject"
+			"text": "Innovation subject",
+			"code": "COLLABSUBJINNOV"
 		},
 		{
 			"idDump": 3,
-			"text": "Incubation"
+			"text": "Incubation",
+			"code": "COLLABINCUB"
 		},
 		{
 			"idDump": 4,
-			"text": "Investissement"
+			"text": "Investissement",
+			"code": "COLLABINVEST"
 		}
 	]
 }

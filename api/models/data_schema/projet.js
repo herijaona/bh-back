@@ -15,7 +15,8 @@ var projetSchema = new mongoose.Schema({
 		ref: "User"
 	},
 	typeCollab: String,
-	dataDetails: {}
+	dataDetails: {},
+	addDate: Date
 });
 
 mongoose.model("Project", projetSchema);

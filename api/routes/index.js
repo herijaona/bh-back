@@ -271,7 +271,6 @@ router.post(
 	ctrlTeams.inviteUserInTeam
 );
 
-
 router.get(
 	"/teamsUsers",
 	auth,
@@ -279,7 +278,6 @@ router.get(
 	req_mid.checkRole,
 	ctrlTeams.getteamsUsersData
 );
-
 
 router.put(
 	"/change_roleAdm",
@@ -297,7 +295,6 @@ router.delete(
 	ctrlTeams.deleteUserFromTeam
 );
 
-
 router.get(
 	"/getAccountCommunity",
 	auth,
@@ -306,18 +303,9 @@ router.get(
 	ctrlTeams.getTeamCommunity
 );
 
+router.get("/teams-users", req_mid.accReqSlug, ctrlTeams.getTeamUsers);
 
-router.get(
-	"/teams-users",
-	req_mid.accReqSlug,
-	ctrlTeams.getTeamUsers
-);
-
-
-router.get(
-	"/team-details",
-	ctrlTeams.getTeamUsersDetails
-);
+router.get("/team-details", ctrlTeams.getTeamUsersDetails);
 
 /**
  *
@@ -363,7 +351,6 @@ router.get(
 	ctrlProject.getAllCompanyProjectApplication
 );
 
-
 router.get(
 	"/bh-projects/ApplicationDetails",
 	auth,
@@ -371,7 +358,6 @@ router.get(
 	req_mid.checkRole,
 	ctrlProject.getProjectApplicationDetails
 );
-
 
 router.post(
 	"/bh-projects-apply",
@@ -382,7 +368,18 @@ router.post(
 
 router.get("/getProjectbyID", ctrlProject.getPrByID);
 router.get("/countryList", ctrlProject.getCountryAll);
-router.get("/bh-projects/getAllCollabtype", ctrlProject.getAllCollaborationType);
+router.get(
+	"/bh-projects/getAllCollabtype",
+	ctrlProject.getAllCollaborationType
+);
+
+router.get(
+	"/admin-cca/getCollabLists",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.getAllCollabList
+);
 
 /**
  *
@@ -425,14 +422,18 @@ router.put(
 router.get("/cInvitationValData", ctrlProfile.checkInvitationVal);
 router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
 
-
 /*
 *
 * Questions 
 *
 */
 
-router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions )
+router.post(
+	"/question-data",
+	auth,
+	req_mid.validUser,
+	ctrlQuestions.postQuestions
+);
 router.get(
 	"/getallCompanyQuestions",
 	auth,
@@ -449,10 +450,7 @@ router.get(
 	ctrlQuestions.getDetailOnQuestion
 );
 
-router.get(
-	"/org_types",
-	ctrlCompanies.getOrgTypes
-);
+router.get("/org_types", ctrlCompanies.getOrgTypes);
 
 /* Specific Route for modify default data*/
 router.get("/patchDATA", ctrlPatch.patchDATA);

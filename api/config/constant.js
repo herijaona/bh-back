@@ -5,6 +5,7 @@ APP.name = 'BUSINESS HAVEN'
 APP.protocol = 'http'
 APP.domain = 'localhost'
 APP.domain_front = 'localhost'
+//APP.domain = '54.36.98.91'
 // APP.domain_front = '54.36.98.91'
 APP.port = process.env.PORT || 3000
 APP.port_front = 4546

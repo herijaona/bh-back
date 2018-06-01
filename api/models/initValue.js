@@ -69,7 +69,8 @@ var initCollaborationDefaultType = async () => {
 	let collborationDf= JSON.parse(collaborationDefaultsType);
 	try {
 		for (defCollab of collborationDf.default_type) {
-			let colSlug = defCollab.text.toLowerCase().replace(/ /g, "");
+			// let colSlug = defCollab.text.toLowerCase().replace(/ /g, "");
+			let colSlug = defCollab.code;
 			let txt = defCollab.text;
 			let colType = await CollaborationType.find({ slug: colSlug });
 			if (colType.length == 0) {
