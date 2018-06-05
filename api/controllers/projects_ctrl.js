@@ -8,7 +8,7 @@ var Account = mongoose.model("Account");
 var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
 var ctrlQuestions = require("./questions_ctrl");
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -94,8 +94,7 @@ module.exports.getAllProjectsCompany = async (req, res) => {
 };
 module.exports.getPrByID = async (req, res) => {
     let prID = req.query["projectID"];
-    var populateQuery = [
-        {
+    var populateQuery = [{
             path: "listeCandidatures"
         },
         {
@@ -125,6 +124,7 @@ module.exports.getPrByID = async (req, res) => {
                         datSendModel,
                         prJ["dataDetails"]["collabDescribData"]
                     );
+                    pp.account = prJ['account']
                     pp.listeCandidatures = pp.listeCandidatures.length;
                     pp._id = prJ._id;
                     return sendJSONresponse(res, 200, {
@@ -155,13 +155,11 @@ module.exports.updateProjects = async (req, res) => {
     let pr_id = req.body.id_;
     let acc_id = req.ACC._id;
     try {
-        let resUpdate = await Project.findOneAndUpdate(
-            {
+        let resUpdate = await Project.findOneAndUpdate({
                 _id: pr_id,
                 account: acc_id
             },
-            req.body.edited,
-            {
+            req.body.edited, {
                 new: true
             }
         );
@@ -243,8 +241,7 @@ var sendApplyEmail = async (userDATA, dataPr) => {
             let Accuser = await acc.populate({
                 path: "userAdmin"
             });
-        } else {
-        }
+        } else {}
     } catch (e) {
         // statements
         console.log(e);
@@ -255,8 +252,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
     try {
         let allApplication = await Candidature.find({
             accountID: accId
-        }).populate([
-            {
+        }).populate([{
                 path: "userID"
             },
             {
@@ -268,8 +264,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
             for (aa of allApplication) {
                 let d = new Date(aa.createdAt);
                 let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne(
-                    {
+                let enseigneCommercialeOrg = await Account.findOne({
                         users: aa.userID._id
                     },
                     "enseigneCommerciale"
@@ -306,8 +301,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
 module.exports.getProjectApplicationDetails = async (req, res) => {
     let applID = req.query.applID;
     try {
-        let allApplDetails = await Candidature.findById(applID).populate([
-            {
+        let allApplDetails = await Candidature.findById(applID).populate([{
                 path: "userID",
                 populate: {
                     path: "imageProfile"
@@ -315,8 +309,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             },
             {
                 path: "projectID",
-                populate: [
-                    {
+                populate: [{
                         path: "createdByUser"
                     },
                     {
@@ -328,8 +321,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
         if (allApplDetails) {
             let d = new Date(allApplDetails.createdAt);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne(
-                {
+            let enseigneCommercialeOrg = await Account.findOne({
                     users: allApplDetails.userID._id
                 },
                 "enseigneCommerciale"
@@ -343,8 +335,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 date: d.toDateString(),
                 usr: {
                     _id: allApplDetails.userID._id,
-                    name:
-                        allApplDetails.userID.lastname +
+                    name: allApplDetails.userID.lastname +
                         " " +
                         allApplDetails.userID.firstname,
                     email: allApplDetails.userID.email,
@@ -358,15 +349,13 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,
                     accSlug: allApplDetails.projectID.account._slug,
-                    byUser:
-                        allApplDetails.projectID.createdByUser.lastname +
+                    byUser: allApplDetails.projectID.createdByUser.lastname +
                         " " +
                         allApplDetails.projectID.createdByUser.firstname
                 },
                 applDetail: {
                     mainActivityDomain: allApplDetails.mainActivityDomain,
-                    secondaryActivityDomain:
-                        allApplDetails.secondaryActivityDomain,
+                    secondaryActivityDomain: allApplDetails.secondaryActivityDomain,
                     skillnCompent: allApplDetails.skillnCompent,
                     userActivityDescrib: allApplDetails.userActivityDescrib,
                     dataSuppl: allApplDetails.dataSuppl
@@ -421,15 +410,15 @@ module.exports.getAllCollabList = async (req, res) => {
     let account_id = req.ACC._id;
     try {
         let my_collab = await Project.find({
-            account: account_id
-        })
-            .populate([
-                {
-                    path: "createdByUser",
-                    select: "firstname lastname"
-                }
-            ])
-            .sort([["addDate", "descending"]]);
+                account: account_id
+            })
+            .populate([{
+                path: "createdByUser",
+                select: "firstname lastname"
+            }])
+            .sort([
+                ["addDate", "descending"]
+            ]);
         if (my_collab) {
             let retVal = [];
             for (col1 of my_collab) {
@@ -465,8 +454,9 @@ module.exports.getDataForApplication = async (req, res) => {
     let userID = req.userDATA._id;
 
     try {
-        let currUsrAcc = await Account.find(
-            { users: userID },
+        let currUsrAcc = await Account.find({
+                users: userID
+            },
             "enseigneCommerciale "
         );
         let prObj = await Project.findById(pID);
@@ -485,8 +475,7 @@ module.exports.getDataForApplication = async (req, res) => {
                 } else {
                     retData["hasAcc"] = false;
                     retData["userACC"] = {
-                        enseigneCommerciale:
-                            req.userDATA.lastname + " " + req.userDATA.firstname
+                        enseigneCommerciale: req.userDATA.lastname + " " + req.userDATA.firstname
                     };
                 }
             }
