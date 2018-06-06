@@ -10,15 +10,15 @@ var africaObj = fs.readFileSync(
     "utf8"
 );
 var europaObj = fs.readFileSync(
-    path.join(global.basedir, "/api/templates/country/africa.json"),
+    path.join(global.basedir, "/api/templates/country/europa.json"),
     "utf8"
 );
 var asiaObj = fs.readFileSync(
-    path.join(global.basedir, "/api/templates/country/africa.json"),
+    path.join(global.basedir, "/api/templates/country/asia.json"),
     "utf8"
 );
 var oceaniaObj = fs.readFileSync(
-    path.join(global.basedir, "/api/templates/country/africa.json"),
+    path.join(global.basedir, "/api/templates/country/oceania.json"),
     "utf8"
 );
 
@@ -33,7 +33,7 @@ module.exports.countryList = () => {
         asia: asiaList,
         europa: europaList,
         america: amList,
-        ocenia: ocaeniaList
+        oceania: ocaeniaList
     };
     let cKey = Object.keys(allCont);
     for (const key of cKey) {
