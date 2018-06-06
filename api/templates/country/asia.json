@@ -1,0 +1,205 @@
+{
+    "obj": "country",
+    "continent": "asia",
+    "list": [{
+            "country": "Afghanistan",
+            "code": ""
+        },
+        {
+            "country": "Armenia",
+            "code": ""
+        },
+        {
+            "country": "Azerbaijan",
+            "code": ""
+        },
+        {
+            "country": "Bahrain",
+            "code": ""
+        },
+        {
+            "country": "Bangladesh",
+            "code": ""
+        },
+        {
+            "country": "Bhutan",
+            "code": ""
+        },
+        {
+            "country": "Brunei",
+            "code": ""
+        },
+        {
+            "country": "Cambodia",
+            "code": ""
+        },
+        {
+            "country": "China",
+            "code": ""
+        },
+        {
+            "country": "Cyprus",
+            "code": ""
+        },
+        {
+            "country": "Georgia",
+            "code": ""
+        },
+        {
+            "country": "India",
+            "code": ""
+        },
+        {
+            "country": "Indonesia",
+            "code": ""
+        },
+        {
+            "country": "Iran",
+            "code": ""
+        },
+        {
+            "country": "Iraq",
+            "code": ""
+        },
+        {
+            "country": "Israel",
+            "code": ""
+        },
+        {
+            "country": "Japan",
+            "code": ""
+        },
+        {
+            "country": "Jordan",
+            "code": ""
+        },
+        {
+            "country": "Kazakhstan",
+            "code": ""
+        },
+        {
+            "country": "Kuwait",
+            "code": ""
+        },
+        {
+            "country": "Kyrgyzstan",
+            "code": ""
+        },
+        {
+            "country": "Laos",
+            "code": ""
+        },
+        {
+            "country": "Lebanon",
+            "code": ""
+        },
+        {
+            "country": "Malaysia",
+            "code": ""
+        },
+        {
+            "country": "Maldives",
+            "code": ""
+        },
+        {
+            "country": "Mongolia",
+            "code": ""
+        },
+        {
+            "country": "Myanmar(formerly Burma)",
+            "code": ""
+        },
+        {
+            "country": "Nepal",
+            "code": ""
+        },
+        {
+            "country": "North Korea",
+            "code": ""
+        },
+        {
+            "country": "Oman",
+            "code": ""
+        },
+        {
+            "country": "Pakistan",
+            "code": ""
+        },
+        {
+            "country": "Palestine",
+            "code": ""
+        },
+        {
+            "country": "Philippines",
+            "code": ""
+        },
+        {
+            "country": "Qatar",
+            "code": ""
+        },
+        {
+            "country": "Russia",
+            "code": ""
+        },
+        {
+            "country": "Saudi Arabia",
+            "code": ""
+        },
+        {
+            "country": "Singapore",
+            "code": ""
+        },
+        {
+            "country": "South Korea",
+            "code": ""
+        },
+        {
+            "country": "Sri Lanka",
+            "code": ""
+        },
+        {
+            "country": "Syria",
+            "code": ""
+        },
+        {
+            "country": "Taiwan",
+            "code": ""
+        },
+        {
+            "country": "Tajikistan",
+            "code": ""
+        },
+        {
+            "country": "Thailand",
+            "code": ""
+        },
+        {
+            "country": "Timor - Leste",
+            "code": ""
+        },
+        {
+            "country": "Turkey",
+            "code": ""
+        },
+        {
+            "country": "Turkmenistan",
+            "code": ""
+        },
+        {
+            "country": "United Arab Emirates(UAE)",
+            "code": ""
+        },
+        {
+            "country": "Uzbekistan",
+            "code": ""
+        },
+        {
+            "country": "Vietnam",
+            "code": ""
+        },
+        {
+            "country": "Yemen",
+            "code": ""
+        }
+    ]
+}

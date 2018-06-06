@@ -1,0 +1,225 @@
+{
+    "obj": "country",
+    "continent": "africa",
+    "list": [{
+            "country": "Algeria",
+            "code": ""
+        },
+        {
+            "country": "Angola",
+            "code": ""
+        },
+        {
+            "country": "Benin",
+            "code": ""
+        },
+        {
+            "country": "Botswana",
+            "code": ""
+        },
+        {
+            "country": "Burkina Faso",
+            "code": ""
+        },
+        {
+            "country": "Burundi",
+            "code": ""
+        },
+        {
+            "country": "Cabo Verde",
+            "code": ""
+        },
+        {
+            "country": "Cameroon",
+            "code": ""
+        },
+        {
+            "country": "Central African Republic(CAR)",
+            "code": ""
+        },
+        {
+            "country": "Chad",
+            "code": ""
+        },
+        {
+            "country": "Comoros",
+            "code": ""
+        },
+        {
+            "country": "Democratic Republic of the Congo",
+            "code": ""
+        },
+        {
+            "country": "Republic of the Congo",
+            "code": ""
+        },
+        {
+            "country": "Cote d 'Ivoire",
+            "code": ""
+        },
+        {
+            "country": "Djibouti",
+            "code": ""
+        },
+        {
+            "country": "Egypt",
+            "code": ""
+        },
+        {
+            "country": "Equatorial Guinea",
+            "code": ""
+        },
+        {
+            "country": "Eritrea",
+            "code": ""
+        },
+        {
+            "country": "Eswatini(formerly Swaziland)",
+            "code": ""
+        },
+        {
+            "country": "Ethiopia",
+            "code": ""
+        },
+        {
+            "country": "Gabon",
+            "code": ""
+        },
+        {
+            "country": "Gambia",
+            "code": ""
+        },
+        {
+            "country": "Ghana",
+            "code": ""
+        },
+        {
+            "country": "Guinea",
+            "code": ""
+        },
+        {
+            "country": "Guinea - Bissau",
+            "code": ""
+        },
+        {
+            "country": "Kenya",
+            "code": ""
+        },
+        {
+            "country": "Lesotho",
+            "code": ""
+        },
+        {
+            "country": "Liberia",
+            "code": ""
+        },
+        {
+            "country": "Libya",
+            "code": ""
+        },
+        {
+            "country": "Madagascar",
+            "code": ""
+        },
+        {
+            "country": "Malawi",
+            "code": ""
+        },
+        {
+            "country": "Mali",
+            "code": ""
+        },
+        {
+            "country": "Mauritania",
+            "code": ""
+        },
+        {
+            "country": "Mauritius",
+            "code": ""
+        },
+        {
+            "country": "Morocco",
+            "code": ""
+        },
+        {
+            "country": "Mozambique",
+            "code": ""
+        },
+        {
+            "country": "Namibia",
+            "code": ""
+        },
+        {
+            "country": "Niger",
+            "code": ""
+        },
+        {
+            "country": "Nigeria",
+            "code": ""
+        },
+        {
+            "country": "Rwanda",
+            "code": ""
+        },
+        {
+            "country": "Sao Tome and Principe",
+            "code": ""
+        },
+        {
+            "country": "Senegal",
+            "code": ""
+        },
+        {
+            "country": "Seychelles",
+            "code": ""
+        },
+        {
+            "country": "Sierra Leone",
+            "code": ""
+        },
+        {
+            "country": "Somalia",
+            "code": ""
+        },
+        {
+            "country": "South Africa",
+            "code": ""
+        },
+        {
+            "country": "South Sudan",
+            "code": ""
+        },
+        {
+            "country": "Sudan",
+            "code": ""
+        },
+        {
+            "country": "Swaziland (Eswatini)",
+            "code": ""
+        },
+        {
+            "country": "Tanzania",
+            "code": ""
+        },
+        {
+            "country": "Togo",
+            "code": ""
+        },
+        {
+            "country": "Tunisia",
+            "code": ""
+        },
+        {
+            "country": "Uganda",
+            "code": ""
+        },
+        {
+            "country": "Zambia",
+            "code": ""
+        },
+        {
+            "country": "Zimbabwe",
+            "code": ""
+        }
+    ]
+}
