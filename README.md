@@ -1,7 +1,7 @@
 # bh-back
 Back pour business haven
 
-# MEAN Stack Authentication
+# MEAN Stack
 
 To run, you just have MongoDB installed and running, and NodeJS installed.
 

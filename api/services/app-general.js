@@ -36,15 +36,13 @@ var notifresetPassTemplate = Hogan.compile(notifResetpass);
 var invitationTemplate = Hogan.compile(templateInvitation);
 var afterUserApplyTemplate = Hogan.compile(templateAfterUserApply);
 
-module.exports.sendActivationMail = function(argMail) {
+module.exports.sendActivationMail = function (argMail) {
 	var subj = "Active votre compte";
 	var data_email = {
-		name:
-			titleCase(argMail.user.firstname) +
+		name: titleCase(argMail.user.firstname) +
 			" " +
 			titleCase(argMail.user.lastname),
-		url_activation:
-			app_const.url_front + "/activate/" + argMail.user.activation_text,
+		url_activation: app_const.url_front + "/activate/" + argMail.user.activation_text,
 		sitename: app_const.name
 	};
 
@@ -58,13 +56,12 @@ module.exports.sendActivationMail = function(argMail) {
 	return deliverEmail(subj, templ, data_email, dest);
 };
 
-module.exports.sendResetPasswordMail = function(u, d) {
+module.exports.sendResetPasswordMail = function (u, d) {
 	var subj = "Demande de reinitialisation de mot de passe ";
 	var templ = resetPassTemplate;
 	var data_m = {
 		sitename: app_const.name,
-		url_reset:
-			app_const.url_front + "/reset-my-pass/" + d._id + "/" + d.resetCode
+		url_reset: app_const.url_front + "/reset-my-pass/" + d._id + "/" + d.resetCode
 	};
 	var dest = {
 		name: titleCase(u.firstname) + " " + titleCase(u.lastname),
@@ -75,7 +72,7 @@ module.exports.sendResetPasswordMail = function(u, d) {
 };
 
 /*Send Mail password was changed*/
-module.exports.sendEmailPassResetednotif = function(u) {
+module.exports.sendEmailPassResetednotif = function (u) {
 	var subj = "Votre mot de passe a changé ";
 
 	var templ = notifresetPassTemplate;
@@ -108,8 +105,7 @@ module.exports.mailInvitations = (inv, usr, usAcc) => {
 		invitedName: titleCase(inv.firstname) + " " + titleCase(inv.lastname),
 		sitename: app_const.name,
 		role: role,
-		invitationUrl:
-			app_const.url_front +
+		invitationUrl: app_const.url_front +
 			"/invitation_response/" +
 			usAcc._slug +
 			"/invitation/" +
@@ -151,25 +147,22 @@ function titleCase(str) {
 /* Real mail Service*/
 function deliverEmail(subject, template, data_email, to_) {
 	// body...
-	const request = mailjet.post("send", { version: "v3.1" }).request({
-		Messages: [
-			{
-				From: {
-					Email: app_const.emails.contact,
-					Name: "Business Haven"
-				},
-				To: [
-					{
-						Email: to_.email,
-						Name: to_.name
-					}
-				],
-				Subject: subject,
-				TextPart:
-					"Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
-				HTMLPart: template.render(data_email)
-			}
-		]
+	const request = mailjet.post("send", {
+		version: "v3.1"
+	}).request({
+		Messages: [{
+			From: {
+				Email: app_const.emails.contact,
+				Name: "Business Haven"
+			},
+			To: [{
+				Email: to_.email,
+				Name: to_.name
+			}],
+			Subject: subject,
+			TextPart: "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
+			HTMLPart: template.render(data_email)
+		}]
 	});
 	return request;
 }
@@ -184,9 +177,9 @@ module.exports.inArray = (needle, haystack) => {
 };
 
 /* Copy data between object */
-module.exports.copydata = function(model, source) {
+module.exports.copydata = function (model, source) {
 	var k2 = JSON.parse(JSON.stringify(source));
-	Object.keys(k2).forEach(function(keyn) {
+	Object.keys(k2).forEach(function (keyn) {
 		if (keyn in model) {
 			model[keyn] = k2[keyn];
 		}
@@ -195,8 +188,8 @@ module.exports.copydata = function(model, source) {
 };
 
 /* 
-* Address Data reformat 
-*/
+ * Address Data reformat 
+ */
 module.exports.getAddrData = ac => {
 	var formt = /[{:}]/;
 	var el = ac.adresse;
@@ -217,13 +210,9 @@ module.exports.media_url = img_ => {
 	return app_const.url + "/" + img_.replace("uploads", "files");
 };
 
-/* get country from json */
-var allCountry = fs.readFileSync(
-	path.join(global.basedir, "/api/templates/country.json"),
-	"utf8"
-);
+var cou2 = require('./../templates/country/country')
 module.exports.getcountry = () => {
-	return JSON.parse(allCountry);
+	return cou2.countryList();
 };
 
 /* get collab type from json */
@@ -231,6 +220,7 @@ var collabfile = fs.readFileSync(
 	path.join(global.basedir, "/api/templates/collaboration_Type_Default.json"),
 	"utf8"
 );
+
 module.exports.getCollabTypeText = type => {
 	let allCollab = JSON.parse(collabfile)["default_type"];
 	let curr = allCollab.filter(el => el.code == type);

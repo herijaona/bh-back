@@ -7,7 +7,7 @@ var TeamFront = mongoose.model("TeamFront");
 
 var Project = mongoose.model("Project");
 /* Response sender*/
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -56,20 +56,20 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
                 el => el.us.toString() == uA.toString()
             );
             if (!tools_service.inArray(inst, sf[0].act)) {
-                let tCommUpdate = await TeamCommunity.findOneAndUpdate(
-                    {
-                        account: aCCID,
-                        users: { $elemMatch: { us: uA } }
-                    },
-                    {
-                        $push: {
-                            "users.$.act": inst
+                let tCommUpdate = await TeamCommunity.findOneAndUpdate({
+                    account: aCCID,
+                    users: {
+                        $elemMatch: {
+                            us: uA
                         }
-                    },
-                    {
-                        new: true
                     }
-                );
+                }, {
+                    $push: {
+                        "users.$.act": inst
+                    }
+                }, {
+                    new: true
+                });
                 if (tCommUpdate) {
                     return;
                 }
@@ -81,34 +81,28 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
             account: aCCID
         });
         if (tComm) {
-            let tCommUpdate = await TeamCommunity.findOneAndUpdate(
-                {
-                    account: aCCID
-                },
-                {
-                    $push: {
-                        users: {
-                            us: uA,
-                            act: inst
-                        }
+            let tCommUpdate = await TeamCommunity.findOneAndUpdate({
+                account: aCCID
+            }, {
+                $push: {
+                    users: {
+                        us: uA,
+                        act: inst
                     }
-                },
-                {
-                    new: true
                 }
-            );
+            }, {
+                new: true
+            });
             if (tCommUpdate) {
                 return;
             }
         } else {
             let tc = new TeamCommunity({
                 account: aCCID,
-                users: [
-                    {
-                        us: uA,
-                        act: "question"
-                    }
-                ]
+                users: [{
+                    us: uA,
+                    act: "question"
+                }]
             });
             let s = await tc.save();
             if (s) {
@@ -125,11 +119,28 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
 
 module.exports.getallquestionsCompany = async (req, res) => {
     let accID = req.ACC._id;
+    let qType = req.query['qtype'];
+    let qr = {};
+    console.log(qType);
+
+    if (qType == 'no-project') {
+        qr = {
+            account: accID,
+            objectRef: {
+                $ne: 'PRT'
+            }
+        };
+    } else {
+        qr = {
+            account: accID,
+            objectRef: 'PRT'
+        };
+    }
 
     try {
-        let allQuest = await Question.find({ account: accID }).populate([
-            { path: "userAsk" }
-        ]);
+        let allQuest = await Question.find(qr).populate([{
+            path: "userAsk"
+        }]);
         if (allQuest) {
             let resp = [];
             for (qq of allQuest) {
@@ -145,8 +156,9 @@ module.exports.getallquestionsCompany = async (req, res) => {
                     email: qq.userAsk.email
                 };
                 let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne(
-                    { users: qq.userAsk._id },
+                let enseigneCommercialeOrg = await Account.findOne({
+                        users: qq.userAsk._id
+                    },
                     "enseigneCommerciale"
                 );
                 if (enseigneCommercialeOrg) {
@@ -178,14 +190,18 @@ module.exports.getallquestionsCompany = async (req, res) => {
 module.exports.getDetailOnQuestion = async (req, res) => {
     let qID = req.query.qID;
     try {
-        let qdata = await Question.findById(qID).populate([
-            { path: "userAsk", populate: { path: "imageProfile" } }
-        ]);
+        let qdata = await Question.findById(qID).populate([{
+            path: "userAsk",
+            populate: {
+                path: "imageProfile"
+            }
+        }]);
         if (qdata) {
             let d = new Date(qdata.addDate);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne(
-                { users: qdata.userAsk._id },
+            let enseigneCommercialeOrg = await Account.findOne({
+                    users: qdata.userAsk._id
+                },
                 "enseigneCommerciale"
             );
             if (enseigneCommercialeOrg) {
@@ -195,7 +211,9 @@ module.exports.getDetailOnQuestion = async (req, res) => {
             let dataObj = {};
             switch (qdata.objectRef) {
                 case "PRT":
-                    let prj = await Project.findById(qdata.objectRefID).populate([{ path: "account" }]);
+                    let prj = await Project.findById(qdata.objectRefID).populate([{
+                        path: "account"
+                    }]);
                     if (prj) {
                         _types = "project";
                         dataObj = {
@@ -209,13 +227,14 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 case "TMV":
                     let tmv = await TeamFront.findById(
                         qdata.objectRefID
-                    ).populate([{ path: "team_users" }]);
+                    ).populate([{
+                        path: "team_users"
+                    }]);
                     _types = "team";
                     dataObj = {
                         _id: tmv._id,
                         userOnMail: tmv.team_users.email,
-                        userOnName:
-                            tmv.team_users.lastname +
+                        userOnName: tmv.team_users.lastname +
                             " " +
                             tmv.team_users.firstname
                     };
@@ -230,8 +249,7 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 question_content: qdata.question_content,
                 usr: {
                     _id: qdata.userAsk._id,
-                    name:
-                        qdata.userAsk.lastname + " " + qdata.userAsk.firstname,
+                    name: qdata.userAsk.lastname + " " + qdata.userAsk.firstname,
                     email: qdata.userAsk.email,
                     org: ensc,
                     function: qdata.userAsk.function,
@@ -245,7 +263,10 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 }
             };
 
-            return sendJSONresponse(res, 200, { status: "OK", data: retDetails });
+            return sendJSONresponse(res, 200, {
+                status: "OK",
+                data: retDetails
+            });
         }
     } catch (e) {
         // statements

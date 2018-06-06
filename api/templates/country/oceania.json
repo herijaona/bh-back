@@ -1,0 +1,60 @@
+{
+    "obj": "country",
+    "continent": "oceania",
+    "list": [{
+            "country": "Australia",
+            "code": ""
+        },
+        {
+            "country": "Fiji",
+            "code": ""
+        },
+        {
+            "country": "Kiribati",
+            "code": ""
+        },
+        {
+            "country": "Marshall Islands",
+            "code": ""
+        },
+        {
+            "country": "Micronesia",
+            "code": ""
+        },
+        {
+            "country": "Nauru",
+            "code": ""
+        },
+        {
+            "country": "New Zealand",
+            "code": ""
+        },
+        {
+            "country": "Palau",
+            "code": ""
+        },
+        {
+            "country": "Papua New Guinea",
+            "code": ""
+        },
+        {
+            "country": "Samoa",
+            "code": ""
+        },
+        {
+            "country": "Solomon Islands",
+            "code": ""
+        },
+        {
+            "country": "Tonga",
+            "code": ""
+        },
+        {
+            "country": "Tuvalu",
+            "code": ""
+        }, {
+            "country": "Vanuatu",
+            "code": ""
+        }
+    ]
+}

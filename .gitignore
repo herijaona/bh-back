@@ -30,3 +30,5 @@ build/Release
 node_modules/
 uploads/*
 api/config/constant.js
+.vscode/
+.sonarlint/

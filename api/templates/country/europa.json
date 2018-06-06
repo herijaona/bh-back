@@ -1,0 +1,209 @@
+{
+    "obj": "country",
+    "continent": "europa",
+    "list": [{
+            "country": "Albania",
+            "code": ""
+        },
+        {
+            "country": "Andorra",
+            "code": ""
+        },
+        {
+            "country": "Armenia",
+            "code": ""
+        },
+        {
+            "country": "Austria",
+            "code": ""
+        },
+        {
+            "country": "Azerbaijan",
+            "code": ""
+        },
+        {
+            "country": "Belarus",
+            "code": ""
+        },
+        {
+            "country": "Belgium",
+            "code": ""
+        },
+        {
+            "country": "Bosnia and Herzegovina",
+            "code": ""
+        },
+        {
+            "country": "Bulgaria",
+            "code": ""
+        },
+        {
+            "country": "Croatia",
+            "code": ""
+        },
+        {
+            "country": "Cyprus",
+            "code": ""
+        },
+        {
+            "country": "Czech Republic",
+            "code": ""
+        },
+        {
+            "country": "Denmark",
+            "code": ""
+        },
+        {
+            "country": "Estonia",
+            "code": ""
+        },
+        {
+            "country": "Finland",
+            "code": ""
+        },
+        {
+            "country": "France",
+            "code": ""
+        },
+        {
+            "country": "Georgia",
+            "code": ""
+        },
+        {
+            "country": "Germany",
+            "code": ""
+        },
+        {
+            "country": "Greece ",
+            "code": ""
+        },
+        {
+            "country": "Hungary",
+            "code": ""
+        },
+        {
+            "country": "Iceland",
+            "code": ""
+        },
+        {
+            "country": "Ireland",
+            "code": ""
+        },
+        {
+            "country": "Italy",
+            "code": ""
+        },
+        {
+            "country": "Kazakhstan",
+            "code": ""
+        },
+        {
+            "country": "Kosovo",
+            "code": ""
+        },
+        {
+            "country": "Latvia",
+            "code": ""
+        },
+        {
+            "country": "Liechtenstein",
+            "code": ""
+        },
+        {
+            "country": "Lithuania",
+            "code": ""
+        },
+        {
+            "country": "Luxembourg",
+            "code": ""
+        },
+        {
+            "country": "Macedonia(FYROM)",
+            "code": ""
+        },
+        {
+            "country": "Malta",
+            "code": ""
+        },
+        {
+            "country": "Moldova",
+            "code": ""
+        },
+        {
+            "country": "Monaco",
+            "code": ""
+        },
+        {
+            "country": "Montenegro",
+            "code": ""
+        },
+        {
+            "country": "Netherlands",
+            "code": ""
+        },
+        {
+            "country": "Norway",
+            "code": ""
+        },
+        {
+            "country": "Poland",
+            "code": ""
+        },
+        {
+            "country": "Portugal",
+            "code": ""
+        },
+        {
+            "country": "Romania",
+            "code": ""
+        },
+        {
+            "country": "Russia ",
+            "code": ""
+        },
+        {
+            "country": "San Marino",
+            "code": ""
+        },
+        {
+            "country": "Serbia",
+            "code": ""
+        },
+        {
+            "country": "Slovakia",
+            "code": ""
+        },
+        {
+            "country": "Slovenia",
+            "code": ""
+        },
+        {
+            "country": "Spain",
+            "code": ""
+        },
+        {
+            "country": "Sweden",
+            "code": ""
+        },
+        {
+            "country": "Switzerland",
+            "code": ""
+        },
+        {
+            "country": "Turkey Ankara",
+            "code": ""
+        },
+        {
+            "country": "Ukraine",
+            "code": ""
+        },
+        {
+            "country": "United Kingdom",
+            "code": ""
+        },
+        {
+            "country": "Vatican City(Holy See)",
+            "code": ""
+        }
+    ]
+}
