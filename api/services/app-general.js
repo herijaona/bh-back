@@ -210,9 +210,19 @@ module.exports.media_url = img_ => {
 	return app_const.url + "/" + img_.replace("uploads", "files");
 };
 
+/* get country from json */
+var allCountry = fs.readFileSync(
+	path.join(global.basedir, "/api/templates/country.json"),
+	"utf8"
+);
 var cou2 = require('./../templates/country/country')
-module.exports.getcountry = () => {
-	return cou2.countryList();
+
+module.exports.getcountry = (type) => {
+	if (type === 'all') {
+		return JSON.parse(allCountry);
+	} else if (type === 'continent') {
+		return cou2.countryList();
+	}
 };
 
 /* get collab type from json */
@@ -220,7 +230,6 @@ var collabfile = fs.readFileSync(
 	path.join(global.basedir, "/api/templates/collaboration_Type_Default.json"),
 	"utf8"
 );
-
 module.exports.getCollabTypeText = type => {
 	let allCollab = JSON.parse(collabfile)["default_type"];
 	let curr = allCollab.filter(el => el.code == type);
@@ -231,3 +240,14 @@ module.exports.getCollabTypeText = type => {
 	}
 	return "no";
 };
+
+module.exports.getCountryText = code => {
+	const allC = JSON.parse(allCountry).default_type;
+	let cText = '';
+	for (const co of allC) {
+		if (co.code === code) {
+			cText = co.name
+		}
+	}
+	return cText;
+}

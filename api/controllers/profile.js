@@ -13,52 +13,53 @@ var userTosend = {
     isAdmin: false,
     imageProfile: ""
 };
-module.exports.profileRead = function(req, res) {
+module.exports.profileRead = function (req, res) {
     if (!req.payload._id) {
-        res.status(401).json({
+        return res.status(401).json({
             message: "UnauthorizedError: private profile",
             Error: "Any data for you"
         });
-    } else {
-        User.findById(req.payload._id).populate([{
-            path: "imageProfile"
-        }]).exec(function(err, user) {
-            var send_data = tools_service.copydata(userTosend, user);
-            Account.find({
-                userAdmin: send_data._id
-            }, (err, resp) => {
-                if (err) {
-                    res.status(200).json(send_data);
-                } else {
-                    var ws = [];
-                    resp.forEach(function(adm) {
-                        var ino = {
-                            _id: adm._id,
-                            name: adm.enseigneCommerciale
-                        };
-                        ws.push(ino);
-                    });
-                    send_data.accountAdmin = ws;
-                    /*to delete before pushing*/
-                    if (tools_service.inArray("imageProfile", Object.keys(JSON.parse(JSON.stringify(user))))) {
-                        send_data["imageProfile"] = tools_service.media_url(send_data["imageProfile"].url);
-                    }
-                    send_data.isAdmin = true;
-                    res.status(200).json(send_data);
-                }
-            });
-        });
     }
+    
+    User.findById(req.payload._id).populate([{
+        path: "imageProfile"
+    }]).exec(function (err, user) {
+        var send_data = tools_service.copydata(userTosend, user);
+        Account.find({
+            userAdmin: send_data._id
+        }, (err, resp) => {
+            if (err) {
+                res.status(200).json(send_data);
+            } else {
+                var ws = [];
+                resp.forEach(function (adm) {
+                    var ino = {
+                        _id: adm._id,
+                        name: adm.enseigneCommerciale
+                    };
+                    ws.push(ino);
+                });
+                send_data.accountAdmin = ws;
+                /*to delete before pushing*/
+                if (tools_service.inArray("imageProfile", Object.keys(JSON.parse(JSON.stringify(user))))) {
+                    send_data["imageProfile"] = tools_service.media_url(send_data["imageProfile"].url);
+                }
+                send_data.isAdmin = true;
+                res.status(200).json(send_data);
+            }
+        });
+    });
+
 };
 // Edit Password
-module.exports.editpass = function(req, res) {
+module.exports.editpass = function (req, res) {
     var _u = new User();
     User.findOne({
         email: req.payload.email
-    }, function(err, user) {
+    }, function (err, user) {
         _u = user;
         _u.setPassword(req.body.password);
-        _u.save(function(e_, u_) {
+        _u.save(function (e_, u_) {
             if (!e_) {
                 res.status(200).json(u_);
             } else {
@@ -71,7 +72,7 @@ module.exports.editpass = function(req, res) {
     });
 };
 //Edit Profile
-module.exports.editprofile = async function(req, res) {
+module.exports.editprofile = async function (req, res) {
     if (!req.payload._id) {
         res.status(401).json({
             message: "UnauthorizedError: private profile",
