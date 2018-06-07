@@ -12,6 +12,16 @@ var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
+var datModelCOllabList = {
+    name: "",
+    _id: "",
+    contexte: "",
+    responseTimeUnit: "",
+    responseTimeValue: 0
+};
+/* 
+ * Save Project ( Collaboration )
+ */
 module.exports.saveProjectsDATA = async (req, res) => {
     // console.log(req.body, req.ACC, req.userDATA);
     let prDATA = req.body;
@@ -37,38 +47,17 @@ module.exports.saveProjectsDATA = async (req, res) => {
         });
     }
 };
+/* 
+ * Get all Projet ( Collaboration )
+ */
 module.exports.getAllProjectsCompany = async (req, res) => {
     let acc_curr = req.ACC;
-    /*var populateQuery = [
-        { path: "listeCandidatures" },
-        { path: "createdByUser" }
-    ];*/
     try {
         let all_ = await Project.find({
             account: acc_curr
         });
         if (all_) {
-            let datSendModel = {
-                name: "",
-                _id: "",
-                contexte: "",
-                responseTimeUnit: "",
-                responseTimeValue: 0
-            };
-            let resData = [];
-            for (prIndex in all_) {
-                let pr0 = all_[prIndex];
-                let m = {};
-                if (pr0["typeCollab"] == "COLLABPROJINNOV") {
-                    m.name = pr0["dataDetails"]["collabDescribData"].name;
-                    m._id = pr0._id;
-                    m.contexte =
-                        pr0["dataDetails"]["collabDescribData"].contexte;
-                }
-                var m1 = Object.create(datSendModel);
-                var send_data = tools_service.copydata(m1, m);
-                resData.push(send_data);
-            }
+            let resData = await this.collabListBuild(all_);
             sendJSONresponse(res, 200, {
                 status: "OK",
                 message: "List",
@@ -83,6 +72,29 @@ module.exports.getAllProjectsCompany = async (req, res) => {
         console.log(e);
     }
 };
+
+module.exports.collabListBuild = async (arrAll) => {
+    let resData = [];
+    for (let prIndex in arrAll) {
+        let pr0 = arrAll[prIndex];
+        let reSndt = await this.formatOneCollabForList(pr0)
+        resData.push(reSndt);
+    }
+    return resData;
+}
+
+module.exports.formatOneCollabForList = async (coll) => {
+    let m = {};
+    if (coll["typeCollab"] == "COLLABPROJINNOV") {
+        m.name = coll["dataDetails"]["collabDescribData"].name;
+        m._id = coll._id;
+        m.contexte =
+            coll["dataDetails"]["collabDescribData"].contexte;
+    }
+    let m1 = Object.create(datModelCOllabList);
+    let send_data = tools_service.copydata(m1, m);
+    return send_data;
+}
 module.exports.getPrByID = async (req, res) => {
     let prID = req.query["projectID"];
     var populateQuery = [{
@@ -252,46 +264,9 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
                 path: "projectID"
             }
         ]);
-        console.log(allApplication);
         let applresp = [];
         if (allApplication) {
-            for (let aa of allApplication) {
-                let d = new Date(aa.createdAt);
-                let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne({
-                        users: aa.userID._id
-                    },
-                    "enseigneCommerciale"
-                );
-                if (enseigneCommercialeOrg) {
-                    ensc = enseigneCommercialeOrg["enseigneCommerciale"];
-                }
-                const ptype = await CollaborationType.findOne({
-                    slug: aa.projectID.typeCollab
-                }, 'text');
-                let pt = '';
-                if (ptype) {
-                    pt = ptype.text
-                }
-                let appl_ = {
-                    _id: aa._id,
-                    countryCD: tools_service.getCountryText(aa.applicationData.countryCD),
-                    hour: d.toTimeString().split(" ")[0],
-                    date: d.toDateString(),
-                    usr: {
-                        lastname: aa.userID.lastname,
-                        firstname: aa.userID.firstname,
-                        email: aa.userID.email,
-                        org: ensc
-                    },
-                    prjt: {
-                        _id: aa.projectID._id,
-                        name: aa.projectID.name,
-                        type: pt
-                    }
-                };
-                applresp.push(appl_);
-            }
+            applresp = await this.dataApplicationArr(allApplication);
         }
         return sendJSONresponse(res, 200, {
             status: "OK",
@@ -302,6 +277,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
         console.log(e);
     }
 };
+
 module.exports.getProjectApplicationDetails = async (req, res) => {
     let applID = req.query.applID;
     try {
@@ -377,6 +353,8 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
         console.log(e);
     }
 };
+
+
 module.exports.getAllCollaborationType = async (req, res) => {
     try {
         let allCollab = await CollaborationType.find({});
@@ -521,3 +499,96 @@ module.exports.getCollabTypeText = async (type) => {
         return "no typed";
     }
 };
+
+
+module.exports.getApplicationByCollabID = async (req, res) => {
+    let rIDCollab = req.query['cID'];
+    try {
+        let allAppl = await Candidature.find({
+            accountID: req.ACC._id,
+            projectID: rIDCollab
+        }).populate([{
+                path: "userID"
+            },
+            {
+                path: "projectID"
+            }
+        ]);
+        let applresp = [];
+        if (allAppl) {
+            applresp = await this.dataApplicationArr(allAppl);
+        }
+
+        let collB = await Project.findById(rIDCollab);
+        let dtColB;
+        if (collB) {
+            dtColB = await this.formatOneCollabForList(collB);
+        } else {
+            dtColB = false;
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: {
+                collabData: dtColB,
+                allApplication: applresp
+            }
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
+/* 
+ * Application Data Format 
+ */
+module.exports.dataApplicationArr = async (arrAll) => {
+    try {
+        let arrRes = [];
+        for (let aa of arrAll) {
+            let formattedAppl = await this.formatApplicationData(aa)
+            arrRes.push(formattedAppl);
+        }
+        return arrRes;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports.formatApplicationData = async (aa) => {
+    let d = new Date(aa.createdAt);
+    let ensc = "";
+    let enseigneCommercialeOrg = await Account.findOne({
+            users: aa.userID._id
+        },
+        "enseigneCommerciale"
+    );
+    if (enseigneCommercialeOrg) {
+        ensc = enseigneCommercialeOrg["enseigneCommerciale"];
+    }
+    const ptype = await CollaborationType.findOne({
+        slug: aa.projectID.typeCollab
+    }, 'text');
+    let pt = '';
+    if (ptype) {
+        pt = ptype.text
+    }
+    return {
+        _id: aa._id,
+        countryCD: tools_service.getCountryText(aa.applicationData.countryCD),
+        hour: d.toTimeString().split(" ")[0],
+        date: d.toDateString(),
+        usr: {
+            lastname: aa.userID.lastname,
+            firstname: aa.userID.firstname,
+            email: aa.userID.email,
+            org: ensc
+        },
+        prjt: {
+            _id: aa.projectID._id,
+            name: aa.projectID.name,
+            type: pt
+        }
+
+    };
+}
