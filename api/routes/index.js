@@ -7,13 +7,13 @@ var auth = jwt({
 });
 
 /*
-*  Middleware
-*/
+ *  Middleware
+ */
 var req_mid = require("../services/requestMiddleware");
 
 /*
-* Controllers
-*/
+ * Controllers
+ */
 var ctrlProfile = require("../controllers/profile");
 var ctrlAuth = require("../controllers/authentication");
 var ctrlUploads = require("../controllers/upload_file");
@@ -25,8 +25,8 @@ var ctrlQuestions = require("../controllers/questions_ctrl");
 var ctrlPatch = require("../controllers/patchData");
 
 /*
-*     ROUTES
-*/
+ *     ROUTES
+ */
 
 // profile
 router.get("/profile", auth, req_mid.validUser, ctrlProfile.profileRead);
@@ -170,8 +170,8 @@ router.get(
 );
 
 /*
-* Check If user IS admin of an Account (Company)
-*/
+ * Check If user IS admin of an Account (Company)
+ */
 router.get(
 	"/check_role",
 	auth,
@@ -327,6 +327,14 @@ router.get(
 	ctrlProject.getAllProjectsCompany
 );
 
+router.get(
+	"/bh-projects/getApplicationByCollabID",
+	auth,
+	req_mid.validUser,
+	req_mid.checkRole,
+	ctrlProject.getApplicationByCollabID
+);
+
 router.put(
 	"/bh-projects",
 	auth,
@@ -431,10 +439,10 @@ router.get("/cInvitationValData", ctrlProfile.checkInvitationVal);
 router.post("/cInvitationValData", ctrlProfile.PostInvitationVal);
 
 /*
-*
-* Questions 
-*
-*/
+ *
+ * Questions 
+ *
+ */
 
 router.post(
 	"/question-data",
