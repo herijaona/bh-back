@@ -333,11 +333,17 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             if (enseigneCommercialeOrg) {
                 ensc = enseigneCommercialeOrg["enseigneCommerciale"];
             }
+
+            let applDtl = allApplDetails.applicationData;
+            if ('countryCD' in applDtl) {
+                applDtl.countryCD = tools_service.getCountryText(applDtl.countryCD);
+            }
+            let collabType = await this.getCollabTypeText(allApplDetails.projectID.typeCollab);
             let retDetails = {
                 _id: allApplDetails._id,
                 hour: d.toTimeString().split(" ")[0],
                 date: d.toDateString(),
-                usr: {
+                candidat: {
                     _id: allApplDetails.userID._id,
                     name: allApplDetails.userID.lastname +
                         " " +
@@ -352,23 +358,18 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 projet: {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,
-                    accSlug: allApplDetails.projectID.account._slug,
+                    accSlug: allApplDetails.projectID.account.enseigneCommerciale,
                     byUser: allApplDetails.projectID.createdByUser.lastname +
                         " " +
-                        allApplDetails.projectID.createdByUser.firstname
+                        allApplDetails.projectID.createdByUser.firstname,
+                    typeCollab: collabType
                 },
-                applDetail: {
-                    mainActivityDomain: allApplDetails.mainActivityDomain,
-                    secondaryActivityDomain: allApplDetails.secondaryActivityDomain,
-                    skillnCompent: allApplDetails.skillnCompent,
-                    userActivityDescrib: allApplDetails.userActivityDescrib,
-                    dataSuppl: allApplDetails.dataSuppl
-                }
+                applDetail: applDtl
             };
+            // data: retDetails,
             return sendJSONresponse(res, 200, {
                 status: "OK",
-                data: retDetails,
-                v: allApplDetails
+                data: retDetails
             });
         }
     } catch (e) {
@@ -429,7 +430,7 @@ module.exports.getAllCollabList = async (req, res) => {
             for (let col1 of my_collab) {
                 let re = Object.create(objMatrice);
                 re.name = col1.dataDetails.collabDescribData.name;
-                re.type = tools_service.getCollabTypeText(col1.typeCollab);
+                re.type = await this.getCollabTypeText(col1.typeCollab);
                 re.date = new Date(col1.addDate).toDateString();
                 re._id = col1._id;
                 re.author = col1.createdByUser;
@@ -468,10 +469,11 @@ module.exports.getDataForApplication = async (req, res) => {
         if (prObj) {
             let retData = {};
             if (prObj["typeCollab"] == const_data.collabType.type1) {
+                let tt = await this.getCollabTypeText(prObj["typeCollab"]);
                 retData = {
                     _id: prObj._id,
                     name: prObj.dataDetails.collabDescribData["name"],
-                    type: tools_service.getCollabTypeText(prObj["typeCollab"]),
+                    type: tt,
                     typeSelect: "type1",
                     accountProjectOwner: prObj.account
                 };
@@ -503,3 +505,19 @@ module.exports.getDataForApplication = async (req, res) => {
 module.exports.userApplicationSent = async () => {
 
 }
+
+module.exports.getCollabTypeText = async (type) => {
+    try {
+        let cType = await CollaborationType.findOne({
+            slug: type
+        });
+        console.log(type);
+        if (!cType) {
+            return "no typed";
+        }
+        return cType.text
+    } catch (error) {
+        console.log(error);
+        return "no typed";
+    }
+};
