@@ -143,7 +143,7 @@ module.exports.getallquestionsCompany = async (req, res) => {
         }]);
         if (allQuest) {
             let resp = [];
-            for (qq of allQuest) {
+            for (let qq of allQuest) {
                 let da = new Date(qq.addDate);
                 let about = "";
                 if (qq.objectRef == "TMV") {
@@ -151,10 +151,6 @@ module.exports.getallquestionsCompany = async (req, res) => {
                 } else if (qq.objectRef == "PRT") {
                     about = "Project";
                 } else about = "Others";
-                let usr = {
-                    name: qq.userAsk.lastname + " " + qq.userAsk.firstname,
-                    email: qq.userAsk.email
-                };
                 let ensc = "";
                 let enseigneCommercialeOrg = await Account.findOne({
                         users: qq.userAsk._id
@@ -164,14 +160,26 @@ module.exports.getallquestionsCompany = async (req, res) => {
                 if (enseigneCommercialeOrg) {
                     ensc = enseigneCommercialeOrg["enseigneCommerciale"];
                 }
-                console.log(enseigneCommercialeOrg);
+
+                let cnt = qq.question_content.replace(/\n/g, '').replace(/<(?:.|\n)*?>/gm, '');
+                if (cnt.length > 300) {
+                    cnt = cnt.substr(0, 300) + '...';
+                }
+
+                let usr = {
+                    name: qq.userAsk.lastname + " " + qq.userAsk.firstname,
+                    email: qq.userAsk.email,
+                    org: ensc
+                };
+
                 let mat = {
                     _id: qq._id,
                     hour: da.toTimeString().split(" ")[0],
                     date: da.toDateString(),
                     about: about,
                     userAsk: usr,
-                    org: ensc
+                    quest_part: cnt
+
                 };
 
                 resp.push(mat);
