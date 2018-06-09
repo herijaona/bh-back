@@ -234,7 +234,7 @@ router.post(
 	auth,
 	req_mid.validUser,
 	req_mid.checkRole,
-	ctrlTeams.saveTeamsFrontVideoData
+	ctrlTeams.saveTeamsFrontData
 );
 
 /* Get front team video data */
@@ -372,6 +372,13 @@ router.post(
 	auth,
 	req_mid.validUser,
 	ctrlProject.applyToProjects
+);
+
+router.get(
+	"/bh-projects/getUserSentApplication",
+	auth,
+	req_mid.validUser,
+	ctrlProject.getUserSentApplication
 );
 
 

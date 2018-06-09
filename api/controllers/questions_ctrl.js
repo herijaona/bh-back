@@ -4,6 +4,7 @@ var Account = mongoose.model("Account");
 var tools_service = require("../services/app-general");
 var TeamCommunity = mongoose.model("TeamCommunity");
 var TeamFront = mongoose.model("TeamFront");
+var User = mongoose.model("User");
 
 var Project = mongoose.model("Project");
 /* Response sender*/
@@ -235,17 +236,22 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 case "TMV":
                     let tmv = await TeamFront.findById(
                         qdata.objectRefID
-                    ).populate([{
-                        path: "team_users"
-                    }]);
+                    );
                     _types = "team";
-                    dataObj = {
-                        _id: tmv._id,
-                        userOnMail: tmv.team_users.email,
-                        userOnName: tmv.team_users.lastname +
-                            " " +
-                            tmv.team_users.firstname
-                    };
+                    if (tmv) {
+                        console.log('--------');
+                        console.log(tmv);
+                        let ww = await User.findById(tmv.data.team_users);
+                        console.log('--------');
+                        console.log(ww);
+                        dataObj = {
+                            _id: ww._id,
+                            userOnMail: ww.email,
+                            userOnName: ww.lastname +
+                                " " +
+                                ww.firstname
+                        };
+                    }
 
                     break;
             }

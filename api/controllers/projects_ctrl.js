@@ -592,3 +592,62 @@ module.exports.formatApplicationData = async (aa) => {
 
     };
 }
+
+module.exports.getUserSentApplication = async (req, res) => {
+    try {
+        let userApplication = await Candidature.find({
+            userID: req.userDATA._id
+        }).populate([{
+                path: "userID"
+            },
+            {
+                path: "projectID",
+            },
+            {
+                path: 'accountID',
+                select: 'adresse enseigneCommerciale'
+            }
+        ]).sort([
+            ["createdAt", "descending"]
+        ]);
+        let allSentAppl = [];
+        if (userApplication) {
+            for (let usApplSent of userApplication) {
+                console.log(usApplSent);
+                let t = await this.formatsApplicationSentData(usApplSent)
+                if ("_id" in t) {
+                    allSentAppl.push(t)
+                }
+            }
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: allSentAppl
+        })
+
+    } catch (error) {
+
+    }
+}
+
+module.exports.formatsApplicationSentData = async (applSent) => {
+    try {
+
+        let d = new Date(applSent.createdAt);
+        let c = JSON.parse(applSent.accountID.adresse).description.split(',').pop();
+        let collabType = await this.getCollabTypeText(applSent.projectID.typeCollab);
+        let m = {
+            _id: applSent._id,
+            date: d.toDateString(),
+            country: c,
+            orgName: applSent.accountID.enseigneCommerciale,
+            typeCollab: collabType,
+            collabName: applSent.projectID.name,
+            status: "p"
+        }
+        return m;
+    } catch (error) {
+        console.log(error);
+        return error
+    }
+}

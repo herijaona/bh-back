@@ -5,14 +5,15 @@ var User = mongoose.model("User");
 var TeamCommunity = mongoose.model("TeamCommunity");
 var InvitationSent = mongoose.model("InvitationSent");
 var Account = mongoose.model("Account");
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
 	res.status(status);
 	res.json(content);
 };
-module.exports.saveTeamsFrontVideoData = async (req, res) => {
+module.exports.saveTeamsFrontData = async (req, res) => {
 	let tmF = new TeamFront(req.body);
 	tmF.user = req.userDATA._id;
 	tmF.account = req.ACC._id;
+	tmF.dateAdd = Date.now();
 	try {
 		let tmN = tmF.save();
 		if (tmN) {
@@ -74,11 +75,10 @@ module.exports.deleteTeamsFrontVideoData = async (req, res) => {
 };
 module.exports.updateTeamsFrontVideoData = async (req, res) => {
 	try {
-		let tmvUpdate = await TeamFront.findOneAndUpdate(
-			{
+		let tmvUpdate = await TeamFront.findOneAndUpdate({
 				_id: req.body.id_
 			},
-			req.body.data
+			req.body.dataUpdate
 		);
 		if (tmvUpdate) {
 			sendJSONresponse(res, 200, {
@@ -185,14 +185,17 @@ module.exports.getTeamUsers = async (req, res) => {
 };
 module.exports.getTeamUsersDetails = async (req, res) => {
 	let i = req.query.id_user;
+	let acc = req.query.accountID;
 	try {
 		let u = await User.findOne({
 			_id: i
 		});
+		let aa = await Account.findById(acc, 'enseigneCommerciale');
 		if (u) {
 			let detl = {
 				usr: u.firstname + " " + u.lastname,
-				fn: u["function"]
+				fn: u["function"],
+				acc: aa.enseigneCommerciale
 			};
 			sendJSONresponse(res, 200, {
 				status: "OK",
@@ -211,14 +214,12 @@ module.exports.getteamsUsersData = async (req, res) => {
 	let usrCom = req.ACC.usersCommetee;
 	let usrTm = req.ACC.usersTeam;
 	try {
-		let popAcc = await Account.populate(req.ACC, [
-			{
-				path: "users",
-				populate: {
-					path: "imageProfile"
-				}
+		let popAcc = await Account.populate(req.ACC, [{
+			path: "users",
+			populate: {
+				path: "imageProfile"
 			}
-		]);
+		}]);
 		if (popAcc) {
 			let ll = [];
 			let ll_in = [];
@@ -291,21 +292,17 @@ module.exports.changeAdmRole = async (req, res) => {
 		}
 		if (reqData.value == true) {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id,
-				{
+				acc_id, {
 					$push: updateData
-				},
-				{
+				}, {
 					new: true
 				}
 			);
 		} else {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id,
-				{
+				acc_id, {
 					$pull: updateData
-				},
-				{
+				}, {
 					new: true
 				}
 			);
@@ -347,15 +344,13 @@ module.exports.deleteUserFromTeam = async (req, res) => {
 			}
 		}
 		let upAcc = await Account.findByIdAndUpdate(
-			acc_id,
-			{
+			acc_id, {
 				$pull: {
 					users: reqData.usr_id,
 					userAdmin: reqData.usr_id,
 					usersTeam: reqData.usr_id
 				}
-			},
-			{
+			}, {
 				new: true
 			}
 		);
@@ -372,11 +367,15 @@ module.exports.getTeamCommunity = async (req, res) => {
 	/*console.log(req.userDATA);
 	console.log(req.ACC);*/
 	try {
-		let s = await TeamCommunity.findOne({ account: req.ACC._id });
+		let s = await TeamCommunity.findOne({
+			account: req.ACC._id
+		});
 		if (s) {
 			let sPop = await TeamCommunity.populate(s, {
 				path: "users.us",
-				populate: { path: "imageProfile" }
+				populate: {
+					path: "imageProfile"
+				}
 			});
 
 			if (sPop) {
@@ -403,8 +402,9 @@ module.exports.getTeamCommunity = async (req, res) => {
 						ds.us.imageProfile.url
 					);
 					comUser["us"] = oo;
-					let enseigneCommercialeOrg = await Account.findOne(
-						{ users: ds.us._id },
+					let enseigneCommercialeOrg = await Account.findOne({
+							users: ds.us._id
+						},
 						"enseigneCommerciale"
 					);
 					if (enseigneCommercialeOrg) {
@@ -429,5 +429,3 @@ module.exports.getTeamCommunity = async (req, res) => {
 		console.log(e);
 	}
 };
-
-
