@@ -52,6 +52,8 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
             "users.us": uA
         });
 
+        console.log(tComm);
+
 
         if (tComm) {
             let sf = tComm.users.filter(
@@ -89,9 +91,7 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
                 $push: {
                     users: {
                         us: uA,
-                        $puhs: {
-                            act: inst
-                        }
+                        act: inst
                     }
                 }
             }, {

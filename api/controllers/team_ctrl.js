@@ -373,6 +373,8 @@ module.exports.getTeamCommunity = async (req, res) => {
 				path: "imageProfile"
 			}
 		}]);
+		
+		console.log(s);
 		if (s) {
 			let sPop = s;
 			if (sPop) {

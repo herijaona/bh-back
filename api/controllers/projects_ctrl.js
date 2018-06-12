@@ -200,7 +200,7 @@ module.exports.deleteProjects = async (req, res) => {
         });
     }
 };
-module.exports.applyToProjects = async (req, res) => {
+module.exports.applyToProjects = async (req, res) => {    
     let dataPr = req.body.currObj;
     let applData = req.body.data;
     try {
@@ -216,7 +216,7 @@ module.exports.applyToProjects = async (req, res) => {
         if (cndt_appl) {
             sendApplyEmail(req.userDATA, dataPr);
             await ctrlQuestions.addToComminity(
-                dataPr["account"],
+                dataPr["accountProjectOwner"],
                 req.userDATA._id,
                 "application"
             );
