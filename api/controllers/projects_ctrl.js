@@ -23,7 +23,6 @@ var datModelCOllabList = {
  * Save Project ( Collaboration )
  */
 module.exports.saveProjectsDATA = async (req, res) => {
-    // console.log(req.body, req.ACC, req.userDATA);
     let prDATA = req.body;
     prDATA["account"] = req.ACC._id;
     prDATA["createdByUser"] = req.userDATA._id;
@@ -203,7 +202,6 @@ module.exports.deleteProjects = async (req, res) => {
 };
 module.exports.applyToProjects = async (req, res) => {
     let dataPr = req.body.currObj;
-    console.log(req.body);
     let applData = req.body.data;
     try {
         let cndt = new Candidature();
@@ -217,16 +215,16 @@ module.exports.applyToProjects = async (req, res) => {
         let cndt_appl = await cndt.save();
         if (cndt_appl) {
             sendApplyEmail(req.userDATA, dataPr);
+            await ctrlQuestions.addToComminity(
+                dataPr["account"],
+                req.userDATA._id,
+                "application"
+            );
             sendJSONresponse(res, 200, {
                 status: "OK",
                 message: "saved",
                 data: {}
             });
-            ctrlQuestions.addToComminity(
-                dataPr["account"],
-                req.userDATA._id,
-                "application"
-            );
         }
     } catch (e) {
         // statements
@@ -489,7 +487,6 @@ module.exports.getCollabTypeText = async (type) => {
         let cType = await CollaborationType.findOne({
             slug: type
         });
-        console.log(type);
         if (!cType) {
             return "no typed";
         }
@@ -613,7 +610,6 @@ module.exports.getUserSentApplication = async (req, res) => {
         let allSentAppl = [];
         if (userApplication) {
             for (let usApplSent of userApplication) {
-                console.log(usApplSent);
                 let t = await this.formatsApplicationSentData(usApplSent)
                 if ("_id" in t) {
                     allSentAppl.push(t)

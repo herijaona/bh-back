@@ -13,7 +13,7 @@ var DataForResponse = {
     _id: "",
     adresse: "",
     Logo: "",
-    raisonSociale: "",
+    activityArea: "",
     enseigneCommerciale: "",
     typeOrganisation: "",
     coverImage: "",
@@ -39,7 +39,6 @@ module.exports.listall = async (req, res) => {
             let l = allAcc.length;
             for (acc_ of allAcc) {
                 if (acc_.isActive) {
-                    console.log(acc_);
                     let m = Object.create(DataForResponse);
                     let c = tools_service.copydata(m, acc_);
                     c.Logo = tools_service.media_url(c.Logo.url, "images");

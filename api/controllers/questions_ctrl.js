@@ -29,7 +29,7 @@ module.exports.postQuestions = async (req, res) => {
     try {
         let d_ = await qst.save();
         if (d_) {
-            this.addToComminity(d_["account"], d_["userAsk"], "question");
+            await this.addToComminity(d_["account"], d_["userAsk"], "question");
             return sendJSONresponse(res, 200, {
                 status: "OK",
                 message: " Saved",
@@ -52,6 +52,7 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
             "users.us": uA
         });
 
+
         if (tComm) {
             let sf = tComm.users.filter(
                 el => el.us.toString() == uA.toString()
@@ -72,23 +73,25 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
                     new: true
                 });
                 if (tCommUpdate) {
-                    return;
+                    return 1;
                 }
-                return;
+                return 2;
             }
-            return;
+            return 3;
         }
-        tComm = await TeamCommunity.findOne({
+        let tComms = await TeamCommunity.findOne({
             account: aCCID
         });
-        if (tComm) {
+        if (tComms) {
             let tCommUpdate = await TeamCommunity.findOneAndUpdate({
                 account: aCCID
             }, {
                 $push: {
                     users: {
                         us: uA,
-                        act: inst
+                        $puhs: {
+                            act: inst
+                        }
                     }
                 }
             }, {
@@ -102,12 +105,11 @@ module.exports.addToComminity = async (aCCID, uA, inst) => {
                 account: aCCID,
                 users: [{
                     us: uA,
-                    act: "question"
+                    act: ["question"]
                 }]
             });
             let s = await tc.save();
             if (s) {
-                console.log("added");
                 return;
             }
         }
@@ -122,7 +124,6 @@ module.exports.getallquestionsCompany = async (req, res) => {
     let accID = req.ACC._id;
     let qType = req.query['qtype'];
     let qr = {};
-    console.log(qType);
 
     if (qType == 'no-project') {
         qr = {
@@ -141,7 +142,9 @@ module.exports.getallquestionsCompany = async (req, res) => {
     try {
         let allQuest = await Question.find(qr).populate([{
             path: "userAsk"
-        }]);
+        }]).sort([
+            ["addDate", "descending"]
+        ]);
         if (allQuest) {
             let resp = [];
             for (let qq of allQuest) {
@@ -240,10 +243,8 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                     _types = "team";
                     if (tmv) {
                         console.log('--------');
-                        console.log(tmv);
                         let ww = await User.findById(tmv.data.team_users);
                         console.log('--------');
-                        console.log(ww);
                         dataObj = {
                             _id: ww._id,
                             userOnMail: ww.email,

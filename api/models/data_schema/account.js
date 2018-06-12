@@ -3,7 +3,7 @@ var crypto = require("crypto");
 
 var accountSchema = new mongoose.Schema({
     enseigneCommerciale: String,
-    raisonSociale: String,
+    activityArea: String,
     Logo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Image"
