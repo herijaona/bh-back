@@ -10,9 +10,7 @@ class ProjectModel {
 			this.initByID(data);
 		} else if (key == "email") {
 			this.initByEmail(data);
-		} else if (key == "object") {
-			console.log('d')
-		}
+		} else if (key == "object") {}
 	}
 
 	async initByID(id) {

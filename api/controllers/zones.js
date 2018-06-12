@@ -114,7 +114,6 @@ module.exports.getZoneDATA = function(req, res) {
 };
 
 module.exports.saveZoneEditDATA = async (req, res) => {
-	// console.log(req.body);
 	let postData = req.body;
 	let curr = postData.currZn;
 	delete postData.currZn;

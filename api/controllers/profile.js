@@ -47,9 +47,7 @@ module.exports.profileRead = function(req, res) {
 						});
 						send_data.accountAdmin = ws;
                         /*to delete before pushing*/
-                        console.log(user);
 						if ('imageProfile' in user) {
-                            console.log('object in image');
 							send_data['imageProfile'] = tools_service.media_url(user['imageProfile'].url);
 						}
 						send_data.isAdmin = true;
@@ -124,7 +122,6 @@ module.exports.editprofile = async function(req, res) {
 	}
 };
 module.exports.checkInvitationVal = async (req, res) => {
-	// console.log(req.query);
 	let invtID = req.query['invitId'];
 	var populateQuery = [
 		{

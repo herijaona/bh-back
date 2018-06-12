@@ -53,7 +53,6 @@ UserModel.prototype.isAdmin = async function() {
             usersCommetee: this.innObj._id
         });
         this.isUserAdmin = accDoc.length > 0 || accDoc2.length > 0;
-        console.log(this.isUserAdmin);
         if (this.isUserAdmin) {
             let administred = [];
             for (let a of accDoc) {
@@ -62,7 +61,6 @@ UserModel.prototype.isAdmin = async function() {
             for (let b of accDoc2) {
                 administred.push(b._id);
             }
-            console.log(administred);
             this.adminAccount = this.remove_duplicates(administred);
             return {
                 val: true,

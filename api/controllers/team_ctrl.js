@@ -364,20 +364,19 @@ module.exports.deleteUserFromTeam = async (req, res) => {
 };
 
 module.exports.getTeamCommunity = async (req, res) => {
-	/*console.log(req.userDATA);
-	console.log(req.ACC);*/
 	try {
 		let s = await TeamCommunity.findOne({
 			account: req.ACC._id
-		});
+		}).populate([{
+			path: "users.us",
+			populate: {
+				path: "imageProfile"
+			}
+		}]);
+		
+		console.log(s);
 		if (s) {
-			let sPop = await TeamCommunity.populate(s, {
-				path: "users.us",
-				populate: {
-					path: "imageProfile"
-				}
-			});
-
+			let sPop = s;
 			if (sPop) {
 				let dataRet = {
 					firstname: "",
@@ -390,7 +389,7 @@ module.exports.getTeamCommunity = async (req, res) => {
 
 				let ret = sPop.users;
 				let aftCh = [];
-				for (ds of ret) {
+				for (let ds of ret) {
 					let comUser = {
 						_id: ds._id,
 						act: ds.act,
