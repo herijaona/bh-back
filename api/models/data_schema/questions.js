@@ -12,9 +12,11 @@ var questionsFrontSchema = new mongoose.Schema({
 			rDate: Date,
 			user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 			respText: String,
-			numbr: Number
+			numbr: Number,
+			state: String
 		}
 	],
-	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" }
+	account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+	stateAdmin: String
 });
 mongoose.model("Question", questionsFrontSchema);

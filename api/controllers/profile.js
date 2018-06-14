@@ -13,7 +13,13 @@ var userTosend = {
 	isAdmin: false,
 	imageProfile: '',
 };
-module.exports.profileRead = function(req, res) {
+
+var sendJSONresponse = function (res, status, content) {
+	res.status(status);
+	res.json(content);
+};
+
+module.exports.profileRead = async function (req, res) {
 	if (!req.payload._id) {
 		return res.status(401).json({
 			message: 'UnauthorizedError: private profile',
@@ -21,16 +27,22 @@ module.exports.profileRead = function(req, res) {
 		});
 	}
 
+	try {
+
+
+	} catch (e) {
+		console.log(e);
+	}
+
+
+
 	User.findById(req.payload._id)
-		.populate([
-			{
-				path: 'imageProfile',
-			},
-		])
-		.exec(function(err, user) {
+		.populate([{
+			path: 'imageProfile',
+		}, ])
+		.exec(function (err, user) {
 			var send_data = tools_service.copydata(userTosend, user);
-			Account.find(
-				{
+			Account.find({
 					userAdmin: send_data._id,
 				},
 				(err, resp) => {
@@ -38,7 +50,7 @@ module.exports.profileRead = function(req, res) {
 						res.status(200).json(send_data);
 					} else {
 						var ws = [];
-						resp.forEach(function(adm) {
+						resp.forEach(function (adm) {
 							var ino = {
 								_id: adm._id,
 								name: adm.enseigneCommerciale,
@@ -46,7 +58,8 @@ module.exports.profileRead = function(req, res) {
 							ws.push(ino);
 						});
 						send_data.accountAdmin = ws;
-                        /*to delete before pushing*/
+						/*to delete before pushing*/
+						console.log(user);
 						if ('imageProfile' in user) {
 							send_data['imageProfile'] = tools_service.media_url(user['imageProfile'].url);
 						}
@@ -58,16 +71,15 @@ module.exports.profileRead = function(req, res) {
 		});
 };
 // Edit Password
-module.exports.editpass = function(req, res) {
+module.exports.editpass = function (req, res) {
 	var _u = new User();
-	User.findOne(
-		{
+	User.findOne({
 			email: req.payload.email,
 		},
-		function(err, user) {
+		function (err, user) {
 			_u = user;
 			_u.setPassword(req.body.password);
-			_u.save(function(e_, u_) {
+			_u.save(function (e_, u_) {
 				if (!e_) {
 					res.status(200).json(u_);
 				} else {
@@ -81,7 +93,7 @@ module.exports.editpass = function(req, res) {
 	);
 };
 //Edit Profile
-module.exports.editprofile = async function(req, res) {
+module.exports.editprofile = async function (req, res) {
 	if (!req.payload._id) {
 		res.status(401).json({
 			message: 'UnauthorizedError: private profile',
@@ -90,12 +102,10 @@ module.exports.editprofile = async function(req, res) {
 	}
 	let bodyData = req.body;
 	try {
-		let usr = await User.findOneAndUpdate(
-			{
+		let usr = await User.findOneAndUpdate({
 				email: req.payload.email,
 			},
-			bodyData,
-			{
+			bodyData, {
 				new: true,
 			}
 		);
@@ -123,8 +133,7 @@ module.exports.editprofile = async function(req, res) {
 };
 module.exports.checkInvitationVal = async (req, res) => {
 	let invtID = req.query['invitId'];
-	var populateQuery = [
-		{
+	var populateQuery = [{
 			path: 'account',
 		},
 		{
@@ -189,6 +198,12 @@ module.exports.PostInvitationVal = async (req, res) => {
 	newUser.setPassword(dtaPass);
 	newUser.generateActivationCode();
 	try {
+		let imageDF = await Image.findOne({
+			name: "DefaultsprofileImage"
+		});
+		if (imageDF) {
+			newUser.imageProfile = imageDF._id;
+		}
 		let nUser = await newUser.save();
 		if (nUser) {
 			let inv = await InvitationSent.findById(dtaInvt._id);
@@ -204,11 +219,9 @@ module.exports.PostInvitationVal = async (req, res) => {
 				}
 				updateData['users'] = nUser._id;
 				let acc = await Account.findByIdAndUpdate(
-					acc_id,
-					{
+					acc_id, {
 						$push: updateData,
-					},
-					{
+					}, {
 						new: true,
 					}
 				);
@@ -234,3 +247,42 @@ module.exports.PostInvitationVal = async (req, res) => {
 		console.log(e);
 	}
 };
+
+
+module.exports.DataRole = async (req, res) => {
+	try {
+		let roleData = {
+			hsAc: false
+		}
+		let accUserAdminIn = await Account.find({
+			userAdmin: req.userDATA._id
+		}, '_slug')
+		let accUserComm = await Account.find({
+			usersCommetee: req.userDATA._id
+		}, '_slug');
+		roleData['isAdm'] = false;
+		if (accUserAdminIn.length > 0) {
+			roleData['hsAc'] = true;
+			roleData['isAdm'] = true;
+			roleData['admAc'] = accUserAdminIn;
+		}
+		roleData['isInCom'] = false;
+		if (accUserComm.length > 0) {
+			roleData['hsAc'] = true;
+			roleData['isInCom'] = true;
+			roleData['inCom'] = accUserComm;
+		}
+
+		return sendJSONresponse(res, 200, {
+			status: 'OK',
+			data: roleData
+		})
+
+	} catch (err) {
+		console.log(err);
+		return sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: 'Error Server'
+		})
+	}
+}

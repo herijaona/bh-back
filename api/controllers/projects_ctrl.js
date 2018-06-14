@@ -53,8 +53,8 @@ module.exports.getAllProjectsCompany = async (req, res) => {
     let acc_curr = req.ACC;
     try {
         let all_ = await Project.find({
-            account: acc_curr
-        });
+            account: acc_curr._id
+        }).sort([['addDate','descending']]);
         if (all_) {
             let resData = await this.collabListBuild(all_);
             sendJSONresponse(res, 200, {
@@ -100,14 +100,13 @@ module.exports.getPrByID = async (req, res) => {
             path: "listeCandidatures"
         },
         {
-            path: "createdByUser"
+            path: "account",
+            select : 'adresse enseigneCommerciale'
         }
     ];
     let datSendModel = {
         name: "",
         _id: "",
-        responseTimeUnit: "",
-        responseTimeValue: 0,
         contexte: "0",
         elementProposition: "",
         listeCandidatures: "",
@@ -121,16 +120,11 @@ module.exports.getPrByID = async (req, res) => {
             }).populate(populateQuery);
             if (prJ) {
                 if (prJ["typeCollab"] == const_data.collabType.type1) {
-                    let pp = tools_service.copydata(
-                        datSendModel,
-                        prJ["dataDetails"]["collabDescribData"]
-                    );
-                    pp.account = prJ['account']
-                    pp.listeCandidatures = pp.listeCandidatures.length;
-                    pp._id = prJ._id;
+                    delete prJ.dataDetails.infoConfidentialData;
+                   prJ.account['adresse']= JSON.parse(prJ.account['adresse']).description.split(',').pop();
                     return sendJSONresponse(res, 200, {
                         status: "OK",
-                        data: pp
+                        data: prJ
                     });
                 } else {
                     return sendJSONresponse(res, 200, {
@@ -200,7 +194,7 @@ module.exports.deleteProjects = async (req, res) => {
         });
     }
 };
-module.exports.applyToProjects = async (req, res) => {    
+module.exports.applyToProjects = async (req, res) => {
     let dataPr = req.body.currObj;
     let applData = req.body.data;
     try {
@@ -218,7 +212,8 @@ module.exports.applyToProjects = async (req, res) => {
             await ctrlQuestions.addToComminity(
                 dataPr["accountProjectOwner"],
                 req.userDATA._id,
-                "application"
+                "application",
+                dataPr._id
             );
             sendJSONresponse(res, 200, {
                 status: "OK",
@@ -646,4 +641,53 @@ module.exports.formatsApplicationSentData = async (applSent) => {
         console.log(error);
         return error
     }
+}
+
+/**f 
+ * Opportuinity
+ */
+module.exports.getAllProjectsAsOpportinuty = async (req, res) => {
+    var id_comp = req.headers["x-ccompany-id"];
+    let opportList = []
+    try {
+        let allCollab = await Project.find({
+            account: {
+                $ne: id_comp
+            }
+        }).populate({
+            path: 'account',
+            select: 'enseigneCommerciale adresse _slug'
+        }).sort([
+            ["addDate", "descending"]
+        ]);
+
+        for (const coll of allCollab) {
+            opportList.push(this.formatOpportuinityCollab(coll))
+        }
+
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: opportList
+        })
+
+    } catch (e) {
+        console.log(e);
+        sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: 'error server'
+        })
+    }
+}
+
+module.exports.formatOpportuinityCollab = (colbMdel) => {
+    let collabCountry = JSON.parse(colbMdel.account.adresse).description.split(',').pop();
+    let clMdl = {
+        _id: colbMdel._id,
+        typeCollab: colbMdel.typeCollab,
+        country: collabCountry,
+        name: colbMdel.name,
+        organisation: colbMdel.account.enseigneCommerciale,
+        org_slug: colbMdel.account._slug
+    }
+    return clMdl
 }

@@ -22,42 +22,28 @@ var accountSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Member"
     },
-    users: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ],
-    projets: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Project"
-        }
-    ],
-    successStories: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "SuccessStorie"
-        }
-    ],
-    meetings: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Meeting"
-        }
-    ]
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    projets: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project"
+    }],
+    successStories: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SuccessStorie"
+    }]
 });
 accountSchema.add({
     pagetoShow: String
 });
 
 accountSchema.add({
-    userAdmin: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ]
+    userAdmin: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 });
 accountSchema.add({
     presentation: {
@@ -77,20 +63,16 @@ accountSchema.add({
     }
 });
 accountSchema.add({
-    usersTeam: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ]
+    usersTeam: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 });
 accountSchema.add({
-    usersCommetee: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ]
+    usersCommetee: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 });
 accountSchema.add({
     coverImage: {
