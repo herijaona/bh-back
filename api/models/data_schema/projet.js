@@ -1,9 +1,10 @@
 var mongoose = require("mongoose");
 
 var projetSchema = new mongoose.Schema({
-	listeCandidatures: [
-		{ type: mongoose.Schema.Types.ObjectId, ref: "Candidature" }
-	],
+	listeCandidatures: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Candidature"
+	}],
 	idProjetCCA: String,
 	view: Number,
 	account: {
@@ -17,7 +18,8 @@ var projetSchema = new mongoose.Schema({
 	typeCollab: String,
 	dataDetails: {},
 	addDate: Date,
-	name: String
+	name: String, 
+	status: String
 });
 
 mongoose.model("Project", projetSchema);

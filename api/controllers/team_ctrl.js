@@ -4,8 +4,9 @@ var tools_service = require("../services/app-general");
 var User = mongoose.model("User");
 var TeamCommunity = mongoose.model("TeamCommunity");
 var InvitationSent = mongoose.model("InvitationSent");
+var Project = mongoose.model("Project");
 var Account = mongoose.model("Account");
-var sendJSONresponse = function (res, status, content) {
+var sendJSONresponse = function(res, status, content) {
 	res.status(status);
 	res.json(content);
 };
@@ -75,7 +76,8 @@ module.exports.deleteTeamsFrontVideoData = async (req, res) => {
 };
 module.exports.updateTeamsFrontVideoData = async (req, res) => {
 	try {
-		let tmvUpdate = await TeamFront.findOneAndUpdate({
+		let tmvUpdate = await TeamFront.findOneAndUpdate(
+			{
 				_id: req.body.id_
 			},
 			req.body.dataUpdate
@@ -101,6 +103,34 @@ module.exports.updateTeamsFrontVideoData = async (req, res) => {
 		});
 	}
 };
+
+module.exports.getInvitationSent = async (req, res) => {
+	try {
+		let invt = await InvitationSent.find({
+			account: req.ACC._id,
+			status: {
+				$ne: "ACTIVE"
+			}
+		})
+			.populate([
+				{
+					path: "invintedbyUser",
+					select: "lastname firstname"
+				}
+			])
+			.sort([["dateAdd", "descending"]]);
+		if (invt.length) {
+			console.log(invt);
+		}
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: invt
+		});
+	} catch (er) {
+		console.log(er);
+	}
+};
+
 module.exports.inviteUserInTeam = async (req, res) => {
 	let dataInvitation = req.body;
 	let userData = req.userDATA;
@@ -118,7 +148,8 @@ module.exports.inviteUserInTeam = async (req, res) => {
 		} else {
 			let usrOwnerMailI = await InvitationSent.find({
 				email: req.body.email,
-				status: "SENT"
+				status: "SENT",
+				account: userACC._id
 			});
 			if (usrOwnerMailI.length > 0) {
 				sendJSONresponse(res, 409, {
@@ -130,7 +161,7 @@ module.exports.inviteUserInTeam = async (req, res) => {
 				invtation["account"] = userACC._id;
 				invtation["invintedbyUser"] = userData._id;
 				invtation["status"] = "SENT";
-				invtation["DateAdd"] = Date.now();
+				invtation["dateAdd"] = Date.now();
 				let yu = await invtation.save();
 				if (yu) {
 					let m = await tools_service.mailInvitations(
@@ -154,6 +185,40 @@ module.exports.inviteUserInTeam = async (req, res) => {
 			status: "NOK",
 			message: "Erreur serveur"
 		});
+	}
+};
+
+module.exports.reviveInvitations = async (req, res) => {
+	let invtID = req.body.invID;
+	try {
+		let inv = await InvitationSent.findById(invtID).populate([
+			{
+				path: "account"
+			},
+			{
+				path: "invintedbyUser"
+			}
+		]);
+		console.log(inv);
+		if (inv) {
+			let m = await tools_service.mailInvitations(
+				inv,
+				inv.invintedbyUser,
+				inv.account
+			);
+			if (m.body.Messages[0].Status == "success") {
+				return sendJSONresponse(res, 200, {
+					status: "OK",
+					message: "Invitation Resent"
+				});
+			}
+		}
+		return sendJSONresponse(res, 404, {
+			status: "NOK",
+			message: "INvitation Not Found"
+		});
+	} catch (e) {
+		console.log(e);
 	}
 };
 module.exports.getTeamUsers = async (req, res) => {
@@ -190,7 +255,7 @@ module.exports.getTeamUsersDetails = async (req, res) => {
 		let u = await User.findOne({
 			_id: i
 		});
-		let aa = await Account.findById(acc, 'enseigneCommerciale');
+		let aa = await Account.findById(acc, "enseigneCommerciale");
 		if (u) {
 			let detl = {
 				usr: u.firstname + " " + u.lastname,
@@ -214,12 +279,14 @@ module.exports.getteamsUsersData = async (req, res) => {
 	let usrCom = req.ACC.usersCommetee;
 	let usrTm = req.ACC.usersTeam;
 	try {
-		let popAcc = await Account.populate(req.ACC, [{
-			path: "users",
-			populate: {
-				path: "imageProfile"
+		let popAcc = await Account.populate(req.ACC, [
+			{
+				path: "users",
+				populate: {
+					path: "imageProfile"
+				}
 			}
-		}]);
+		]);
 		if (popAcc) {
 			let ll = [];
 			let ll_in = [];
@@ -292,17 +359,21 @@ module.exports.changeAdmRole = async (req, res) => {
 		}
 		if (reqData.value == true) {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id, {
+				acc_id,
+				{
 					$push: updateData
-				}, {
+				},
+				{
 					new: true
 				}
 			);
 		} else {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id, {
+				acc_id,
+				{
 					$pull: updateData
-				}, {
+				},
+				{
 					new: true
 				}
 			);
@@ -344,13 +415,15 @@ module.exports.deleteUserFromTeam = async (req, res) => {
 			}
 		}
 		let upAcc = await Account.findByIdAndUpdate(
-			acc_id, {
+			acc_id,
+			{
 				$pull: {
 					users: reqData.usr_id,
 					userAdmin: reqData.usr_id,
 					usersTeam: reqData.usr_id
 				}
-			}, {
+			},
+			{
 				new: true
 			}
 		);
@@ -365,64 +438,65 @@ module.exports.deleteUserFromTeam = async (req, res) => {
 
 module.exports.getTeamCommunity = async (req, res) => {
 	try {
-		let s = await TeamCommunity.findOne({
+		let sPop = await TeamCommunity.findOne({
 			account: req.ACC._id
-		}).populate([{
-			path: "users.us",
-			populate: {
-				path: "imageProfile"
-			}
-		}]);
-		
-		console.log(s);
-		if (s) {
-			let sPop = s;
-			if (sPop) {
-				let dataRet = {
-					firstname: "",
-					lastname: "",
-					email: "",
-					imageProfile: "",
-					_id: "",
-					function: ""
-				};
-
-				let ret = sPop.users;
-				let aftCh = [];
-				for (let ds of ret) {
-					let comUser = {
-						_id: ds._id,
-						act: ds.act,
-						org: ""
-					};
-					let oo = Object.create(dataRet);
-					oo = tools_service.copydata(oo, ds.us);
-					oo.imageProfile = tools_service.media_url(
-						ds.us.imageProfile.url
-					);
-					comUser["us"] = oo;
-					let enseigneCommercialeOrg = await Account.findOne({
-							users: ds.us._id
-						},
-						"enseigneCommerciale"
-					);
-					if (enseigneCommercialeOrg) {
-						comUser["org"] =
-							enseigneCommercialeOrg["enseigneCommerciale"];
-					}
-					aftCh.push(comUser);
+		}).populate([
+			{
+				path: "users.us",
+				select: "firstname lastname email imageProfile function",
+				populate: {
+					path: "imageProfile"
 				}
-				let rrt = {
-					users: aftCh,
-					_id: sPop._id,
-					account: sPop.account
-				};
-				return sendJSONresponse(res, 200, {
-					status: "OK",
-					data: rrt
-				});
 			}
+		]);
+
+		console.log(sPop, req.ACC._id);
+		let aftCh = [];
+		if (sPop) {
+			let ret = sPop.users;
+			for (let ds of ret) {
+				let comUser = JSON.parse(JSON.stringify(ds));
+				let oo = JSON.parse(JSON.stringify(ds.us));
+
+				oo.imageProfile = tools_service.media_url(
+					ds.us.imageProfile.url
+				);
+
+				comUser["us"] = oo;
+				let enseigneCommercialeOrg = await Account.findOne(
+					{
+						users: ds.us._id
+					},
+					"enseigneCommerciale"
+				);
+				if (enseigneCommercialeOrg) {
+					comUser["org"] =
+						enseigneCommercialeOrg["enseigneCommerciale"];
+				}
+
+				if (comUser.last_act == "application") {
+					let prDa = await Project.findById(
+						comUser.last_objData,
+						"name"
+					);
+					comUser.lastPrName = prDa.name;
+				}
+				aftCh.push(comUser);
+			}
+			let rrt = {
+				users: aftCh,
+				_id: sPop._id,
+				account: sPop.account
+			};
+			return sendJSONresponse(res, 200, {
+				status: "OK",
+				data: rrt
+			});
 		}
+		return sendJSONresponse(res, 200, {
+			status: "NOK",
+			message: "any user found"
+		});
 	} catch (e) {
 		// statements
 		console.log(e);

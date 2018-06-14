@@ -104,7 +104,7 @@ var defaultDATAAcc = async (rs, ac) => {
         dtype: 3,
         canDeleted: false,
         caption: "_chiffres",
-        data_suppl: '{"createdYear":0,"ageMoyen":0,"collabor":0,"createdOpportinuite":"0","turnOver":0,"pariteFemme":0,"pariteHomme":0, "curr":"default"}',
+        data_suppl: '{}',
         account: ac._id,
         __v: 0
     };
