@@ -175,9 +175,14 @@ module.exports.getallquestionsCompany = async (req, res) => {
             .populate([
                 {
                     path: "userAsk"
+                },
+                {
+                    path: "responseAll.user",
+                    select: "lastname firstname"
                 }
             ])
             .sort([["addDate", "descending"]]);
+        console.log(allQuest);
         if (allQuest) {
             let resp = [];
             for (let qq of allQuest) {
@@ -211,14 +216,16 @@ module.exports.getallquestionsCompany = async (req, res) => {
                     email: qq.userAsk.email,
                     org: ensc
                 };
-
+                let respIN = qq.responseAll.length > 0 ? true : false;
                 let mat = {
                     _id: qq._id,
                     hour: da.toTimeString().split(" ")[0],
                     date: da.toDateString(),
                     about: about,
                     userAsk: usr,
-                    quest_part: cnt
+                    quest_part: cnt,
+                    responseIN: qq.responseAll,
+                    hasresp: respIN
                 };
 
                 resp.push(mat);
@@ -354,5 +361,28 @@ module.exports.archives_questions = async (req, res) => {
 };
 
 module.exports.replyQuestions = async (req, res) => {
-    return sendJSONresponse(res, 200, { status: "OK" });
+    console.log(req.body, req.userDATA);
+    let responseData = {
+        rDate: Date.now(),
+        user: req.userDATA._id,
+        respText: req.body.response_value,
+        state: "not-seen"
+    };
+    try {
+        let qSt = await Question.findByIdAndUpdate(
+            req.body.qID,
+            {
+                $push: {
+                    responseAll: responseData
+                }
+            },
+            { new: true }
+        );
+        if (qSt) {
+            return sendJSONresponse(res, 200, { status: "OK" });
+        }
+    } catch (e) {
+        // statements
+        console.log(e);
+    }
 };

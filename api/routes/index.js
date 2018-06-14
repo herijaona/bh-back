@@ -245,6 +245,7 @@ router.get('/getallCompanyQuestions', auth, req_mid.validUser, req_mid.checkRole
 
 router.get('/getDetailOnQuestion', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getDetailOnQuestion);
 router.post('/archives_questions', auth, req_mid.validUser,req_mid.checkRole, ctrlQuestions.archives_questions);
+router.post('/reply_questions', auth, req_mid.validUser,req_mid.checkRole, ctrlQuestions.replyQuestions);
 
 router.get('/org_types', ctrlCompanies.getOrgTypes);
 
