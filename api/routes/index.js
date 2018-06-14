@@ -242,10 +242,13 @@ router.post('/cInvitationValData', ctrlProfile.PostInvitationVal);
 
 router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions);
 router.get('/getallCompanyQuestions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallquestionsCompany);
-router.get('/getallCompanyArchives', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallarchivesCompany);
+router.get('/getallCompanyArchives', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallCompanyArchives);
 
 router.get('/getDetailOnQuestion', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getDetailOnQuestion);
+
 router.post('/archives_questions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.archives_questions);
+router.post('/reply_questions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.replyQuestions);
+
 
 router.get('/org_types', ctrlCompanies.getOrgTypes);
 

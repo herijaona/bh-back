@@ -165,12 +165,19 @@ module.exports.getallquestionsCompany = async(req, res) => {
 
     try {
         let allQuest = await Question.find(qr)
-            .populate([{
-                path: "userAsk"
-            }])
+
+        .populate([{
+                    path: "userAsk"
+                },
+                {
+                    path: "responseAll.user",
+                    select: "lastname firstname"
+                }
+            ])
             .sort([
                 ["addDate", "descending"]
             ]);
+        console.log(allQuest);
         if (allQuest) {
             let resp = [];
             for (let qq of allQuest) {
@@ -203,98 +210,16 @@ module.exports.getallquestionsCompany = async(req, res) => {
                     email: qq.userAsk.email,
                     org: ensc
                 };
-
+                let respIN = qq.responseAll.length > 0 ? true : false;
                 let mat = {
                     _id: qq._id,
                     hour: da.toTimeString().split(" ")[0],
                     date: da.toDateString(),
                     about: about,
                     userAsk: usr,
-                    quest_part: cnt
-                };
-
-                resp.push(mat);
-            }
-            return sendJSONresponse(res, 200, {
-                status: "OK",
-                data: resp
-            });
-        }
-    } catch (e) {
-        // statements
-        console.log(e);
-    }
-};
-
-
-module.exports.getallarchivesCompany = async(req, res) => {
-    let accID = req.ACC._id;
-    let qType = req.query["qtype"];
-    let qr = {};
-
-    if (qType == "no-project") {
-        qr = {
-            account: accID,
-            objectRef: {
-                $ne: "PRT"
-            },
-            stateAdmin: "archived"
-        };
-    } else {
-        qr = {
-            account: accID,
-            objectRef: "PRT"
-        };
-    }
-
-    try {
-        let allQuest = await Question.find(qr)
-            .populate([{
-                path: "userAsk"
-            }])
-            .sort([
-                ["addDate", "descending"]
-            ]);
-        if (allQuest) {
-            let resp = [];
-            for (let qq of allQuest) {
-                let da = new Date(qq.addDate);
-                let about = "";
-                if (qq.objectRef == "TMV") {
-                    about = "Team";
-                } else if (qq.objectRef == "PRT") {
-                    about = "Project";
-                } else about = "Others";
-                let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne({
-                        users: qq.userAsk._id
-                    },
-                    "enseigneCommerciale"
-                );
-                if (enseigneCommercialeOrg) {
-                    ensc = enseigneCommercialeOrg["enseigneCommerciale"];
-                }
-
-                let cnt = qq.question_content;
-                /*      .replace(/\n/g, "")
-                    .replace(/<(?:.|\n)*?>/gm, "");
-                if (cnt.length > 300) {
-                    cnt = cnt.substr(0, 300) + "...";
-                }*/
-
-                let usr = {
-                    name: qq.userAsk.lastname + " " + qq.userAsk.firstname,
-                    email: qq.userAsk.email,
-                    org: ensc
-                };
-
-                let mat = {
-                    _id: qq._id,
-                    hour: da.toTimeString().split(" ")[0],
-                    date: da.toDateString(),
-                    about: about,
-                    userAsk: usr,
-                    quest_part: cnt
+                    quest_part: cnt,
+                    responseIN: qq.responseAll,
+                    hasresp: respIN
                 };
 
                 resp.push(mat);
@@ -421,7 +346,34 @@ module.exports.archives_questions = async(req, res) => {
 };
 
 
-module.exports.getallquestionsCompany = async(req, res) => {
+module.exports.replyQuestions = async(req, res) => {
+    console.log(req.body, req.userDATA);
+    let responseData = {
+        rDate: Date.now(),
+        user: req.userDATA._id,
+        respText: req.body.response_value,
+        state: "not-seen"
+    };
+    try {
+        let qSt = await Question.findByIdAndUpdate(
+            req.body.qID, {
+                $push: {
+                    responseAll: responseData
+                }
+            }, { new: true }
+        );
+        if (qSt) {
+            return sendJSONresponse(res, 200, { status: "OK" });
+        }
+    } catch (e) {
+        // statements
+        console.log(e);
+    }
+};
+
+
+
+module.exports.getallCompanyArchives = async(req, res) => {
     let accID = req.ACC._id;
     let qType = req.query["qtype"];
     let qr = {};
@@ -432,7 +384,7 @@ module.exports.getallquestionsCompany = async(req, res) => {
             objectRef: {
                 $ne: "PRT"
             },
-            stateAdmin: "active"
+            stateAdmin: "archived"
         };
     } else {
         qr = {
@@ -502,9 +454,4 @@ module.exports.getallquestionsCompany = async(req, res) => {
         // statements
         console.log(e);
     }
-};
-
-
-module.exports.replyQuestions = async(req, res) => {
-    return sendJSONresponse(res, 200, { status: "OK" });
 };
