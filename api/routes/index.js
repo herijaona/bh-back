@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
 var auth = jwt({
-	secret: 'MY_SECRET',
-	userProperty: 'payload',
+    secret: 'MY_SECRET',
+    userProperty: 'payload',
 });
 
 /*
@@ -107,11 +107,11 @@ router.get('/company_details', req_mid.accReqSlug, ctrlCompanies.getCompanyDetai
 
 /* by user ID*/
 router.get(
-	'/userCompanyDetails',
-	auth,
-	req_mid.validUser,
-	ctrlCompanies.companyDetailsByUserID,
-	ctrlCompanies.getCompanyDetailsData
+    '/userCompanyDetails',
+    auth,
+    req_mid.validUser,
+    ctrlCompanies.companyDetailsByUserID,
+    ctrlCompanies.getCompanyDetailsData
 );
 
 /* Get company presentation */
@@ -166,11 +166,11 @@ router.post('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProj
 router.get('/bh-projects', req_mid.accReqSlug, ctrlProject.getAllProjectsCompany);
 
 router.get(
-	'/bh-projects/getApplicationByCollabID',
-	auth,
-	req_mid.validUser,
-	req_mid.checkRole,
-	ctrlProject.getApplicationByCollabID
+    '/bh-projects/getApplicationByCollabID',
+    auth,
+    req_mid.validUser,
+    req_mid.checkRole,
+    ctrlProject.getApplicationByCollabID
 );
 
 router.put('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.updateProjects);
@@ -178,19 +178,19 @@ router.put('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProje
 router.delete('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.deleteProjects);
 
 router.get(
-	'/bh-projects/allCompanyApplication',
-	auth,
-	req_mid.validUser,
-	req_mid.checkRole,
-	ctrlProject.getAllCompanyProjectApplication
+    '/bh-projects/allCompanyApplication',
+    auth,
+    req_mid.validUser,
+    req_mid.checkRole,
+    ctrlProject.getAllCompanyProjectApplication
 );
 
 router.get(
-	'/bh-projects/ApplicationDetails',
-	auth,
-	req_mid.validUser,
-	req_mid.checkRole,
-	ctrlProject.getProjectApplicationDetails
+    '/bh-projects/ApplicationDetails',
+    auth,
+    req_mid.validUser,
+    req_mid.checkRole,
+    ctrlProject.getProjectApplicationDetails
 );
 
 router.post('/bh-projects-apply', auth, req_mid.validUser, ctrlProject.applyToProjects);
@@ -242,9 +242,10 @@ router.post('/cInvitationValData', ctrlProfile.PostInvitationVal);
 
 router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions);
 router.get('/getallCompanyQuestions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallquestionsCompany);
+router.get('/getallCompanyArchives', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallarchivesCompany);
 
 router.get('/getDetailOnQuestion', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getDetailOnQuestion);
-router.post('/archives_questions', auth, req_mid.validUser,req_mid.checkRole, ctrlQuestions.archives_questions);
+router.post('/archives_questions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.archives_questions);
 
 router.get('/org_types', ctrlCompanies.getOrgTypes);
 
