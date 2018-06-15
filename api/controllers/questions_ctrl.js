@@ -396,8 +396,13 @@ module.exports.getallCompanyArchives = async(req, res) => {
     try {
         let allQuest = await Question.find(qr)
             .populate([{
-                path: "userAsk"
-            }])
+                    path: "userAsk"
+                },
+                {
+                    path: "responseAll.user",
+                    select: "lastname firstname"
+                }
+            ])
             .sort([
                 ["addDate", "descending"]
             ]);
@@ -433,16 +438,17 @@ module.exports.getallCompanyArchives = async(req, res) => {
                     email: qq.userAsk.email,
                     org: ensc
                 };
-
+                let respIN = qq.responseAll.length > 0 ? true : false;
                 let mat = {
                     _id: qq._id,
                     hour: da.toTimeString().split(" ")[0],
                     date: da.toDateString(),
                     about: about,
                     userAsk: usr,
-                    quest_part: cnt
+                    quest_part: cnt,
+                    responseIN: qq.responseAll,
+                    hasresp: respIN
                 };
-
                 resp.push(mat);
             }
             return sendJSONresponse(res, 200, {
