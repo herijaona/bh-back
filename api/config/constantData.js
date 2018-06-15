@@ -5,4 +5,23 @@ CONSTData.collabType = {
 	type3: "COLLABINCUB",
 	type4: "COLLABINVEST"
 };
+
+CONSTData.collabTypeText = [
+	{
+		slug: "COLLABSUBJINNOV",
+		text: "Suggestions"
+	},
+	{
+		slug: "COLLABPROJINNOV",
+		text: "Project"
+	},
+	{
+		slug: "COLLABINCUB",
+		text: "Incubation"
+	},
+	{
+		slug: "COLLABINVEST",
+		text: "Investment"
+	}
+];
 module.exports = CONSTData;

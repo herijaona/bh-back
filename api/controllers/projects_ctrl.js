@@ -8,7 +8,7 @@ var Account = mongoose.model("Account");
 var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
 var ctrlQuestions = require("./questions_ctrl");
-var sendJSONresponse = function (res, status, content) {
+var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -54,7 +54,7 @@ module.exports.getAllProjectsCompany = async (req, res) => {
     try {
         let all_ = await Project.find({
             account: acc_curr._id
-        }).sort([['addDate','descending']]);
+        }).sort([["addDate", "descending"]]);
         if (all_) {
             let resData = await this.collabListBuild(all_);
             sendJSONresponse(res, 200, {
@@ -72,36 +72,37 @@ module.exports.getAllProjectsCompany = async (req, res) => {
     }
 };
 
-module.exports.collabListBuild = async (arrAll) => {
+module.exports.collabListBuild = async arrAll => {
     let resData = [];
     for (let prIndex in arrAll) {
         let pr0 = arrAll[prIndex];
-        let reSndt = await this.formatOneCollabForList(pr0)
+        let reSndt = await this.formatOneCollabForList(pr0);
         resData.push(reSndt);
     }
     return resData;
-}
+};
 
-module.exports.formatOneCollabForList = async (coll) => {
+module.exports.formatOneCollabForList = async coll => {
     let m = {};
+
     if (coll["typeCollab"] == "COLLABPROJINNOV") {
         m.name = coll["dataDetails"]["collabDescribData"].name;
         m._id = coll._id;
-        m.contexte =
-            coll["dataDetails"]["collabDescribData"].contexte;
+        m.contexte = coll["dataDetails"]["collabDescribData"].contexte;
+        m.typeCollab = coll["typeCollab"];
     }
-    let m1 = Object.create(datModelCOllabList);
-    let send_data = tools_service.copydata(m1, m);
-    return send_data;
-}
+
+    return m;
+};
 module.exports.getPrByID = async (req, res) => {
     let prID = req.query["projectID"];
-    var populateQuery = [{
+    var populateQuery = [
+        {
             path: "listeCandidatures"
         },
         {
             path: "account",
-            select : 'adresse enseigneCommerciale'
+            select: "adresse enseigneCommerciale"
         }
     ];
     let datSendModel = {
@@ -121,7 +122,9 @@ module.exports.getPrByID = async (req, res) => {
             if (prJ) {
                 if (prJ["typeCollab"] == const_data.collabType.type1) {
                     delete prJ.dataDetails.infoConfidentialData;
-                   prJ.account['adresse']= JSON.parse(prJ.account['adresse']).description.split(',').pop();
+                    prJ.account["adresse"] = JSON.parse(prJ.account["adresse"])
+                        .description.split(",")
+                        .pop();
                     return sendJSONresponse(res, 200, {
                         status: "OK",
                         data: prJ
@@ -150,11 +153,13 @@ module.exports.updateProjects = async (req, res) => {
     let pr_id = req.body.id_;
     let acc_id = req.ACC._id;
     try {
-        let resUpdate = await Project.findOneAndUpdate({
+        let resUpdate = await Project.findOneAndUpdate(
+            {
                 _id: pr_id,
                 account: acc_id
             },
-            req.body.edited, {
+            req.body.edited,
+            {
                 new: true
             }
         );
@@ -204,8 +209,7 @@ module.exports.applyToProjects = async (req, res) => {
         cndt.createdAt = Date.now();
         cndt.userID = req.userDATA._id;
         cndt.projectID = dataPr._id;
-        cndt.countryCD =
-            cndt.status = "Pending";
+        cndt.countryCD = cndt.status = "Pending";
         let cndt_appl = await cndt.save();
         if (cndt_appl) {
             sendApplyEmail(req.userDATA, dataPr);
@@ -238,7 +242,8 @@ var sendApplyEmail = async (userDATA, dataPr) => {
             let Accuser = await acc.populate({
                 path: "userAdmin"
             });
-        } else {}
+        } else {
+        }
     } catch (e) {
         // statements
         console.log(e);
@@ -250,7 +255,8 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
     try {
         let allApplication = await Candidature.find({
             accountID: accId
-        }).populate([{
+        }).populate([
+            {
                 path: "userID"
             },
             {
@@ -274,7 +280,8 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
 module.exports.getProjectApplicationDetails = async (req, res) => {
     let applID = req.query.applID;
     try {
-        let allApplDetails = await Candidature.findById(applID).populate([{
+        let allApplDetails = await Candidature.findById(applID).populate([
+            {
                 path: "userID",
                 populate: {
                     path: "imageProfile"
@@ -282,7 +289,8 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             },
             {
                 path: "projectID",
-                populate: [{
+                populate: [
+                    {
                         path: "createdByUser"
                     },
                     {
@@ -294,7 +302,8 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
         if (allApplDetails) {
             let d = new Date(allApplDetails.createdAt);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne({
+            let enseigneCommercialeOrg = await Account.findOne(
+                {
                     users: allApplDetails.userID._id
                 },
                 "enseigneCommerciale"
@@ -304,17 +313,20 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             }
 
             let applDtl = allApplDetails.applicationData;
-            if ('countryCD' in applDtl) {
-                applDtl.countryCD = tools_service.getCountryText(applDtl.countryCD);
+            if ("countryCD" in applDtl) {
+                applDtl.countryCD = tools_service.getCountryText(
+                    applDtl.countryCD
+                );
             }
-            let collabType = await this.getCollabTypeText(allApplDetails.projectID.typeCollab);
+
             let retDetails = {
                 _id: allApplDetails._id,
                 hour: d.toTimeString().split(" ")[0],
                 date: d.toDateString(),
                 candidat: {
                     _id: allApplDetails.userID._id,
-                    name: allApplDetails.userID.lastname +
+                    name:
+                        allApplDetails.userID.lastname +
                         " " +
                         allApplDetails.userID.firstname,
                     email: allApplDetails.userID.email,
@@ -327,11 +339,13 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 projet: {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,
-                    accSlug: allApplDetails.projectID.account.enseigneCommerciale,
-                    byUser: allApplDetails.projectID.createdByUser.lastname +
+                    accSlug:
+                        allApplDetails.projectID.account.enseigneCommerciale,
+                    byUser:
+                        allApplDetails.projectID.createdByUser.lastname +
                         " " +
                         allApplDetails.projectID.createdByUser.firstname,
-                    typeCollab: collabType
+                    typeCollab: allApplDetails.projectID.typeCollab
                 },
                 applDetail: applDtl
             };
@@ -346,7 +360,6 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
         console.log(e);
     }
 };
-
 
 module.exports.getAllCollaborationType = async (req, res) => {
     try {
@@ -369,7 +382,7 @@ module.exports.getAllCollaborationType = async (req, res) => {
     }
 };
 module.exports.getCountryAll = async (req, res) => {
-    const cType = req.query['type'];
+    const cType = req.query["type"];
     return sendJSONresponse(res, 200, {
         status: "OK",
         data: tools_service.getcountry(cType)
@@ -386,22 +399,25 @@ module.exports.getAllCollabList = async (req, res) => {
     };
     let account_id = req.ACC._id;
     try {
-        let my_collab = await Project.find({
+        let my_collab = await Project.find(
+            {
                 account: account_id
-            })
-            .populate([{
-                path: "createdByUser",
-                select: "firstname lastname"
-            }])
-            .sort([
-                ["addDate", "descending"]
-            ]);
+            },
+            "name typeCollab createdByUser addDate"
+        )
+            .populate([
+                {
+                    path: "createdByUser",
+                    select: "firstname lastname"
+                }
+            ])
+            .sort([["addDate", "descending"]]);
         if (my_collab) {
             let retVal = [];
             for (let col1 of my_collab) {
                 let re = Object.create(objMatrice);
-                re.name = col1.dataDetails.collabDescribData.name;
-                re.type = await this.getCollabTypeText(col1.typeCollab);
+                re.name = col1.name;
+                re.type = col1.typeCollab;
                 re.date = new Date(col1.addDate).toDateString();
                 re._id = col1._id;
                 re.author = col1.createdByUser;
@@ -431,7 +447,8 @@ module.exports.getDataForApplication = async (req, res) => {
     let userID = req.userDATA._id;
 
     try {
-        let currUsrAcc = await Account.find({
+        let currUsrAcc = await Account.find(
+            {
                 users: userID
             },
             "enseigneCommerciale "
@@ -454,7 +471,8 @@ module.exports.getDataForApplication = async (req, res) => {
                 } else {
                     retData["hasAcc"] = false;
                     retData["userACC"] = {
-                        enseigneCommerciale: req.userDATA.lastname + " " + req.userDATA.firstname
+                        enseigneCommerciale:
+                            req.userDATA.lastname + " " + req.userDATA.firstname
                     };
                 }
             }
@@ -473,11 +491,9 @@ module.exports.getDataForApplication = async (req, res) => {
     }
 };
 
-module.exports.userApplicationSent = async () => {
+module.exports.userApplicationSent = async () => {};
 
-}
-
-module.exports.getCollabTypeText = async (type) => {
+module.exports.getCollabTypeText = async type => {
     try {
         let cType = await CollaborationType.findOne({
             slug: type
@@ -485,21 +501,21 @@ module.exports.getCollabTypeText = async (type) => {
         if (!cType) {
             return "no typed";
         }
-        return cType.text
+        return cType.text;
     } catch (error) {
         console.log(error);
         return "no typed";
     }
 };
 
-
 module.exports.getApplicationByCollabID = async (req, res) => {
-    let rIDCollab = req.query['cID'];
+    let rIDCollab = req.query["cID"];
     try {
         let allAppl = await Candidature.find({
             accountID: req.ACC._id,
             projectID: rIDCollab
-        }).populate([{
+        }).populate([
+            {
                 path: "userID"
             },
             {
@@ -528,29 +544,29 @@ module.exports.getApplicationByCollabID = async (req, res) => {
     } catch (e) {
         console.log(e);
     }
-}
-
+};
 
 /* 
  * Application Data Format 
  */
-module.exports.dataApplicationArr = async (arrAll) => {
+module.exports.dataApplicationArr = async arrAll => {
     try {
         let arrRes = [];
         for (let aa of arrAll) {
-            let formattedAppl = await this.formatApplicationData(aa)
+            let formattedAppl = await this.formatApplicationForListData(aa);
             arrRes.push(formattedAppl);
         }
         return arrRes;
     } catch (error) {
         console.log(error);
     }
-}
+};
 
-module.exports.formatApplicationData = async (aa) => {
+module.exports.formatApplicationForListData = async aa => {
     let d = new Date(aa.createdAt);
     let ensc = "";
-    let enseigneCommercialeOrg = await Account.findOne({
+    let enseigneCommercialeOrg = await Account.findOne(
+        {
             users: aa.userID._id
         },
         "enseigneCommerciale"
@@ -558,13 +574,7 @@ module.exports.formatApplicationData = async (aa) => {
     if (enseigneCommercialeOrg) {
         ensc = enseigneCommercialeOrg["enseigneCommerciale"];
     }
-    const ptype = await CollaborationType.findOne({
-        slug: aa.projectID.typeCollab
-    }, 'text');
-    let pt = '';
-    if (ptype) {
-        pt = ptype.text
-    }
+    
     return {
         _id: aa._id,
         countryCD: tools_service.getCountryText(aa.applicationData.countryCD),
@@ -579,54 +589,54 @@ module.exports.formatApplicationData = async (aa) => {
         prjt: {
             _id: aa.projectID._id,
             name: aa.projectID.name,
-            type: pt
+            type: aa.projectID.typeCollab
         }
-
     };
-}
+};
 
 module.exports.getUserSentApplication = async (req, res) => {
     try {
         let userApplication = await Candidature.find({
             userID: req.userDATA._id
-        }).populate([{
-                path: "userID"
-            },
-            {
-                path: "projectID",
-            },
-            {
-                path: 'accountID',
-                select: 'adresse enseigneCommerciale'
-            }
-        ]).sort([
-            ["createdAt", "descending"]
-        ]);
+        })
+            .populate([
+                {
+                    path: "userID"
+                },
+                {
+                    path: "projectID"
+                },
+                {
+                    path: "accountID",
+                    select: "adresse enseigneCommerciale"
+                }
+            ])
+            .sort([["createdAt", "descending"]]);
         let allSentAppl = [];
         if (userApplication) {
             for (let usApplSent of userApplication) {
-                let t = await this.formatsApplicationSentData(usApplSent)
+                let t = await this.formatsApplicationSentData(usApplSent);
                 if ("_id" in t) {
-                    allSentAppl.push(t)
+                    allSentAppl.push(t);
                 }
             }
         }
         return sendJSONresponse(res, 200, {
             status: "OK",
             data: allSentAppl
-        })
+        });
+    } catch (error) {}
+};
 
-    } catch (error) {
-
-    }
-}
-
-module.exports.formatsApplicationSentData = async (applSent) => {
+module.exports.formatsApplicationSentData = async applSent => {
     try {
-
         let d = new Date(applSent.createdAt);
-        let c = JSON.parse(applSent.accountID.adresse).description.split(',').pop();
-        let collabType = await this.getCollabTypeText(applSent.projectID.typeCollab);
+        let c = JSON.parse(applSent.accountID.adresse)
+            .description.split(",")
+            .pop();
+        let collabType = await this.getCollabTypeText(
+            applSent.projectID.typeCollab
+        );
         let m = {
             _id: applSent._id,
             date: d.toDateString(),
@@ -635,52 +645,53 @@ module.exports.formatsApplicationSentData = async (applSent) => {
             typeCollab: collabType,
             collabName: applSent.projectID.name,
             status: "p"
-        }
+        };
         return m;
     } catch (error) {
         console.log(error);
-        return error
+        return error;
     }
-}
+};
 
-/**f 
+/**f
  * Opportuinity
  */
 module.exports.getAllProjectsAsOpportinuty = async (req, res) => {
     var id_comp = req.headers["x-ccompany-id"];
-    let opportList = []
+    let opportList = [];
     try {
         let allCollab = await Project.find({
             account: {
                 $ne: id_comp
             }
-        }).populate({
-            path: 'account',
-            select: 'enseigneCommerciale adresse _slug'
-        }).sort([
-            ["addDate", "descending"]
-        ]);
+        })
+            .populate({
+                path: "account",
+                select: "enseigneCommerciale adresse _slug"
+            })
+            .sort([["addDate", "descending"]]);
 
         for (const coll of allCollab) {
-            opportList.push(this.formatOpportuinityCollab(coll))
+            opportList.push(this.formatOpportuinityCollab(coll));
         }
 
         return sendJSONresponse(res, 200, {
             status: "OK",
             data: opportList
-        })
-
+        });
     } catch (e) {
         console.log(e);
         sendJSONresponse(res, 500, {
             status: "NOK",
-            message: 'error server'
-        })
+            message: "error server"
+        });
     }
-}
+};
 
-module.exports.formatOpportuinityCollab = (colbMdel) => {
-    let collabCountry = JSON.parse(colbMdel.account.adresse).description.split(',').pop();
+module.exports.formatOpportuinityCollab = colbMdel => {
+    let collabCountry = JSON.parse(colbMdel.account.adresse)
+        .description.split(",")
+        .pop();
     let clMdl = {
         _id: colbMdel._id,
         typeCollab: colbMdel.typeCollab,
@@ -688,6 +699,6 @@ module.exports.formatOpportuinityCollab = (colbMdel) => {
         name: colbMdel.name,
         organisation: colbMdel.account.enseigneCommerciale,
         org_slug: colbMdel.account._slug
-    }
-    return clMdl
-}
+    };
+    return clMdl;
+};

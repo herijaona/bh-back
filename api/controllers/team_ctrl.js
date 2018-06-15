@@ -450,7 +450,7 @@ module.exports.getTeamCommunity = async (req, res) => {
 			}
 		]);
 
-		console.log(sPop, req.ACC._id);
+		console.log(sPop);
 		let aftCh = [];
 		if (sPop) {
 			let ret = sPop.users;
