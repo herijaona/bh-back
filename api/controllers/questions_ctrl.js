@@ -235,7 +235,6 @@ module.exports.getallquestionsCompany = async(req, res) => {
     }
 };
 
-
 module.exports.getDetailOnQuestion = async(req, res) => {
     let qID = req.query.qID;
     try {
@@ -345,7 +344,6 @@ module.exports.archives_questions = async(req, res) => {
     }
 };
 
-
 module.exports.replyQuestions = async(req, res) => {
     console.log(req.body, req.userDATA);
     let responseData = {
@@ -371,31 +369,20 @@ module.exports.replyQuestions = async(req, res) => {
     }
 };
 
-
-
 module.exports.getallCompanyArchives = async(req, res) => {
     let accID = req.ACC._id;
-    let qType = req.query["qtype"];
-    let qr = {};
-
-    if (qType == "no-project") {
-        qr = {
-            account: accID,
-            objectRef: {
-                $ne: "PRT"
-            },
-            stateAdmin: "archived"
-        };
-    } else {
-        qr = {
-            account: accID,
-            objectRef: "PRT"
-        };
-    }
+    let qr = {
+        account: accID,
+        objectRef: {
+            $ne: "PRT"
+        },
+        stateAdmin: "archived"
+    };
 
     try {
         let allQuest = await Question.find(qr)
-            .populate([{
+
+        .populate([{
                     path: "userAsk"
                 },
                 {
@@ -413,8 +400,6 @@ module.exports.getallCompanyArchives = async(req, res) => {
                 let about = "";
                 if (qq.objectRef == "TMV") {
                     about = "Team";
-                } else if (qq.objectRef == "PRT") {
-                    about = "Project";
                 } else about = "Others";
                 let ensc = "";
                 let enseigneCommercialeOrg = await Account.findOne({
@@ -459,5 +444,6 @@ module.exports.getallCompanyArchives = async(req, res) => {
     } catch (e) {
         // statements
         console.log(e);
+        return sendJSONresponse(res, 500, { status: "NOK", message: "Server Error" })
     }
 };
