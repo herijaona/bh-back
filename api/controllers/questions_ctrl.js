@@ -14,7 +14,7 @@ var sendJSONresponse = function(res, status, content) {
 };
 
 /* Post Questions*/
-module.exports.postQuestions = async (req, res) => {
+module.exports.postQuestions = async(req, res) => {
     let dAbout = req.body.dataAbout;
     let dq = {
         objectRef: req.body.objectRef,
@@ -52,7 +52,7 @@ module.exports.postQuestions = async (req, res) => {
     }
 };
 /* Add inCommunity */
-module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
+module.exports.addToComminity = async(aCCID, uA, inst, lastData) => {
     try {
         let tComm = await TeamCommunity.findOne({
             account: aCCID,
@@ -80,8 +80,7 @@ module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
                     "users.$.last_act": inst
                 };
             }
-            let tCommUpdate = await TeamCommunity.findOneAndUpdate(
-                {
+            let tCommUpdate = await TeamCommunity.findOneAndUpdate({
                     account: aCCID,
                     users: {
                         $elemMatch: {
@@ -89,8 +88,7 @@ module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
                         }
                     }
                 },
-                datUpdate,
-                {
+                datUpdate, {
                     new: true
                 }
             );
@@ -103,25 +101,21 @@ module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
         });
         console.log(tComms);
         if (tComms) {
-            let tCommUpdate = await TeamCommunity.findOneAndUpdate(
-                {
-                    account: aCCID
-                },
-                {
-                    users: {
-                        $push: {
-                            us: uA,
-                            act: inst,
-                            last_date: Date.now(),
-                            last_objData: lastData,
-                            last_act: inst
-                        }
+            let tCommUpdate = await TeamCommunity.findOneAndUpdate({
+                account: aCCID
+            }, {
+                users: {
+                    $push: {
+                        us: uA,
+                        act: inst,
+                        last_date: Date.now(),
+                        last_objData: lastData,
+                        last_act: inst
                     }
-                },
-                {
-                    new: true
                 }
-            );
+            }, {
+                new: true
+            });
             if (tCommUpdate) {
                 return;
             }
@@ -129,15 +123,13 @@ module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
             let tc = new TeamCommunity({
                 account: aCCID,
 
-                users: [
-                    {
-                        us: uA,
-                        act: inst,
-                        last_date: Date.now(),
-                        last_objData: lastData,
-                        last_act: inst
-                    }
-                ]
+                users: [{
+                    us: uA,
+                    act: inst,
+                    last_date: Date.now(),
+                    last_objData: lastData,
+                    last_act: inst
+                }]
             });
             let s = await tc.save();
             if (s) {
@@ -151,7 +143,7 @@ module.exports.addToComminity = async (aCCID, uA, inst, lastData) => {
     }
 };
 
-module.exports.getallquestionsCompany = async (req, res) => {
+module.exports.getallquestionsCompany = async(req, res) => {
     let accID = req.ACC._id;
     let qType = req.query["qtype"];
     let qr = {};
@@ -174,8 +166,7 @@ module.exports.getallquestionsCompany = async (req, res) => {
     try {
         let allQuest = await Question.find(qr)
 
-            .populate([
-                {
+        .populate([{
                     path: "userAsk"
                 },
                 {
@@ -183,7 +174,9 @@ module.exports.getallquestionsCompany = async (req, res) => {
                     select: "lastname firstname"
                 }
             ])
-            .sort([["addDate", "descending"]]);
+            .sort([
+                ["addDate", "descending"]
+            ]);
         console.log(allQuest);
         if (allQuest) {
             let resp = [];
@@ -196,8 +189,7 @@ module.exports.getallquestionsCompany = async (req, res) => {
                     about = "Project";
                 } else about = "Others";
                 let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne(
-                    {
+                let enseigneCommercialeOrg = await Account.findOne({
                         users: qq.userAsk._id
                     },
                     "enseigneCommerciale"
@@ -243,22 +235,19 @@ module.exports.getallquestionsCompany = async (req, res) => {
     }
 };
 
-module.exports.getDetailOnQuestion = async (req, res) => {
+module.exports.getDetailOnQuestion = async(req, res) => {
     let qID = req.query.qID;
     try {
-        let qdata = await Question.findById(qID).populate([
-            {
-                path: "userAsk",
-                populate: {
-                    path: "imageProfile"
-                }
+        let qdata = await Question.findById(qID).populate([{
+            path: "userAsk",
+            populate: {
+                path: "imageProfile"
             }
-        ]);
+        }]);
         if (qdata) {
             let d = new Date(qdata.addDate);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne(
-                {
+            let enseigneCommercialeOrg = await Account.findOne({
                     users: qdata.userAsk._id
                 },
                 "enseigneCommerciale"
@@ -272,11 +261,9 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 case "PRT":
                     let prj = await Project.findById(
                         qdata.objectRefID
-                    ).populate([
-                        {
-                            path: "account"
-                        }
-                    ]);
+                    ).populate([{
+                        path: "account"
+                    }]);
                     if (prj) {
                         _types = "project";
                         dataObj = {
@@ -308,8 +295,7 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 question_content: qdata.question_content,
                 usr: {
                     _id: qdata.userAsk._id,
-                    name:
-                        qdata.userAsk.lastname + " " + qdata.userAsk.firstname,
+                    name: qdata.userAsk.lastname + " " + qdata.userAsk.firstname,
                     email: qdata.userAsk.email,
                     org: ensc,
                     function: qdata.userAsk.function,
@@ -334,21 +320,17 @@ module.exports.getDetailOnQuestion = async (req, res) => {
     }
 };
 
-module.exports.archives_questions = async (req, res) => {
+module.exports.archives_questions = async(req, res) => {
     try {
-        let archQ = await Question.findByIdAndUpdate(
-            {
-                _id: req.body.idQ
-            },
-            {
-                $set: {
-                    stateAdmin: "archived"
-                }
-            },
-            {
-                new: true
+        let archQ = await Question.findByIdAndUpdate({
+            _id: req.body.idQ
+        }, {
+            $set: {
+                stateAdmin: "archived"
             }
-        );
+        }, {
+            new: true
+        });
         if (archQ) {
             return sendJSONresponse(res, 200, { status: "OK" });
         }
@@ -362,7 +344,7 @@ module.exports.archives_questions = async (req, res) => {
     }
 };
 
-module.exports.replyQuestions = async (req, res) => {
+module.exports.replyQuestions = async(req, res) => {
     console.log(req.body, req.userDATA);
     let responseData = {
         rDate: Date.now(),
@@ -372,13 +354,11 @@ module.exports.replyQuestions = async (req, res) => {
     };
     try {
         let qSt = await Question.findByIdAndUpdate(
-            req.body.qID,
-            {
+            req.body.qID, {
                 $push: {
                     responseAll: responseData
                 }
-            },
-            { new: true }
+            }, { new: true }
         );
         if (qSt) {
             return sendJSONresponse(res, 200, { status: "OK" });
@@ -389,7 +369,7 @@ module.exports.replyQuestions = async (req, res) => {
     }
 };
 
-module.exports.getallCompanyArchives = async (req, res) => {
+module.exports.getallCompanyArchives = async(req, res) => {
     let accID = req.ACC._id;
     let qr = {
         account: accID,
@@ -401,8 +381,8 @@ module.exports.getallCompanyArchives = async (req, res) => {
 
     try {
         let allQuest = await Question.find(qr)
-            .populate([
-                {
+
+        .populate([{
                     path: "userAsk"
                 },
                 {
@@ -410,7 +390,9 @@ module.exports.getallCompanyArchives = async (req, res) => {
                     select: "lastname firstname"
                 }
             ])
-            .sort([["addDate", "descending"]]);
+            .sort([
+                ["addDate", "descending"]
+            ]);
         if (allQuest) {
             let resp = [];
             for (let qq of allQuest) {
@@ -420,8 +402,7 @@ module.exports.getallCompanyArchives = async (req, res) => {
                     about = "Team";
                 } else about = "Others";
                 let ensc = "";
-                let enseigneCommercialeOrg = await Account.findOne(
-                    {
+                let enseigneCommercialeOrg = await Account.findOne({
                         users: qq.userAsk._id
                     },
                     "enseigneCommerciale"
@@ -453,7 +434,6 @@ module.exports.getallCompanyArchives = async (req, res) => {
                     responseIN: qq.responseAll,
                     hasresp: respIN
                 };
-
                 resp.push(mat);
             }
             return sendJSONresponse(res, 200, {
@@ -464,6 +444,6 @@ module.exports.getallCompanyArchives = async (req, res) => {
     } catch (e) {
         // statements
         console.log(e);
-        return sendJSONresponse(res,500,{status:"NOK", message: "Server Error"})
+        return sendJSONresponse(res, 500, { status: "NOK", message: "Server Error" })
     }
 };
