@@ -455,6 +455,7 @@ module.exports.getTeamCommunity = async (req, res) => {
 		if (sPop) {
 			let ret = sPop.users;
 			for (let ds of ret) {
+				console.log(ds.us);
 				let comUser = JSON.parse(JSON.stringify(ds));
 				let oo = JSON.parse(JSON.stringify(ds.us));
 
