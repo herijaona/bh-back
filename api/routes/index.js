@@ -193,7 +193,7 @@ router.get(
     ctrlProject.getProjectApplicationDetails
 );
 
-router.post('/bh-projects-apply', auth, req_mid.validUser, ctrlProject.applyToProjects);
+router.post('/bh-projects-apply', auth, req_mid.validUser,req_mid.checkRole, ctrlProject.applyToProjects);
 
 router.get('/bh-projects/getUserSentApplication', auth, req_mid.validUser, ctrlProject.getUserSentApplication);
 

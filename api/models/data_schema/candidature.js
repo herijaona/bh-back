@@ -19,7 +19,8 @@ var candidatureSchema = new mongoose.Schema({
 		ref: "Project"
 	},
 	status: String,
-	applicationData: {}
+	applicationData: {},
+	countryCD: String
 });
 /* candidat: { type: mongoose.Schema.Types.ObjectId, ref: "Candidat" }, */
 mongoose.model("Candidature", candidatureSchema);

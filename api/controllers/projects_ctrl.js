@@ -202,6 +202,7 @@ module.exports.deleteProjects = async (req, res) => {
 module.exports.applyToProjects = async (req, res) => {
     let dataPr = req.body.currObj;
     let applData = req.body.data;
+
     try {
         let cndt = new Candidature();
         cndt.applicationData = applData;
@@ -209,7 +210,21 @@ module.exports.applyToProjects = async (req, res) => {
         cndt.createdAt = Date.now();
         cndt.userID = req.userDATA._id;
         cndt.projectID = dataPr._id;
-        cndt.countryCD = cndt.status = "Pending";
+        let adrrC = "";
+        if (req.body.candidatAccID) {
+            let cndCompC = await Account.findById(
+                req.body.candidatAccID,
+                "adresse"
+            );
+            if (cndCompC) {
+                adrrC = JSON.parse(cndCompC.adresse)
+                    .description.split(",")
+                    .pop()
+                    .trim();
+            }
+        }
+        cndt.countryCD = adrrC;
+        cndt.status = "Pending";
         let cndt_appl = await cndt.save();
         if (cndt_appl) {
             sendApplyEmail(req.userDATA, dataPr);
@@ -314,9 +329,9 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
 
             let applDtl = allApplDetails.applicationData;
             if ("countryCD" in applDtl) {
-                applDtl.countryCD = tools_service.getCountryText(
-                    applDtl.countryCD
-                );
+                applDtl.countryCD = allApplDetails.countryCD
+            }else{
+                applDtl.countryCD = allApplDetails.countryCD
             }
 
             let retDetails = {
@@ -451,19 +466,22 @@ module.exports.getDataForApplication = async (req, res) => {
             {
                 users: userID
             },
-            "enseigneCommerciale "
-        );
+            "enseigneCommerciale typeOrganisation "
+        ).populate([{ path: "typeOrganisation" }]);
         let prObj = await Project.findById(pID);
         if (prObj) {
             let retData = {};
             if (prObj["typeCollab"] == const_data.collabType.type1) {
-                let tt = await this.getCollabTypeText(prObj["typeCollab"]);
                 retData = {
                     _id: prObj._id,
-                    name: prObj.dataDetails.collabDescribData["name"],
-                    type: tt,
+                    name: prObj["name"],
+                    type: prObj["typeCollab"],
                     typeSelect: "type1",
-                    accountProjectOwner: prObj.account
+                    accountProjectOwner: prObj.account,
+                    collabData: {
+                        contexte: prObj.dataDetails.collabDescribData.contexte,
+                        objectif: prObj.dataDetails.collabDescribData.objectif
+                    }
                 };
                 if (currUsrAcc.length) {
                     retData["hasAcc"] = true;
@@ -574,10 +592,10 @@ module.exports.formatApplicationForListData = async aa => {
     if (enseigneCommercialeOrg) {
         ensc = enseigneCommercialeOrg["enseigneCommerciale"];
     }
-    
+
     return {
         _id: aa._id,
-        countryCD: tools_service.getCountryText(aa.applicationData.countryCD),
+        countryCD: aa.countryCD,
         hour: d.toTimeString().split(" ")[0],
         date: d.toDateString(),
         usr: {
