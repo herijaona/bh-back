@@ -1,12 +1,14 @@
 var mongoose = require("mongoose");
 var TeamFront = mongoose.model("TeamFront");
 var tools_service = require("../services/app-general");
+var mail_services = require("../services/mailing-service");
 var User = mongoose.model("User");
 var TeamCommunity = mongoose.model("TeamCommunity");
 var InvitationSent = mongoose.model("InvitationSent");
+var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var Project = mongoose.model("Project");
 var Account = mongoose.model("Account");
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
 	res.status(status);
 	res.json(content);
 };
@@ -76,8 +78,7 @@ module.exports.deleteTeamsFrontVideoData = async (req, res) => {
 };
 module.exports.updateTeamsFrontVideoData = async (req, res) => {
 	try {
-		let tmvUpdate = await TeamFront.findOneAndUpdate(
-			{
+		let tmvUpdate = await TeamFront.findOneAndUpdate({
 				_id: req.body.id_
 			},
 			req.body.dataUpdate
@@ -107,18 +108,18 @@ module.exports.updateTeamsFrontVideoData = async (req, res) => {
 module.exports.getInvitationSent = async (req, res) => {
 	try {
 		let invt = await InvitationSent.find({
-			account: req.ACC._id,
-			status: {
-				$ne: "ACTIVE"
-			}
-		})
-			.populate([
-				{
-					path: "invintedbyUser",
-					select: "lastname firstname"
+				account: req.ACC._id,
+				status: {
+					$ne: "ACTIVE"
 				}
-			])
-			.sort([["dateAdd", "descending"]]);
+			})
+			.populate([{
+				path: "invintedbyUser",
+				select: "lastname firstname"
+			}])
+			.sort([
+				["dateAdd", "descending"]
+			]);
 		if (invt.length) {
 			console.log(invt);
 		}
@@ -164,7 +165,7 @@ module.exports.inviteUserInTeam = async (req, res) => {
 				invtation["dateAdd"] = Date.now();
 				let yu = await invtation.save();
 				if (yu) {
-					let m = await tools_service.mailInvitations(
+					let m = await mail_services.mailInvitations(
 						yu,
 						userData,
 						userACC
@@ -191,8 +192,7 @@ module.exports.inviteUserInTeam = async (req, res) => {
 module.exports.reviveInvitations = async (req, res) => {
 	let invtID = req.body.invID;
 	try {
-		let inv = await InvitationSent.findById(invtID).populate([
-			{
+		let inv = await InvitationSent.findById(invtID).populate([{
 				path: "account"
 			},
 			{
@@ -201,7 +201,7 @@ module.exports.reviveInvitations = async (req, res) => {
 		]);
 		console.log(inv);
 		if (inv) {
-			let m = await tools_service.mailInvitations(
+			let m = await mail_services.mailInvitations(
 				inv,
 				inv.invintedbyUser,
 				inv.account
@@ -229,7 +229,7 @@ module.exports.getTeamUsers = async (req, res) => {
 		});
 		if (acc) {
 			let ll = [];
-			for (eo of acc.users) {
+			for (let eo of acc.users) {
 				if (eo.active) {
 					let s = {};
 					s["name_"] = eo.lastname + " " + eo.firstname;
@@ -279,14 +279,12 @@ module.exports.getteamsUsersData = async (req, res) => {
 	let usrCom = req.ACC.usersCommetee;
 	let usrTm = req.ACC.usersTeam;
 	try {
-		let popAcc = await Account.populate(req.ACC, [
-			{
-				path: "users",
-				populate: {
-					path: "imageProfile"
-				}
+		let popAcc = await Account.populate(req.ACC, [{
+			path: "users",
+			populate: {
+				path: "imageProfile"
 			}
-		]);
+		}]);
 		if (popAcc) {
 			let ll = [];
 			let ll_in = [];
@@ -313,7 +311,7 @@ var userAdmProcess = (l, l_in, usrAdm, usrCom, usrTab) => {
 		isAdm: false,
 		isComm: false
 	};
-	for (va of usrTab) {
+	for (let va of usrTab) {
 		if (!tools_service.inArray(va._id, l_in)) {
 			var m = Object.create(usr);
 			let rp = tools_service.copydata(m, va);
@@ -359,21 +357,17 @@ module.exports.changeAdmRole = async (req, res) => {
 		}
 		if (reqData.value == true) {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id,
-				{
+				acc_id, {
 					$push: updateData
-				},
-				{
+				}, {
 					new: true
 				}
 			);
 		} else {
 			upAcc = await Account.findByIdAndUpdate(
-				acc_id,
-				{
+				acc_id, {
 					$pull: updateData
-				},
-				{
+				}, {
 					new: true
 				}
 			);
@@ -415,15 +409,13 @@ module.exports.deleteUserFromTeam = async (req, res) => {
 			}
 		}
 		let upAcc = await Account.findByIdAndUpdate(
-			acc_id,
-			{
+			acc_id, {
 				$pull: {
 					users: reqData.usr_id,
 					userAdmin: reqData.usr_id,
 					usersTeam: reqData.usr_id
 				}
-			},
-			{
+			}, {
 				new: true
 			}
 		);
@@ -440,15 +432,13 @@ module.exports.getTeamCommunity = async (req, res) => {
 	try {
 		let sPop = await TeamCommunity.findOne({
 			account: req.ACC._id
-		}).populate([
-			{
-				path: "users.us",
-				select: "firstname lastname email imageProfile function",
-				populate: {
-					path: "imageProfile"
-				}
+		}).populate([{
+			path: "users.us",
+			select: "firstname lastname email imageProfile function",
+			populate: {
+				path: "imageProfile"
 			}
-		]);
+		}]);
 
 		console.log(sPop);
 		let aftCh = [];
@@ -464,8 +454,7 @@ module.exports.getTeamCommunity = async (req, res) => {
 				);
 
 				comUser["us"] = oo;
-				let enseigneCommercialeOrg = await Account.findOne(
-					{
+				let enseigneCommercialeOrg = await Account.findOne({
 						users: ds.us._id
 					},
 					"enseigneCommerciale"
@@ -502,4 +491,46 @@ module.exports.getTeamCommunity = async (req, res) => {
 		// statements
 		console.log(e);
 	}
+};
+
+module.exports.sendOrgInvitations = async (req, res) => {
+	let orgDATA = req.body.org_data;
+	try {
+		let resForAll = [];
+		for (let invt of orgDATA) {
+			let status = '';
+			let userExist = await User.findOne({
+				email: invt.invitation_email
+			});
+			if (userExist) {
+				status = {
+					value: 'NOK',
+					motif: 'User Already has account'
+				};
+			} else {
+				let nInv = new OrganisationInvitation({
+					dataDetails: invt
+				});
+				nInv.account = req.ACC._id;
+				nInv.byUser = req.userDATA._id;
+				let nn = await nInv.save();
+				if (nn) {
+					let datMail = {
+						invetedData: invt,
+						byAccount: req.ACC,
+						byUser: req.userDATA
+					}
+				}
+
+			}
+			console.log(invt);
+		}
+	} catch (e) {
+		// statements
+		console.log(e);
+	}
+	return sendJSONresponse(res, 200, {
+		status: "OK",
+		data: orgDATA
+	});
 };

@@ -154,6 +154,7 @@ router.get('/teams-users', req_mid.accReqSlug, ctrlTeams.getTeamUsers);
 router.get('/team-details', ctrlTeams.getTeamUsersDetails);
 
 router.get('/getInvitationSent', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getInvitationSent);
+router.post('/invite_organisation', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.sendOrgInvitations);
 
 /**
  *

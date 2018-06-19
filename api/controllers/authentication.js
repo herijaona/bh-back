@@ -6,10 +6,10 @@ var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
 var Account = mongoose.model("Account");
 var ResetPassword = mongoose.model("ResetPassword");
-var gen_services = require("../services/app-general");
+var mail_services = require("../services/mailing-service");
 var CryptoJS = require("crypto-js");
 /* response sender */
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -130,7 +130,7 @@ module.exports.registerOrganisation = async (req, res) => {
     let acc = await registerAccount(req, res, user);
     let createDefaultData = await defaultDATAAcc(res, acc);
     if (createDefaultData.length == 3) {
-        let resEmail = gen_services.sendActivationMail({
+        let resEmail = mail_services.sendActivationMail({
             user: user,
             account: acc
         }).then(reslt => {
@@ -152,8 +152,8 @@ module.exports.registerOrganisation = async (req, res) => {
         });
     }
 };
-module.exports.login = function(req, res) {
-    passport.authenticate("local", function(err, user, info) {
+module.exports.login = function (req, res) {
+    passport.authenticate("local", function (err, user, info) {
         var token;
         // If Passport throws/catches an error
         if (err) {
@@ -231,7 +231,7 @@ module.exports.activate_user = async (req, res) => {
         });
     }
 };
-module.exports.requestResetPass = function(req, res) {
+module.exports.requestResetPass = function (req, res) {
     if (!req.body.email) {
         res.status(404).json({
             status: "NOK",
@@ -254,7 +254,7 @@ module.exports.requestResetPass = function(req, res) {
                 resetPass.setResetCode(usr_.email);
                 resetPass.save((er_, doc_reset) => {
                     if (!er_) {
-                        var mail_res = gen_services.sendResetPasswordMail(usr_, doc_reset);
+                        var mail_res = mail_services.sendResetPasswordMail(usr_, doc_reset);
                         mail_res.then(result => {
                             res.status(200).json({
                                 status: "OK",
@@ -274,7 +274,7 @@ module.exports.requestResetPass = function(req, res) {
     });
 };
 /*  check reset pass Data */
-module.exports.checkResetPass = function(req, res) {
+module.exports.checkResetPass = function (req, res) {
     // body...
     if (!req.body.id_data || !req.body.code_) {
         return res.status(403).json({
@@ -320,7 +320,7 @@ module.exports.checkResetPass = function(req, res) {
     }
 };
 /* Submit new pass */
-module.exports.submitNewPass = function(req, res) {
+module.exports.submitNewPass = function (req, res) {
     var mdp = req.body.mdp_dump;
     var id_data = req.body.id_data;
     var code_ = req.body.code_;
@@ -354,7 +354,7 @@ module.exports.submitNewPass = function(req, res) {
             doc.save((w, c) => {
                 if (!w) {
                     /* Envoie d'email password change succefully*/
-                    var em = gen_services.sendEmailPassResetednotif(et);
+                    var em = mail_services.sendEmailPassResetednotif(et);
                     em.then(() => {
                         res.status(200).json({
                             status: "OK",
@@ -370,7 +370,7 @@ module.exports.submitNewPass = function(req, res) {
 module.exports.registerMember = async (req, res) => {
     let usr = await this.regUser(req, res);
     if (usr) {
-        let resEmail = gen_services.sendActivationMail({
+        let resEmail = mail_services.sendActivationMail({
             user: usr,
             account: {}
         }).then(reslt => {

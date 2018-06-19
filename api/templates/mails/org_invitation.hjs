@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+Hi {{invitedName}} <br>
+{{userSender}} like to invite your Organisation: {{invitedOrganisationName }} to participe on Collabotation Capital Website.
+click <a href="{{invitationUrl}}"> <b>Here</b> </a> to create your Account.
+</body>
+</html>

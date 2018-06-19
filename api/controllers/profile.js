@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var tools_service = require('../services/app-general');
+var mail_services = require('../services/mailing-service');
 var Account = mongoose.model('Account');
 var InvitationSent = mongoose.model('InvitationSent');
 var userTosend = {
@@ -229,7 +230,7 @@ module.exports.PostInvitationVal = async (req, res) => {
 					let invs = await inv.update({
 						status: 'ACTIVE',
 					});
-					let mailRes = await tools_service.sendActivationMail({
+					let mailRes = await mail_services.sendActivationMail({
 						user: nUser,
 					});
 					if (mailRes.body.Messages[0].Status == 'success') {

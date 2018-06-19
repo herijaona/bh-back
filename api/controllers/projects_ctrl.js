@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var User = mongoose.model("User");
 var tools_service = require("../services/app-general");
+var mail_services = require("../services/mailing-service");
 var const_data = require("../config/constantData");
 var TeamFront = mongoose.model("TeamFront");
 var Candidature = mongoose.model("Candidature");
@@ -250,7 +251,7 @@ var sendApplyEmail = async (userDATA, dataPr) => {
     try {
         let acc = await Account.findById(dataPr.account);
         if (acc) {
-            tools_service.userEmailAfterApply(userDATA, {
+            mail_services.userEmailAfterApply(userDATA, {
                 ens: acc.enseigneCommerciale,
                 t: dataPr.name
             });
@@ -329,9 +330,9 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
 
             let applDtl = allApplDetails.applicationData;
             if ("countryCD" in applDtl) {
-                applDtl.countryCD = allApplDetails.countryCD
-            }else{
-                applDtl.countryCD = allApplDetails.countryCD
+                applDtl.countryCD = allApplDetails.countryCD;
+            } else {
+                applDtl.countryCD = allApplDetails.countryCD;
             }
 
             let retDetails = {
@@ -683,13 +684,20 @@ module.exports.getAllProjectsAsOpportinuty = async (req, res) => {
                 $ne: id_comp
             }
         })
-            .populate({
-                path: "account",
-                select: "enseigneCommerciale adresse _slug"
-            })
+            .populate([
+                {
+                    path: "account",
+                    select: "enseigneCommerciale adresse _slug"
+                },
+                {
+                    path: 'createdByUser',
+                    select: 'lastname firstname function'
+                }
+            ])
             .sort([["addDate", "descending"]]);
 
         for (const coll of allCollab) {
+            console.log(coll);
             opportList.push(this.formatOpportuinityCollab(coll));
         }
 
@@ -716,7 +724,8 @@ module.exports.formatOpportuinityCollab = colbMdel => {
         country: collabCountry,
         name: colbMdel.name,
         organisation: colbMdel.account.enseigneCommerciale,
-        org_slug: colbMdel.account._slug
+        org_slug: colbMdel.account._slug,
+        byUser: colbMdel.createdByUser
     };
     return clMdl;
 };

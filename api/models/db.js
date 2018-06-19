@@ -62,10 +62,10 @@ require('./data_schema/zone');
 require('./data_schema/team_front');
 require('./data_schema/candidature');
 require('./data_schema/team_community');
-require('./data_schema/team_account');
 require('./data_schema/questions');
 require('./data_schema/collaboration_type');
 require('./data_schema/invitation_sent');
+require('./data_schema/organistaion_invitation');
 // require('./data_schema/biblioImage');
 
 /* Init value */
