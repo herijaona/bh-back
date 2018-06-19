@@ -140,7 +140,7 @@ module.exports.userEmailAfterApply = (usr, data) => {
 module.exports.sendOrgInvitationEmail = (data) => {
     var subj = "Invitation";
     var templ = invitationOrganisationTemplate;
-    let urlInvitation = app_const.url_front + "/reply-invitation/" + data.id;
+    let urlInvitation = app_const.url_front + "/reply-invitation/organisation/" + data.id;
     var data_m = {
         userSender: gen.titleCase(data.byUser.firstname) + " " + gen.titleCase(data.byUser.lastname),
         invitedOrganisationName: data.invetedData.organisationName,
