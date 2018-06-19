@@ -137,6 +137,24 @@ module.exports.userEmailAfterApply = (usr, data) => {
     return deliverEmail(subj, templ, data_m, dest);
 };
 
+module.exports.sendOrgInvitationEmail = (data) => {
+    var subj = "Invitation";
+    var templ = invitationOrganisationTemplate;
+    let urlInvitation = app_const.url_front + "/reply-invitation/" + data.id;
+    var data_m = {
+        userSender: gen.titleCase(data.byUser.firstname) + " " + gen.titleCase(data.byUser.lastname),
+        invitedOrganisationName: data.invetedData.organisationName,
+        invitationUrl: urlInvitation,
+        byAccountName: data.byAccount.enseigneCommerciale,
+        invitedName: gen.titleCase(data.invetedData.firstname) + " " + gen.titleCase(data.invetedData.lastname),
+    };
+    var dest = {
+        name: gen.titleCase(data.invetedData.firstname) + " " + gen.titleCase(data.invetedData.lastname),
+        email: data.invetedData.invitation_email
+    };
+    console.log(urlInvitation);
+    return deliverEmail(subj, templ, data_m, dest);
+}
 
 /* Real mail Service*/
 function deliverEmail(subject, template, data_email, to_) {

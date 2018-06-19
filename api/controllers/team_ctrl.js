@@ -508,29 +508,56 @@ module.exports.sendOrgInvitations = async (req, res) => {
 					motif: 'User Already has account'
 				};
 			} else {
-				let nInv = new OrganisationInvitation({
-					dataDetails: invt
+				let alreadyInvited = await OrganisationInvitation.find({
+					byAccount: req.ACC._id,
+					byUser: req.userDATA,
+					'dataDetails.invitation_email': invt.invitation_email
 				});
-				nInv.account = req.ACC._id;
-				nInv.byUser = req.userDATA._id;
-				let nn = await nInv.save();
-				if (nn) {
-					let datMail = {
-						invetedData: invt,
-						byAccount: req.ACC,
-						byUser: req.userDATA
-					}
-				}
+				if (alreadyInvited.length > 0) {
+					status = {
+						value: 'NOK',
+						motif: 'User Already invited'
+					};
+				} else {
 
+					let nInv = new OrganisationInvitation({
+						dataDetails: invt
+					});
+					nInv.byAccount = req.ACC._id;
+					nInv.byUser = req.userDATA._id;
+					let nn = await nInv.save();
+					if (nn) {
+						let datMail = {
+							invetedData: invt,
+							byAccount: req.ACC,
+							byUser: req.userDATA,
+							id: nn._id
+						}
+						let resp = await mail_services.sendOrgInvitationEmail(datMail);
+						if (resp.body.Messages[0].Status == "success") {
+							status = {
+								value: 'OK',
+								motif: 'User invited and mail succesfully send'
+							};
+						}
+					}
+
+				}
 			}
-			console.log(invt);
+			resForAll.push({
+				objInv: invt,
+				res_value: status
+			})
 		}
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: resForAll
+		});
 	} catch (e) {
-		// statements
 		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: "error server"
+		})
 	}
-	return sendJSONresponse(res, 200, {
-		status: "OK",
-		data: orgDATA
-	});
 };

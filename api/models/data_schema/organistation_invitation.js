@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 var orgInvitSchema = new mongoose.Schema({
 	dataDetails: {},
-	account: {
+	byAccount: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Account"
 	},
