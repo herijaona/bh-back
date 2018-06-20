@@ -9,7 +9,7 @@ var Account = mongoose.model("Account");
 var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
 var ctrlQuestions = require("./questions_ctrl");
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -55,7 +55,12 @@ module.exports.getAllProjectsCompany = async (req, res) => {
     try {
         let all_ = await Project.find({
             account: acc_curr._id
-        }).sort([["addDate", "descending"]]);
+        }).populate({
+            path: 'account',
+            select: 'adresse'
+        }).sort([
+            ["addDate", "descending"]
+        ]);
         if (all_) {
             let resData = await this.collabListBuild(all_);
             sendJSONresponse(res, 200, {
@@ -85,20 +90,30 @@ module.exports.collabListBuild = async arrAll => {
 
 module.exports.formatOneCollabForList = async coll => {
     let m = {};
-
+    const addr = JSON.parse(coll.account.adresse)
+        .description.split(",")
+        .pop().trim();
     if (coll["typeCollab"] == "COLLABPROJINNOV") {
         m.name = coll["dataDetails"]["collabDescribData"].name;
         m._id = coll._id;
         m.contexte = coll["dataDetails"]["collabDescribData"].contexte;
         m.typeCollab = coll["typeCollab"];
+        m.accCountry = addr;
+        let ds = coll["dataDetails"]['diffusionDatas']['partCountry'];
+        const cK = Object.keys(ds);
+        let num = 0;
+        for (const tt of cK) {
+            num += ds[tt].length;
+        }
+        m.diffusionCountry = num;
+        m.durationType = coll["dataDetails"]['collabDurationType'];
     }
 
     return m;
 };
 module.exports.getPrByID = async (req, res) => {
     let prID = req.query["projectID"];
-    var populateQuery = [
-        {
+    var populateQuery = [{
             path: "listeCandidatures"
         },
         {
@@ -154,13 +169,11 @@ module.exports.updateProjects = async (req, res) => {
     let pr_id = req.body.id_;
     let acc_id = req.ACC._id;
     try {
-        let resUpdate = await Project.findOneAndUpdate(
-            {
+        let resUpdate = await Project.findOneAndUpdate({
                 _id: pr_id,
                 account: acc_id
             },
-            req.body.edited,
-            {
+            req.body.edited, {
                 new: true
             }
         );
@@ -258,8 +271,7 @@ var sendApplyEmail = async (userDATA, dataPr) => {
             let Accuser = await acc.populate({
                 path: "userAdmin"
             });
-        } else {
-        }
+        } else {}
     } catch (e) {
         // statements
         console.log(e);
@@ -271,8 +283,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
     try {
         let allApplication = await Candidature.find({
             accountID: accId
-        }).populate([
-            {
+        }).populate([{
                 path: "userID"
             },
             {
@@ -296,8 +307,7 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
 module.exports.getProjectApplicationDetails = async (req, res) => {
     let applID = req.query.applID;
     try {
-        let allApplDetails = await Candidature.findById(applID).populate([
-            {
+        let allApplDetails = await Candidature.findById(applID).populate([{
                 path: "userID",
                 populate: {
                     path: "imageProfile"
@@ -305,8 +315,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             },
             {
                 path: "projectID",
-                populate: [
-                    {
+                populate: [{
                         path: "createdByUser"
                     },
                     {
@@ -318,8 +327,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
         if (allApplDetails) {
             let d = new Date(allApplDetails.createdAt);
             let ensc = "";
-            let enseigneCommercialeOrg = await Account.findOne(
-                {
+            let enseigneCommercialeOrg = await Account.findOne({
                     users: allApplDetails.userID._id
                 },
                 "enseigneCommerciale"
@@ -341,8 +349,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 date: d.toDateString(),
                 candidat: {
                     _id: allApplDetails.userID._id,
-                    name:
-                        allApplDetails.userID.lastname +
+                    name: allApplDetails.userID.lastname +
                         " " +
                         allApplDetails.userID.firstname,
                     email: allApplDetails.userID.email,
@@ -355,10 +362,8 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 projet: {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,
-                    accSlug:
-                        allApplDetails.projectID.account.enseigneCommerciale,
-                    byUser:
-                        allApplDetails.projectID.createdByUser.lastname +
+                    accSlug: allApplDetails.projectID.account.enseigneCommerciale,
+                    byUser: allApplDetails.projectID.createdByUser.lastname +
                         " " +
                         allApplDetails.projectID.createdByUser.firstname,
                     typeCollab: allApplDetails.projectID.typeCollab
@@ -415,19 +420,18 @@ module.exports.getAllCollabList = async (req, res) => {
     };
     let account_id = req.ACC._id;
     try {
-        let my_collab = await Project.find(
-            {
-                account: account_id
-            },
-            "name typeCollab createdByUser addDate"
-        )
-            .populate([
-                {
-                    path: "createdByUser",
-                    select: "firstname lastname"
-                }
-            ])
-            .sort([["addDate", "descending"]]);
+        let my_collab = await Project.find({
+                    account: account_id
+                },
+                "name typeCollab createdByUser addDate"
+            )
+            .populate([{
+                path: "createdByUser",
+                select: "firstname lastname"
+            }])
+            .sort([
+                ["addDate", "descending"]
+            ]);
         if (my_collab) {
             let retVal = [];
             for (let col1 of my_collab) {
@@ -463,12 +467,13 @@ module.exports.getDataForApplication = async (req, res) => {
     let userID = req.userDATA._id;
 
     try {
-        let currUsrAcc = await Account.find(
-            {
+        let currUsrAcc = await Account.find({
                 users: userID
             },
             "enseigneCommerciale typeOrganisation "
-        ).populate([{ path: "typeOrganisation" }]);
+        ).populate([{
+            path: "typeOrganisation"
+        }]);
         let prObj = await Project.findById(pID);
         if (prObj) {
             let retData = {};
@@ -490,8 +495,7 @@ module.exports.getDataForApplication = async (req, res) => {
                 } else {
                     retData["hasAcc"] = false;
                     retData["userACC"] = {
-                        enseigneCommerciale:
-                            req.userDATA.lastname + " " + req.userDATA.firstname
+                        enseigneCommerciale: req.userDATA.lastname + " " + req.userDATA.firstname
                     };
                 }
             }
@@ -533,8 +537,7 @@ module.exports.getApplicationByCollabID = async (req, res) => {
         let allAppl = await Candidature.find({
             accountID: req.ACC._id,
             projectID: rIDCollab
-        }).populate([
-            {
+        }).populate([{
                 path: "userID"
             },
             {
@@ -584,8 +587,7 @@ module.exports.dataApplicationArr = async arrAll => {
 module.exports.formatApplicationForListData = async aa => {
     let d = new Date(aa.createdAt);
     let ensc = "";
-    let enseigneCommercialeOrg = await Account.findOne(
-        {
+    let enseigneCommercialeOrg = await Account.findOne({
             users: aa.userID._id
         },
         "enseigneCommerciale"
@@ -616,10 +618,9 @@ module.exports.formatApplicationForListData = async aa => {
 module.exports.getUserSentApplication = async (req, res) => {
     try {
         let userApplication = await Candidature.find({
-            userID: req.userDATA._id
-        })
-            .populate([
-                {
+                userID: req.userDATA._id
+            })
+            .populate([{
                     path: "userID"
                 },
                 {
@@ -630,7 +631,9 @@ module.exports.getUserSentApplication = async (req, res) => {
                     select: "adresse enseigneCommerciale"
                 }
             ])
-            .sort([["createdAt", "descending"]]);
+            .sort([
+                ["createdAt", "descending"]
+            ]);
         let allSentAppl = [];
         if (userApplication) {
             for (let usApplSent of userApplication) {
@@ -680,12 +683,11 @@ module.exports.getAllProjectsAsOpportinuty = async (req, res) => {
     let opportList = [];
     try {
         let allCollab = await Project.find({
-            account: {
-                $ne: id_comp
-            }
-        })
-            .populate([
-                {
+                account: {
+                    $ne: id_comp
+                }
+            })
+            .populate([{
                     path: "account",
                     select: "enseigneCommerciale adresse _slug"
                 },
@@ -694,7 +696,9 @@ module.exports.getAllProjectsAsOpportinuty = async (req, res) => {
                     select: 'lastname firstname function'
                 }
             ])
-            .sort([["addDate", "descending"]]);
+            .sort([
+                ["addDate", "descending"]
+            ]);
 
         for (const coll of allCollab) {
             console.log(coll);
