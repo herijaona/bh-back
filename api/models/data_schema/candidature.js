@@ -20,6 +20,7 @@ var candidatureSchema = new mongoose.Schema({
 	},
 	status: String,
 	applicationData: {},
+	applicationName: String,
 	countryCD: String
 });
 /* candidat: { type: mongoose.Schema.Types.ObjectId, ref: "Candidat" }, */

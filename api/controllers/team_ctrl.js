@@ -625,3 +625,55 @@ module.exports.getInProgressOrgInvitation = async (req, res) => {
 		})
 	}
 }
+
+module.exports.getAcceptedInvitation = async (req, res) => {
+	let accID = req.ACC._id;
+	try {
+		let list = await OrganisationInvitation.find({
+			byAccount: accID,
+			status: 'active'
+		}).populate([{
+			path: 'byUser',
+			select: 'firstname lastname function'
+		}, {
+			path: 'collabConcerned',
+			select: 'name'
+		}]).sort([
+			['activeDate', 'descending']
+		]);
+		let datTOsend = [];
+		if (list.length > 0) {
+			for (const inv of list) {
+				const orgName = await Account.findOne({
+					_id: inv.dataDetails.accountCreated
+				}, 'enseigneCommerciale adresse');
+
+				const userDT = await User.findOne({
+					_id: inv.dataDetails.userSignedUp
+				}, 'firstname lastname function')
+				const addr = JSON.parse(orgName.adresse)
+					.description.split(",")
+					.pop().trim();
+				let unit = {
+					activeDate: new Date(inv.activeDate).toDateString(),
+					orgName: orgName.enseigneCommerciale,
+					orgCountry: addr,
+					userOrg: userDT,
+					collabNum: inv.collabConcerned.length,
+					collabIn: inv.collabConcerned
+				}
+				datTOsend.push(unit)
+			}
+		}
+		return sendJSONresponse(res, 200, {
+			status: 'OK',
+			data: datTOsend
+		});
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: 'NOK',
+			message: 'Error server'
+		})
+	}
+}

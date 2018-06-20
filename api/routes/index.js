@@ -158,6 +158,7 @@ router.post('/invite_organisation', auth, req_mid.validUser, req_mid.checkRole, 
 
 router.get('/checkinvitation/organisation', ctrlTeams.ckeckInvitationsOrg);
 router.get('/get-org-invitations-inprogress', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getInProgressOrgInvitation);
+router.get('/get-accepted-invitations', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getAcceptedInvitation);
 
 /**
  *

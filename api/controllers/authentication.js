@@ -136,7 +136,7 @@ module.exports.registerOrganisation = async (req, res) => {
         }).then(reslt => {
             if (reslt.body.Messages[0].Status == "success") {
                 if ('invitationId' in req.body) {
-                    invitation_Process(req.body.invitationId, acc._id);
+                    invitation_Process(req.body.invitationId, acc._id, user._id);
                 }
                 return sendJSONresponse(res, 200, {
                     status: "OK",
@@ -155,15 +155,17 @@ module.exports.registerOrganisation = async (req, res) => {
     }
 };
 
-var invitation_Process = async (invtID, accID) => {
+var invitation_Process = async (invtID, accID, usrID) => {
     try {
         let updateInvitation = await OrganisationInvitation.findOneAndUpdate({
             _id: invtID
         }, {
             status: 'active',
             $set: {
-                'dataDetails.accountCreated': accID
-            }
+                'dataDetails.accountCreated': accID,
+                'dataDetails.userSignedUp': usrID
+            },
+            activeDate: Date.now()
         }, {
             new: true
         })
