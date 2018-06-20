@@ -156,6 +156,9 @@ router.get('/team-details', ctrlTeams.getTeamUsersDetails);
 router.get('/getInvitationSent', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getInvitationSent);
 router.post('/invite_organisation', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.sendOrgInvitations);
 
+router.get('/checkinvitation/organisation', ctrlTeams.ckeckInvitationsOrg);
+router.get('/get-org-invitations-inprogress', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getInProgressOrgInvitation);
+
 /**
  *
  *  PROJECTS DATA ROUTES
@@ -194,7 +197,7 @@ router.get(
     ctrlProject.getProjectApplicationDetails
 );
 
-router.post('/bh-projects-apply', auth, req_mid.validUser,req_mid.checkRole, ctrlProject.applyToProjects);
+router.post('/bh-projects-apply', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.applyToProjects);
 
 router.get('/bh-projects/getUserSentApplication', auth, req_mid.validUser, ctrlProject.getUserSentApplication);
 

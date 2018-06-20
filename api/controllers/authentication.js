@@ -6,8 +6,8 @@ var Zone = mongoose.model("Zone");
 var Presentation = mongoose.model("Presentation");
 var Account = mongoose.model("Account");
 var ResetPassword = mongoose.model("ResetPassword");
+var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var mail_services = require("../services/mailing-service");
-var CryptoJS = require("crypto-js");
 /* response sender */
 var sendJSONresponse = function (res, status, content) {
     res.status(status);
@@ -61,7 +61,7 @@ var registerAccount = async (rq, rs, usr) => {
     account_.usersTeam.push(usr.id);
     account_.usersCommetee.push(usr.id);
     account_.users.push(usr.id);
-    sl_ = rq.body.enseigneCommerciale.replace(/ /g, "");
+    let sl_ = rq.body.enseigneCommerciale.replace(/ /g, "");
     account_["_slug"] = sl_;
     var sl_dupl = 0;
     var loop_ind = true;
@@ -100,7 +100,7 @@ var defaultDATAAcc = async (rs, ac) => {
     zn.dtype = 1;
     zn.canDeleted = false;
     zn.rang = 100;
-    dtz = {
+    let dtz = {
         dtype: 3,
         canDeleted: false,
         caption: "_chiffres",
@@ -130,17 +130,19 @@ module.exports.registerOrganisation = async (req, res) => {
     let acc = await registerAccount(req, res, user);
     let createDefaultData = await defaultDATAAcc(res, acc);
     if (createDefaultData.length == 3) {
-        let resEmail = mail_services.sendActivationMail({
+        mail_services.sendActivationMail({
             user: user,
             account: acc
         }).then(reslt => {
             if (reslt.body.Messages[0].Status == "success") {
-                res.status(200);
-                res.json({
+                if ('invitationId' in req.body) {
+                    invitation_Process(req.body.invitationId, acc._id);
+                }
+                return sendJSONresponse(res, 200, {
                     status: "OK",
                     message: "email sent",
                     user_email: user.email
-                });
+                })
             }
         }, err => {
             console.log(err);
@@ -152,6 +154,26 @@ module.exports.registerOrganisation = async (req, res) => {
         });
     }
 };
+
+var invitation_Process = async (invtID, accID) => {
+    try {
+        let updateInvitation = await OrganisationInvitation.findOneAndUpdate({
+            _id: invtID
+        }, {
+            status: 'active',
+            $set: {
+                'dataDetails.accountCreated': accID
+            }
+        }, {
+            new: true
+        })
+        return;
+    } catch (e) {
+        console.log(e);
+        return;
+    }
+};
+
 module.exports.login = function (req, res) {
     passport.authenticate("local", function (err, user, info) {
         var token;
@@ -189,7 +211,7 @@ module.exports.activate_user = async (req, res) => {
                     });
                     if (acc) {
                         let o = [];
-                        for (a_ of acc) {
+                        for (let a_ of acc) {
                             let w = await Account.findByIdAndUpdate({
                                 _id: a_._id
                             }, {
@@ -286,7 +308,7 @@ module.exports.checkResetPass = function (req, res) {
             if (!err) {
                 if (doc) {
                     if (doc.resetCode == req.body.code_) {
-                        isValid = doc.checkValidate();
+                        let isValid = doc.checkValidate();
                         if (isValid) {
                             sendJSONresponse(res, 200, {
                                 status: "valid",
@@ -370,7 +392,7 @@ module.exports.submitNewPass = function (req, res) {
 module.exports.registerMember = async (req, res) => {
     let usr = await this.regUser(req, res);
     if (usr) {
-        let resEmail = mail_services.sendActivationMail({
+        mail_services.sendActivationMail({
             user: usr,
             account: {}
         }).then(reslt => {

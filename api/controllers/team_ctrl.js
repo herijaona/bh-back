@@ -277,7 +277,6 @@ module.exports.getTeamUsersDetails = async (req, res) => {
 module.exports.getteamsUsersData = async (req, res) => {
 	let usrAdm = req.ACC.userAdmin;
 	let usrCom = req.ACC.usersCommetee;
-	let usrTm = req.ACC.usersTeam;
 	try {
 		let popAcc = await Account.populate(req.ACC, [{
 			path: "users",
@@ -519,12 +518,13 @@ module.exports.sendOrgInvitations = async (req, res) => {
 						motif: 'User Already invited'
 					};
 				} else {
-
 					let nInv = new OrganisationInvitation({
 						dataDetails: invt
 					});
 					nInv.byAccount = req.ACC._id;
 					nInv.byUser = req.userDATA._id;
+					nInv.status = 'sent';
+					nInv.sendDate = Date.now();
 					let nn = await nInv.save();
 					if (nn) {
 						let datMail = {
@@ -541,7 +541,6 @@ module.exports.sendOrgInvitations = async (req, res) => {
 							};
 						}
 					}
-
 				}
 			}
 			resForAll.push({
@@ -561,3 +560,68 @@ module.exports.sendOrgInvitations = async (req, res) => {
 		})
 	}
 };
+
+module.exports.ckeckInvitationsOrg = async (req, res) => {
+	let invtID = req.query['invitID'];
+	let retData = {};
+	try {
+		let ivn = await OrganisationInvitation.findOne({
+			_id: invtID
+		}).populate([{
+			path: 'byAccount',
+			select: 'enseigneCommerciale'
+		}, {
+			path: 'byUser',
+			select: 'lastname firstname function'
+		}]);
+		if (ivn) {
+			if (ivn.status == 'sent') {
+				retData = {
+					status: 'OK',
+					data: ivn
+				};
+			} else {
+				retData = {
+					status: 'NOK',
+					message: 'Invitation already used'
+				}
+			}
+		} else {
+			retData = {
+				status: 'NOK',
+				message: 'Invitation NOT FOUND'
+			}
+		}
+		return sendJSONresponse(res, 200, retData);
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+module.exports.getInProgressOrgInvitation = async (req, res) => {
+	let accID = req.ACC._id;
+	try {
+		let list = await OrganisationInvitation.find({
+			byAccount: accID,
+			status: 'sent'
+		}, 'dataDetails byUser').populate([{
+			path: 'byUser',
+			select: 'firstname lastname function'
+		}]).sort([
+			['sendDate', 'descending']
+		]);
+
+		return sendJSONresponse(res, 200, {
+			status: 'OK',
+			data: list
+		})
+
+
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: 'NOK',
+			message: 'Error server'
+		})
+	}
+}
