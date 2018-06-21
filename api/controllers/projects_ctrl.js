@@ -220,6 +220,7 @@ module.exports.applyToProjects = async (req, res) => {
     try {
         let cndt = new Candidature();
         cndt.applicationData = applData;
+        cndt.applicationName = applData.applicationName;
         cndt.accountID = dataPr["accountProjectOwner"];
         cndt.createdAt = Date.now();
         cndt.userID = req.userDATA._id;
@@ -549,7 +550,11 @@ module.exports.getApplicationByCollabID = async (req, res) => {
             applresp = await this.dataApplicationArr(allAppl);
         }
 
-        let collB = await Project.findById(rIDCollab);
+        let collB = await Project.findOne({
+            _id: rIDCollab
+        }).populate({
+            path: 'account'
+        });
         let dtColB;
         if (collB) {
             dtColB = await this.formatOneCollabForList(collB);
@@ -655,18 +660,16 @@ module.exports.formatsApplicationSentData = async applSent => {
         let d = new Date(applSent.createdAt);
         let c = JSON.parse(applSent.accountID.adresse)
             .description.split(",")
-            .pop();
-        let collabType = await this.getCollabTypeText(
-            applSent.projectID.typeCollab
-        );
+            .pop().trim();
         let m = {
             _id: applSent._id,
             date: d.toDateString(),
             country: c,
             orgName: applSent.accountID.enseigneCommerciale,
-            typeCollab: collabType,
+            typeCollab: applSent.projectID.typeCollab,
             collabName: applSent.projectID.name,
-            status: "p"
+            status: applSent.status,
+            applicationName: applSent.applicationName
         };
         return m;
     } catch (error) {

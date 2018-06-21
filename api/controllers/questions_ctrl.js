@@ -190,7 +190,12 @@ module.exports.getallquestionsCompany = async (req, res) => {
                 if (qq.objectRef == "TMV") {
                     about = "Team";
                 } else if (qq.objectRef == "PRT") {
-                    about = "Project";
+                    let objQ = await Project.findOne({
+                        _id: qq.objectRefID
+                    }, 'typeCollab name');
+                    if (objQ) {
+                        about = objQ;
+                    }
                 } else about = "Others";
                 let ensc = "";
                 let enseigneCommercialeOrg = await Account.findOne({
@@ -202,15 +207,11 @@ module.exports.getallquestionsCompany = async (req, res) => {
                     ensc = enseigneCommercialeOrg["enseigneCommerciale"];
                 }
 
-                let cnt = qq.question_content;
-                /*      .replace(/\n/g, "")
-                    .replace(/<(?:.|\n)*?>/gm, "");
-                if (cnt.length > 300) {
-                    cnt = cnt.substr(0, 300) + "...";
-                }*/
+                let cnt = this.qLimiteText(qq.question_content)
 
                 let usr = {
-                    name: qq.userAsk.lastname + " " + qq.userAsk.firstname,
+                    lastname: qq.userAsk.lastname,
+                    firstname: qq.userAsk.firstname,
                     email: qq.userAsk.email,
                     org: ensc
                 };
@@ -251,13 +252,17 @@ module.exports.getDetailOnQuestion = async (req, res) => {
         if (qdata) {
             let d = new Date(qdata.addDate);
             let ensc = "";
+            let addrCountry = '';
             let enseigneCommercialeOrg = await Account.findOne({
                     users: qdata.userAsk._id
                 },
-                "enseigneCommerciale"
+                "enseigneCommerciale adresse"
             );
             if (enseigneCommercialeOrg) {
                 ensc = enseigneCommercialeOrg["enseigneCommerciale"];
+                addrCountry = JSON.parse(enseigneCommercialeOrg["adresse"])
+                    .description.split(",")
+                    .pop().trim();
             }
             let _types = "";
             let dataObj = {};
@@ -291,17 +296,20 @@ module.exports.getDetailOnQuestion = async (req, res) => {
 
                     break;
             }
-
             let retDetails = {
                 _id: qdata._id,
                 hour: d.toTimeString().split(" ")[0],
                 date: d.toDateString(),
+                stateAdmin: qdata.stateAdmin,
                 question_content: qdata.question_content,
+                responseIN: await this.formatRespInQ(qdata.responseAll),
                 usr: {
                     _id: qdata.userAsk._id,
-                    name: qdata.userAsk.lastname + " " + qdata.userAsk.firstname,
-                    email: qdata.userAsk.email,
+                    lastname: qdata.userAsk.lastname,
+                    firstname: qdata.userAsk.firstname,
+                    /* email: qdata.userAsk.email, */
                     org: ensc,
+                    orgAddr: addrCountry,
                     function: qdata.userAsk.function,
                     imageProfile: tools_service.media_url(
                         qdata.userAsk.imageProfile.url
@@ -323,6 +331,18 @@ module.exports.getDetailOnQuestion = async (req, res) => {
         console.log(e);
     }
 };
+
+module.exports.formatRespInQ = async (allResp) => {
+    let populatedResp = [];
+    for (const itt of allResp) {
+        let dw = await User.findOne({
+            _id: itt.user
+        }, 'firstname lastname function');
+        itt.user = dw;
+        populatedResp.push(itt)
+    }
+    return populatedResp;
+}
 
 module.exports.archives_questions = async (req, res) => {
     try {
@@ -351,7 +371,6 @@ module.exports.archives_questions = async (req, res) => {
 };
 
 module.exports.replyQuestions = async (req, res) => {
-    console.log(req.body, req.userDATA);
     let responseData = {
         rDate: Date.now(),
         user: req.userDATA._id,
@@ -369,13 +388,19 @@ module.exports.replyQuestions = async (req, res) => {
             }
         );
         if (qSt) {
+
             return sendJSONresponse(res, 200, {
-                status: "OK"
+                status: "OK",
+                data: await this.formatRespInQ(qSt.responseAll)
             });
         }
     } catch (e) {
         // statements
         console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: 'NOK',
+            message: 'Server Error'
+        })
     }
 };
 
@@ -383,9 +408,6 @@ module.exports.getallCompanyArchives = async (req, res) => {
     let accID = req.ACC._id;
     let qr = {
         account: accID,
-        objectRef: {
-            $ne: "PRT"
-        },
         stateAdmin: "archived"
     };
 
@@ -408,9 +430,19 @@ module.exports.getallCompanyArchives = async (req, res) => {
             for (let qq of allQuest) {
                 let da = new Date(qq.addDate);
                 let about = "";
+                let abType = ''
                 if (qq.objectRef == "TMV") {
-                    about = "Team";
-                } else about = "Others";
+                    abType = 'tmv'
+                    about = "Questions";
+                } else if (qq.objectRef == "PRT") {
+                    let objQ = await Project.findOne({
+                        _id: qq.objectRefID
+                    }, 'typeCollab');
+                    if (objQ) {
+                        about = objQ.typeCollab;
+                        abType = 'prt'
+                    }
+                }
                 let ensc = "";
                 let enseigneCommercialeOrg = await Account.findOne({
                         users: qq.userAsk._id
@@ -421,16 +453,12 @@ module.exports.getallCompanyArchives = async (req, res) => {
                     ensc = enseigneCommercialeOrg["enseigneCommerciale"];
                 }
 
-                let cnt = qq.question_content;
-                /*      .replace(/\n/g, "")
-                    .replace(/<(?:.|\n)*?>/gm, "");
-                if (cnt.length > 300) {
-                    cnt = cnt.substr(0, 300) + "...";
-                }*/
+                let cnt = this.qLimiteText(qq.question_content)
 
                 let usr = {
-                    name: qq.userAsk.lastname + " " + qq.userAsk.firstname,
-                    email: qq.userAsk.email,
+                    lastname: qq.userAsk.lastname,
+                    firstname: qq.userAsk.firstname,
+                    /*   email: qq.userAsk.email, */
                     org: ensc
                 };
                 let respIN = qq.responseAll.length > 0 ? true : false;
@@ -439,6 +467,7 @@ module.exports.getallCompanyArchives = async (req, res) => {
                     hour: da.toTimeString().split(" ")[0],
                     date: da.toDateString(),
                     about: about,
+                    abType: abType,
                     userAsk: usr,
                     quest_part: cnt,
                     responseIN: qq.responseAll,
@@ -460,3 +489,12 @@ module.exports.getallCompanyArchives = async (req, res) => {
         });
     }
 };
+
+module.exports.qLimiteText = (params) => {
+    params = params.replace(/\n/g, "")
+        .replace(/<(?:.|\n)*?>/gm, "");
+    if (params.length > 300) {
+        params = params.substr(0, 300) + "...";
+    }
+    return params
+}
