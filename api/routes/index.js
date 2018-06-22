@@ -22,6 +22,7 @@ var ctrlZones = require('../controllers/zones');
 var ctrlTeams = require('../controllers/team_ctrl');
 var ctrlProject = require('../controllers/projects_ctrl');
 var ctrlQuestions = require('../controllers/questions_ctrl');
+var ctrlDealSpaces = require('../controllers/deal_ctrl');
 var ctrlPatch = require('../controllers/patchData');
 
 /*
@@ -256,6 +257,11 @@ router.post('/reply_questions', auth, req_mid.validUser, req_mid.checkRole, ctrl
 
 
 router.get('/org_types', ctrlCompanies.getOrgTypes);
+
+/**
+ * Deal Spaces Routes
+ */
+router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData )
 
 /* Specific Route for modify default data*/
 router.get('/patchDATA', ctrlPatch.patchDATA);
