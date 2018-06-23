@@ -606,6 +606,8 @@ module.exports.formatApplicationForListData = async aa => {
         countryCD: aa.countryCD,
         hour: d.toTimeString().split(" ")[0],
         date: d.toDateString(),
+        status: aa.status,
+        applicationName: aa.applicationName,
         usr: {
             lastname: aa.userID.lastname,
             firstname: aa.userID.firstname,

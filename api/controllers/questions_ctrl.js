@@ -163,7 +163,8 @@ module.exports.getallquestionsCompany = async (req, res) => {
     } else {
         qr = {
             account: accID,
-            objectRef: "PRT"
+            objectRef: "PRT",
+            stateAdmin: "active"
         };
     }
 

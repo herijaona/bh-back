@@ -72,3 +72,89 @@ module.exports.dealFormats = async (collDeal) => {
     }
     return m;
 }
+
+module.exports.acceptAddApplication = async (req, res) => {
+    const accID = req.ACC._id;
+    const applicationID = req.body.applicationID
+
+    try {
+        let applyData = await Candidature.findOneAndUpdate({
+            _id: applicationID
+        }, {
+            $set: {
+                status: 'accepted'
+            }
+        }, {
+            new: true
+        })
+
+        if (applyData) {
+            let oneDeal = await CollaborationDeal.findOne({
+                accountID: accID,
+                collaborationObj: applyData.projectID
+            });
+            if (oneDeal) {
+                let oneUpDeal = await CollaborationDeal.findOneAndUpdate({
+                    _id: oneDeal._id
+                }, {
+                    $push: {
+                        selectedUser: {
+                            applicationData: applicationID,
+                            selectionDate: Date.now(),
+                            dataExchanges: {
+                                files: [],
+                                questionsResponse: [],
+                                planning: []
+                            }
+                        }
+                    }
+                }, {
+                    new: true
+                })
+                if (oneUpDeal) {
+                    return sendJSONresponse(res, 200, {
+                        status: "OK",
+                        message: 'succesfull'
+                    })
+                }
+            } else {
+                let data = {
+                    accountID: accID,
+                    selectedUser: [{
+                        applicationData: applicationID,
+                        selectionDate: Date.now(),
+                        dataExchanges: {
+                            files: [],
+                            questionsResponse: [],
+                            planning: []
+                        }
+                    }],
+                    collaborationObj: applyData.projectID,
+                    createdAt: Date.now(),
+                    status: 'active',
+                    observations: []
+                }
+                let newDeal = new CollaborationDeal(data);
+                await newDeal.save()
+                return sendJSONresponse(res, 200, {
+                    status: "OK",
+                    message: 'succesfully saved'
+                })
+            }
+        }
+
+        return sendJSONresponse(res, 404, {
+            status: "NOK",
+            message: 'Application data Not valid'
+        })
+
+
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: 'Error server'
+        })
+    }
+
+}

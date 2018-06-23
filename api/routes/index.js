@@ -210,6 +210,10 @@ router.get('/countryList', ctrlProject.getCountryAll);
 router.get('/bh-projects/getAllCollabtype', ctrlProject.getAllCollaborationType);
 
 router.get('/admin-cca/getCollabLists', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.getAllCollabList);
+/**
+ * Accept Application
+ */
+
 
 /**
  *  Collaboration as Opportuinity
@@ -261,7 +265,9 @@ router.get('/org_types', ctrlCompanies.getOrgTypes);
 /**
  * Deal Spaces Routes
  */
-router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData )
+router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
+router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
+router.post('/accept-application', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.acceptAddApplication)
 
 /* Specific Route for modify default data*/
 router.get('/patchDATA', ctrlPatch.patchDATA);

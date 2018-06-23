@@ -6,10 +6,6 @@ var collabDealSchema = new mongoose.Schema({
         ref: 'Account'
     },
     selectedUser: [{
-        userData: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Candidature'
-        },
         applicationData: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Candidature'
