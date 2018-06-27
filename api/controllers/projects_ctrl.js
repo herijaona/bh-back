@@ -1,18 +1,36 @@
 var mongoose = require("mongoose");
+/**
+ * Model Require
+ */
 var User = mongoose.model("User");
-var tools_service = require("../services/app-general");
-var mail_services = require("../services/mailing-service");
-var const_data = require("../config/constantData");
 var TeamFront = mongoose.model("TeamFront");
 var Candidature = mongoose.model("Candidature");
 var Account = mongoose.model("Account");
+var Question = mongoose.model("Question");
 var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
+/**
+ * Require Logic File
+ */
 var ctrlQuestions = require("./questions_ctrl");
+var const_data = require("../config/constantData");
+var tools_service = require("../services/app-general");
+var mail_services = require("../services/mailing-service");
+
+/**
+ * 
+ * @param {*} res 
+ * @param {*} status 
+ * @param {*} content 
+ */
 var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
+
+/**
+ * Model Matrice
+ */
 var datModelCOllabList = {
     name: "",
     _id: "",
@@ -20,6 +38,7 @@ var datModelCOllabList = {
     responseTimeUnit: "",
     responseTimeValue: 0
 };
+
 /* 
  * Save Project ( Collaboration )
  */
@@ -47,6 +66,7 @@ module.exports.saveProjectsDATA = async (req, res) => {
         });
     }
 };
+
 /* 
  * Get all Projet ( Collaboration )
  */
@@ -436,12 +456,14 @@ module.exports.getAllCollabList = async (req, res) => {
         if (my_collab) {
             let retVal = [];
             for (let col1 of my_collab) {
+                console.log(col1);
                 let re = Object.create(objMatrice);
                 re.name = col1.name;
                 re.type = col1.typeCollab;
                 re.date = new Date(col1.addDate).toDateString();
                 re._id = col1._id;
                 re.author = col1.createdByUser;
+                re.interaction_number = await this.collInterActNumber(col1._id);
                 retVal.push(re);
             }
             return sendJSONresponse(res, 200, {
@@ -462,6 +484,23 @@ module.exports.getAllCollabList = async (req, res) => {
         });
     }
 };
+
+module.exports.collInterActNumber = async (collabID) => {
+    try {
+        let coll = await Candidature.find({
+            projectID: collabID,
+        })
+
+        let qst = await Question.find({
+            objectRef: const_data.QST_OBJ_REF._PROJECT,
+            objectRefID: collabID
+        })
+        return coll.length + qst.length
+    } catch (e) {
+        console.log(e);
+        return 0
+    }
+}
 
 module.exports.getDataForApplication = async (req, res) => {
     let pID = req.query["projectID"];

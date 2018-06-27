@@ -22,7 +22,7 @@ var DataForResponse = {
     pagetoShow: "",
     websiteUrl: ""
 };
-var sendJSONresponse = function(res, status, content) {
+var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 };
@@ -36,8 +36,7 @@ module.exports.listall = async (req, res) => {
         }]);
         if (allAcc) {
             let accMap = [];
-            let l = allAcc.length;
-            for (acc_ of allAcc) {
+            for (const acc_ of allAcc) {
                 if (acc_.isActive) {
                     let m = Object.create(DataForResponse);
                     let c = tools_service.copydata(m, acc_);
@@ -61,7 +60,7 @@ module.exports.listall = async (req, res) => {
     }
 };
 /* Controllers handle request on  company generale info */
-module.exports.general_info = function(req, res) {
+module.exports.general_info = function (req, res) {
     var m = Object.create(DataForResponse);
     var populateQuery = [{
         path: "Logo"
@@ -76,7 +75,7 @@ module.exports.general_info = function(req, res) {
         }).populate(populateQuery).exec((e_, u_) => {
             if (!e_) {
                 var r;
-                u_.forEach(function(elt) {
+                u_.forEach(function (elt) {
                     if (id_v == elt._id) {
                         r = tools_service.copydata(m, elt);
                         r.Logo = tools_service.media_url(r.Logo.url, "images");
@@ -138,13 +137,13 @@ module.exports.getCompanyDetailsData = async (req, res) => {
     }
 };
 /* Controllers handle  company generale info Update*/
-module.exports.updategeneral_info = async function(req, res) {
+module.exports.updategeneral_info = async function (req, res) {
     var m = Object.create(DataForResponse);
     var acc = req.ACC;
     var sl_ = "";
     var sl_dupl = 0;
     var loop_ind = true;
-    Object.keys(req.body).forEach(function(keyn) {
+    Object.keys(req.body).forEach(function (keyn) {
         acc[keyn] = req.body[keyn];
         if (keyn == "enseigneCommerciale") {
             sl_ = req.body[keyn].replace(/ /g, "");
@@ -183,15 +182,15 @@ module.exports.updategeneral_info = async function(req, res) {
     }
 };
 /* Controllers handle  company generale Logo Update*/
-module.exports.updateCompanyImage = function(req, res) {
+module.exports.updateCompanyImage = function (req, res) {
     var m = Object.create(DataForResponse);
     var acc = req.ACC;
     acc[req.body.dataIm] = new mongoose.mongo.ObjectId(req.body.IdIm);
-    acc.save(function(e, r) {
+    acc.save(function (e, r) {
         if (!e) {
             Account.populate(r, {
                 path: "Logo"
-            }, function(err, a) {
+            }, function (err, a) {
                 var et = tools_service.copydata(m, a);
                 et.Logo = tools_service.media_url(et.Logo.url, "images");
                 et.adresse = tools_service.getAddrData(et);
@@ -200,10 +199,10 @@ module.exports.updateCompanyImage = function(req, res) {
         }
     });
 };
-module.exports.updatePageShow = function(req, res) {
+module.exports.updatePageShow = function (req, res) {
     var ac = req.ACC;
     ac.pagetoShow = JSON.stringify(req.body);
-    ac.save(function(e, r) {
+    ac.save(function (e, r) {
         if (!e) {
             res.status(200).json({
                 status: "OK"
@@ -231,7 +230,7 @@ async function getimage(res, _keySearch_) {
         let imbb = await Image.find(_keySearch_);
         if (imbb) {
             let l_ = [];
-            await imbb.forEach(function(el, indx) {
+            await imbb.forEach(function (el, indx) {
                 let on_ = {
                     _id: el._id,
                     url: tools_service.media_url(el.url),
@@ -251,15 +250,15 @@ async function getimage(res, _keySearch_) {
         });
     }
 }
-module.exports.updateImageBiblio = function(req, res) {
+module.exports.updateImageBiblio = function (req, res) {
     var data_T = req.body.ty_pe == "images" ? Image : Video;
     var ac = req.body.all_im;
     var prom = new Promise((resolve, reject) => {
         var l = ac.length;
-        ac.forEach(function(ee, ie) {
-            data_T.findById(new mongoose.mongo.ObjectId(ee), function(er, im) {
+        ac.forEach(function (ee, ie) {
+            data_T.findById(new mongoose.mongo.ObjectId(ee), function (er, im) {
                 im.acc_owner = req.ACC._id;
-                im.save(function(e, r) {
+                im.save(function (e, r) {
                     if (l == ie + 1) {
                         resolve();
                     }
@@ -274,15 +273,15 @@ module.exports.updateImageBiblio = function(req, res) {
         });
     });
 };
-module.exports.updateUserImageBiblio = function(req, res) {
+module.exports.updateUserImageBiblio = function (req, res) {
     var data_T = req.body.ty_pe == "images" ? Image : Video;
     var ac = req.body.all_im;
     var prom = new Promise((resolve, reject) => {
         var l = ac.length;
-        ac.forEach(function(ee, ie) {
-            data_T.findById(new mongoose.mongo.ObjectId(ee), function(er, im) {
+        ac.forEach(function (ee, ie) {
+            data_T.findById(new mongoose.mongo.ObjectId(ee), function (er, im) {
                 im.user_owner = req.userDATA._id;
-                im.save(function(e, r) {
+                im.save(function (e, r) {
                     if (l == ie + 1) {
                         resolve();
                     }
@@ -346,7 +345,7 @@ module.exports.getCompanyPresentation = async (req, res) => {
 /* 
  * Return the mindset data for admin view 
  */
-module.exports.getAdminDataMindset = function(req, res) {
+module.exports.getAdminDataMindset = function (req, res) {
     var znData = new Promise((resolve, reject) => {
         var populateQuery = [{
             path: "video"
@@ -363,7 +362,7 @@ module.exports.getAdminDataMindset = function(req, res) {
             }
         });
     });
-    znData.then(function(arrElts) {
+    znData.then(function (arrElts) {
         var ln = arrElts.length;
         var id_in = [];
         for (var i = 0; i < ln; i++) {
@@ -401,7 +400,7 @@ module.exports.getAdminDataMindset = function(req, res) {
         });
     }, err => {});
 };
-module.exports.checkRole_userAdmin = function(req, res) {
+module.exports.checkRole_userAdmin = function (req, res) {
     var currUSERID = req.userDATA._id;
     var dt = req.query.slug_chk;
     if (req.userDATA.active) {
@@ -412,7 +411,7 @@ module.exports.checkRole_userAdmin = function(req, res) {
                 if (elts) {
                     var usersAdm = elts.userAdmin;
                     var existIN = false;
-                    for (i_d in usersAdm) {
+                    for (const i_d in usersAdm) {
                         if (currUSERID.toString() == usersAdm[i_d].toString()) {
                             existIN = true;
                             break;
@@ -420,7 +419,7 @@ module.exports.checkRole_userAdmin = function(req, res) {
                     }
                     var userComm = elts.usersCommetee;
                     let existINC = false;
-                    for (i_Cd in userComm) {
+                    for (const i_Cd in userComm) {
                         if (currUSERID.toString() == userComm[i_Cd].toString()) {
                             existINC = true;
                             break;
@@ -468,14 +467,14 @@ module.exports.companyDetailsByUserID = async (req, res, next) => {
         });
     }
 };
-module.exports.checkRoleAdmin = async (req, res) => {
+module.exports.getCompanyDataDetails = async (req, res) => {
     try {
-        let currentUserAccount = await Account.find({
-            userAdmin: req.userDATA._id
+        let currentUserAccount = await Account.findOne({
+            _id: req.query['idCompany']
         });
-        if (currentUserAccount.length == 1) {
+        if (currentUserAccount) {
             var m = Object.create(DataForResponse);
-            let var_res = tools_service.copydata(m, currentUserAccount[0]);
+            let var_res = tools_service.copydata(m, currentUserAccount);
             res.status(200).json({
                 status: "OK",
                 data: var_res

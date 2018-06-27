@@ -604,7 +604,7 @@ module.exports.getInProgressOrgInvitation = async (req, res) => {
 		let list = await OrganisationInvitation.find({
 			byAccount: accID,
 			status: 'sent'
-		}, 'dataDetails byUser').populate([{
+		}, 'dataDetails byUser sendDate').populate([{
 			path: 'byUser',
 			select: 'firstname lastname function'
 		}]).sort([

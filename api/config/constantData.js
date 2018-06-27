@@ -6,8 +6,7 @@ CONSTData.collabType = {
 	type4: "COLLABINVEST"
 };
 
-CONSTData.collabTypeText = [
-	{
+CONSTData.collabTypeText = [{
 		slug: "COLLABSUBJINNOV",
 		text: "Suggestions",
 		type: 2
@@ -28,4 +27,21 @@ CONSTData.collabTypeText = [
 		type: 4
 	}
 ];
+
+CONSTData.APPLICATION_STATUS = {
+	_ACCEPTED: 'accepted',
+	_PENDING: 'pending',
+	_REFUSED: 'refused'
+}
+
+CONSTData.COLLAB_STATUS = {
+	_ACTIVE: 'active',
+	_STOPPED: 'stopped',
+	_PAUSED: 'paused'
+}
+CONSTData.QST_OBJ_REF = {
+	_PROJECT: 'PRT',
+	_QUESTION: 'TMV',
+	_IDEA: 'IDEA'
+}
 module.exports = CONSTData;

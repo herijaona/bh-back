@@ -100,7 +100,7 @@ router.get('/check_role', auth, req_mid.validUser, ctrlCompanies.checkRole_userA
  *
  * check Role by User Id
  */
-router.get('/Admincheck_role', auth, req_mid.validUser, ctrlCompanies.checkRoleAdmin);
+router.get('/Admincheck_role', auth, req_mid.validUser, ctrlCompanies.getCompanyDataDetails);
 
 /* Get company DATA DETAILS*/
 /* by slug */
