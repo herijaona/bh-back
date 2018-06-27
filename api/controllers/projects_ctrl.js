@@ -777,3 +777,126 @@ module.exports.formatOpportuinityCollab = colbMdel => {
     };
     return clMdl;
 };
+
+
+module.exports.getContryListHavingCollaborations = async (req, res) => {
+    try {
+        let cCountry = []
+        let listCollab = await Project.find({
+            status: const_data.COLLAB_STATUS._ACTIVE
+        }).populate([{
+            path: 'account',
+            select: 'adresse'
+        }])
+        if (listCollab) {
+            let sw = listCollab.map(el => {
+                return JSON.parse(el.account.adresse)
+                    .description.split(",")
+                    .pop().trim();
+            });
+            cCountry = sw.filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            });
+        }
+
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: cCountry
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: 'Error server'
+        })
+    }
+
+}
+
+module.exports.getAllCollaborationsByFilter = async (req, res) => {
+    let filterKey = req.query;
+    try {
+        let listCollab = await Project.find({
+            status: const_data.COLLAB_STATUS._ACTIVE
+        }).populate([{
+            path: 'account',
+            select: 'adresse typeOrganisation activityArea Logo',
+            populate: [{
+                path: 'Logo'
+            }, {
+                path: 'typeOrganisation'
+            }]
+        }]);
+        let afterFilter = listCollab;
+        if (filterKey.cCountry !== 'all') {
+            let tmpAll = afterFilter;
+            afterFilter = [];
+            afterFilter = tmpAll.filter(el => {
+                let adr = JSON.parse(el.account.adresse)
+                    .description.split(",")
+                    .pop().trim().toLowerCase().replace(/ /g, "");
+                if (adr === filterKey.cCountry) {
+                    return true;
+                }
+                return false;
+            })
+        }
+
+        if (filterKey.typeCollab !== 'all') {
+            let tmpAll = afterFilter;
+            afterFilter = [];
+            afterFilter = tmpAll.filter(el => {
+                if (el.typeCollab === filterKey.typeCollab) {
+                    return true;
+                }
+                return false;
+            })
+        }
+
+        if (filterKey.areaActivity !== 'all') {
+            let tmpAll = afterFilter;
+            afterFilter = [];
+            afterFilter = tmpAll.filter(el => {
+                if (el.account.activityArea === filterKey.areaActivity) {
+                    return true;
+                }
+                return false;
+            })
+        }
+
+        let formatedData = [];
+        for (const itemCollab of afterFilter) {
+            let numApplication = await Candidature.find({
+                projectID: itemCollab._id
+            });
+            let numApplAcceptd = numApplication.filter(el => {
+                if (el.status === const_data.APPLICATION_STATUS._ACCEPTED) {
+                    return true
+                }
+                return false
+            })
+            let m = {
+                _id: itemCollab._id,
+                name: itemCollab.name,
+                logoAccont: tools_service.media_url(itemCollab.account.Logo.Url),
+                acceptedApplication: numApplAcceptd.length,
+                allApplication: numApplication.length
+            }
+
+            if (itemCollab.typeCollab === const_data.collabType.type1) {
+                m.durationType = itemCollab.dataDetails.collabDurationType;
+            }
+            formatedData.push(m)
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: formatedData
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: "Error Serveur"
+        })
+    }
+}

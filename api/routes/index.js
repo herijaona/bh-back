@@ -210,6 +210,12 @@ router.get('/countryList', ctrlProject.getCountryAll);
 router.get('/bh-projects/getAllCollabtype', ctrlProject.getAllCollaborationType);
 
 router.get('/admin-cca/getCollabLists', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.getAllCollabList);
+
+/* getList for front Maoris */
+router.get('/getCountryHasCollab', ctrlProject.getContryListHavingCollaborations);
+router.get('/getCollabFilter', ctrlProject.getAllCollaborationsByFilter);
+/* get  */
+
 /**
  * Accept Application
  */
@@ -265,7 +271,6 @@ router.get('/org_types', ctrlCompanies.getOrgTypes);
 /**
  * Deal Spaces Routes
  */
-router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
 router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
 router.post('/accept-application', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.acceptAddApplication)
 
