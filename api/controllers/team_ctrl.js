@@ -4,6 +4,7 @@ var tools_service = require("../services/app-general");
 var mail_services = require("../services/mailing-service");
 var User = mongoose.model("User");
 var TeamCommunity = mongoose.model("TeamCommunity");
+var CommunitiesData = mongoose.model("CommunitiesData");
 var InvitationSent = mongoose.model("InvitationSent");
 var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var Project = mongoose.model("Project");
@@ -678,6 +679,45 @@ module.exports.getAcceptedInvitation = async (req, res) => {
 	}
 }
 
-module.exports.createCommunityFree = async (req,res)=>{
-	 
+module.exports.createCommunityFree = async (req, res) => {
+	let newCommData = req.body;
+	newCommData['creationDate'] = Date.now();
+	newCommData['accountOwner'] = req.ACC._id;
+	newCommData['byUser'] = req.userDATA._id;
+	let nComm = new CommunitiesData(newCommData);
+	try {
+		let nn = await nComm.save();
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: nn
+		})
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: "NOK"
+		})
+	}
+}
+
+module.exports.getCommunitiesListData = async (req, res) => {
+	const accID = req.ACC._id;
+	try {
+		let commList = await CommunitiesData.find({
+			accountOwner: accID
+		}).populate([{
+			path: 'byUser'
+		}]);
+		let dataCommList = [];
+		if (commList.length > 0) {
+			for (const cData of commList) {
+				console.log(cData);
+			}
+		}
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: dataCommList
+		})
+	} catch (e) {
+
+	}
 }

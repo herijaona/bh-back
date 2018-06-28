@@ -8,7 +8,7 @@ var listCommSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    users: [{
+    users_in: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }],

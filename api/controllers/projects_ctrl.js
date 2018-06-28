@@ -837,7 +837,7 @@ module.exports.getAllCollaborationsByFilter = async (req, res) => {
                 let adr = JSON.parse(el.account.adresse)
                     .description.split(",")
                     .pop().trim().toLowerCase().replace(/ /g, "");
-                if (adr === filterKey.cCountry) {
+                if (adr === filterKey.cCountry.toLowerCase().replace(/ /g, "")) {
                     return true;
                 }
                 return false;
@@ -880,7 +880,7 @@ module.exports.getAllCollaborationsByFilter = async (req, res) => {
             let m = {
                 _id: itemCollab._id,
                 name: itemCollab.name,
-                logoAccont: tools_service.media_url(itemCollab.account.Logo.Url),
+                logoAccont: tools_service.media_url(itemCollab.account.Logo.url),
                 acceptedApplication: numApplAcceptd.length,
                 allApplication: numApplication.length
             }

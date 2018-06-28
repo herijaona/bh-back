@@ -128,6 +128,8 @@ router.post('/save-presentation', auth, req_mid.validUser, req_mid.checkRole, ct
 
 /* Save front team video data */
 router.post('/team_front_video', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.saveTeamsFrontData);
+/** Create new Community */
+router.post('/addAccountNewCommunity', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.createCommunityFree);
 
 /* Get front team video data */
 router.get('/team_front_video', req_mid.accReqSlug, ctrlTeams.getTeamsFrontVideoData);
