@@ -272,7 +272,12 @@ router.get('/org_types', ctrlCompanies.getOrgTypes);
  * Deal Spaces Routes
  */
 router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
+/**
+ *  accept candidture params : applicationID 
+ */
 router.post('/accept-application', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.acceptAddApplication)
+/* Get list user in a deal spaces params : dealID */
+router.get('/getDealUserlist', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getDealSpaceUserList)
 
 /* Specific Route for modify default data*/
 router.get('/patchDATA', ctrlPatch.patchDATA);

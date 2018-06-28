@@ -67,6 +67,8 @@ require('./data_schema/collaboration_type');
 require('./data_schema/invitation_sent');
 require('./data_schema/collaboration-deal');
 require('./data_schema/organistation_invitation');
+require('./data_schema/communitiesList');
+require('./data_schema/communitySubject');
 // require('./data_schema/biblioImage');
 
 /* Init value */

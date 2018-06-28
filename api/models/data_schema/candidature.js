@@ -9,13 +9,15 @@ var candidatureSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
+  userCDAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account'
+  },
   createdAt: Date,
-  questions: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Question'
-    }
-  ],
+  questions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Question'
+  }],
   projectID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project'

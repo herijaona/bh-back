@@ -76,7 +76,6 @@ module.exports.dealFormats = async (collDeal) => {
 module.exports.acceptAddApplication = async (req, res) => {
     const accID = req.ACC._id;
     const applicationID = req.body.applicationID
-
     try {
         let applyData = await Candidature.findOneAndUpdate({
             _id: applicationID
@@ -157,4 +156,43 @@ module.exports.acceptAddApplication = async (req, res) => {
         })
     }
 
+}
+
+module.exports.getDealSpaceUserList = async (req, res) => {
+    let dealSpID = req.query.dealID;
+    try {
+        let dealSP = await CollaborationDeal.findOne({
+            _id: dealSpID
+        }).populate([{
+            path: 'selectedUser.applicationData',
+            populate: [{
+                path: 'userID',
+                select: 'lastname firstname function'
+            }, {
+                path: 'userCDAccount',
+                select: 'enseigneCommerciale'
+            }]
+        }])
+        let listUser = [];
+        if (dealSP && dealSP['selectedUser']) {
+            for (const userCD of dealSP['selectedUser']) {
+                let m = {
+                    user: userCD.applicationData.userID,
+                    userAccount: userCD.applicationData.userCDAccount
+                }
+
+                listUser.push(m)
+            }
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: listUser
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: "NOK",
+            message: "Error server"
+        })
+    }
 }

@@ -677,3 +677,7 @@ module.exports.getAcceptedInvitation = async (req, res) => {
 		})
 	}
 }
+
+module.exports.createCommunityFree = async (req,res)=>{
+	 
+}
