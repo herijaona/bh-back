@@ -48,6 +48,7 @@ module.exports.saveProjectsDATA = async (req, res) => {
     prDATA["createdByUser"] = req.userDATA._id;
     prDATA["vue"] = 0;
     prDATA["addDate"] = Date.now();
+    prDATA['status'] = const_data.COLLAB_STATUS._ACTIVE;
     try {
         let pr = new Project(prDATA);
         let sv = await pr.save();
@@ -788,6 +789,7 @@ module.exports.getContryListHavingCollaborations = async (req, res) => {
             path: 'account',
             select: 'adresse'
         }])
+
         if (listCollab) {
             let sw = listCollab.map(el => {
                 return JSON.parse(el.account.adresse)
