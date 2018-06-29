@@ -843,11 +843,11 @@ module.exports.savenewSubjectData = async (req, res) => {
 		nSubj.creationDate = Date.now();
 		nSubj.status = const_data.COMMSUBJECT_STATUS._ACTIVE;
 		nSubj.byUser = req.userDATA._id;
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: []
+		})
 	} catch (e) {
-
+		console.log(e);
 	}
-	return sendJSONresponse(res, 200, {
-		status: "OK",
-		data: []
-	})
 }
