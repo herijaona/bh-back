@@ -361,10 +361,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
             let applDtl = allApplDetails.applicationData;
             if ("countryCD" in applDtl) {
                 applDtl.countryCD = allApplDetails.countryCD;
-            } else {
-                applDtl.countryCD = allApplDetails.countryCD;
             }
-
             let retDetails = {
                 _id: allApplDetails._id,
                 hour: d.toTimeString().split(" ")[0],
@@ -381,6 +378,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                         allApplDetails.userID.imageProfile.url
                     )
                 },
+                status: allApplDetails.status,
                 projet: {
                     _id: allApplDetails.projectID._id,
                     name: allApplDetails.projectID.name,

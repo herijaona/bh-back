@@ -1,14 +1,26 @@
 var mongoose = require("mongoose");
+/**
+ * Model import
+ */
 var TeamFront = mongoose.model("TeamFront");
-var tools_service = require("../services/app-general");
-var mail_services = require("../services/mailing-service");
 var User = mongoose.model("User");
 var CollaborationDeal = mongoose.model("CollaborationDeal");
+var Candidature = mongoose.model("Candidature");
 var InvitationSent = mongoose.model("InvitationSent");
 var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var Project = mongoose.model("Project");
 var Account = mongoose.model("Account");
-/** Return DATA */
+
+/**
+ *  FIles and services
+ */
+var mail_services = require("../services/mailing-service");
+var tools_service = require("../services/app-general");
+
+/**
+ *  Return DATA 
+ * 
+ **/
 var sendJSONresponse = function (res, status, content) {
     res.status(status);
     res.json(content);
