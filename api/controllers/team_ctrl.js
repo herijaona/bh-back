@@ -843,11 +843,68 @@ module.exports.savenewSubjectData = async (req, res) => {
 		nSubj.creationDate = Date.now();
 		nSubj.status = const_data.COMMSUBJECT_STATUS._ACTIVE;
 		nSubj.byUser = req.userDATA._id;
+		let nsave = nSubj.save();
 		return sendJSONresponse(res, 200, {
 			status: "OK",
-			data: []
+			message: 'Successfully saved'
 		})
 	} catch (e) {
 		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: 'Error server'
+		})
+	}
+}
+/**
+ * get one community subject list
+ * @param {*} req 
+ * @param {*} res 
+ */
+module.exports.getCommSubjectsList = async (req, res) => {
+	let commID = req.query['commID'];
+	try {
+		let subjList = await CommunitySubject.find({
+			communitiesID: commID,
+			status: const_data.COMMSUBJECT_STATUS._ACTIVE,
+		}).populate([{
+			path: 'byUser',
+			select: 'lastname firstname function'
+		}, {
+			path: "responseAll.byUser",
+			select: 'lastname firstname function'
+		}]);
+		console.log(subjList);
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: subjList
+		})
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: 'NOK',
+			message: 'Error server'
+		})
+	}
+}
+
+module.exports.getCommDetailsData = async (req, res) => {
+	let commID = req.query['commID'];
+	try {
+		let comm = await CommunitiesData.findOne({
+			_id: commID
+		}).populate([{
+			path: "users_in",
+			select: 'firstname lastname'
+		}])
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			data: comm
+		})
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: "NOK"
+		})
 	}
 }
