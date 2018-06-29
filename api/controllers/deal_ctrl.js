@@ -206,11 +206,11 @@ module.exports.getUserQuestionsResponse = async (req, res) => {
         }).populate([{
             path: 'selectedUser.applicationData'
         }])
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: []
+        })
     } catch (e) {
-
+        console.log(e);
     }
-    return sendJSONresponse(res, 200, {
-        status: "OK",
-        data: []
-    })
 }

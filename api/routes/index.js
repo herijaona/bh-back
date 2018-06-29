@@ -134,6 +134,8 @@ router.post('/addAccountNewCommunity', auth, req_mid.validUser, req_mid.checkRol
 router.get('/getAccountCommDataList', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getCommunitiesListData);
 /** Save user comm List */
 router.post('/saveCommDataUser', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.saveUserCommList);
+/** Save new Subjects data */
+router.post('/save-new-subjects', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.savenewSubjectData);
 
 /* Get front team video data */
 router.get('/team_front_video', req_mid.accReqSlug, ctrlTeams.getTeamsFrontVideoData);

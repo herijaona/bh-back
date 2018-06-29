@@ -39,6 +39,10 @@ CONSTData.COLLAB_STATUS = {
 	_STOPPED: 'stopped',
 	_PAUSED: 'paused'
 }
+CONSTData.COMMSUBJECT_STATUS = {
+	_ACTIVE: 'active',
+	_CLOSED: 'closed'
+}
 CONSTData.QST_OBJ_REF = {
 	_PROJECT: 'PRT',
 	_QUESTION: 'TMV',

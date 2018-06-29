@@ -9,11 +9,16 @@ var subjectCommSchema = new mongoose.Schema({
         ref: "User"
     },
     subject: String,
+    creationDate: Date,
+    name: String,
+    status: String,
     responseAll: [{
+        status: String,
         byUser: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+
         responseDate: Date,
         responseContent: String,
         dataSuppl: {}

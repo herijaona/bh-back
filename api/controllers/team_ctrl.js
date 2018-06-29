@@ -1,7 +1,11 @@
+/**
+ * Import modules node
+ */
 var mongoose = require("mongoose");
+/**
+ *  Import Model
+ */
 var TeamFront = mongoose.model("TeamFront");
-var tools_service = require("../services/app-general");
-var mail_services = require("../services/mailing-service");
 var User = mongoose.model("User");
 var TeamCommunity = mongoose.model("TeamCommunity");
 var CommunitiesData = mongoose.model("CommunitiesData");
@@ -9,10 +13,31 @@ var InvitationSent = mongoose.model("InvitationSent");
 var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var Project = mongoose.model("Project");
 var Account = mongoose.model("Account");
+var CommunitySubject = mongoose.model("CommunitySubject");
+
+/**
+ * Import Files and services
+ */
+var tools_service = require("../services/app-general");
+var const_data = require("../config/constantData");
+var mail_services = require("../services/mailing-service");
+
+/**
+ * respnae sender
+ * @param {*} res 
+ * @param {*} status 
+ * @param {*} content 
+ */
 var sendJSONresponse = function (res, status, content) {
 	res.status(status);
 	res.json(content);
 };
+
+/**
+ * Team data on front (commitee) save
+ * @param {*} req 
+ * @param {*} res 
+ */
 module.exports.saveTeamsFrontData = async (req, res) => {
 	let tmF = new TeamFront(req.body);
 	tmF.user = req.userDATA._id;
@@ -31,6 +56,12 @@ module.exports.saveTeamsFrontData = async (req, res) => {
 		console.log(e);
 	}
 };
+
+/**
+ * fetch data of teams front (commitee)
+ * @param {*} req 
+ * @param {*} res 
+ */
 module.exports.getTeamsFrontVideoData = async (req, res) => {
 	try {
 		let allmyVideoTeamFrom = await TeamFront.find({
@@ -802,4 +833,21 @@ module.exports.saveUserCommList = async (req, res) => {
 			message: "Error server"
 		})
 	}
+}
+
+module.exports.savenewSubjectData = async (req, res) => {
+	let subjData = req.body;
+	console.log(subjData);
+	try {
+		let nSubj = new CommunitySubject(subjData);
+		nSubj.creationDate = Date.now();
+		nSubj.status = const_data.COMMSUBJECT_STATUS._ACTIVE;
+		nSubj.byUser = req.userDATA._id;
+	} catch (e) {
+
+	}
+	return sendJSONresponse(res, 200, {
+		status: "OK",
+		data: []
+	})
 }
