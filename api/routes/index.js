@@ -130,6 +130,10 @@ router.post('/save-presentation', auth, req_mid.validUser, req_mid.checkRole, ct
 router.post('/team_front_video', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.saveTeamsFrontData);
 /** Create new Community */
 router.post('/addAccountNewCommunity', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.createCommunityFree);
+/** Get Community data List */
+router.get('/getAccountCommDataList', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.getCommunitiesListData);
+/** Save user comm List */
+router.post('/saveCommDataUser', auth, req_mid.validUser, req_mid.checkRole, ctrlTeams.saveUserCommList);
 
 /* Get front team video data */
 router.get('/team_front_video', req_mid.accReqSlug, ctrlTeams.getTeamsFrontVideoData);

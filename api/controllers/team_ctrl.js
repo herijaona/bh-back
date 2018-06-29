@@ -453,6 +453,11 @@ module.exports.getTeamCommunity = async (req, res) => {
 					ds.us.imageProfile.url
 				);
 
+				comUser["community"] = await CommunitiesData.find({
+					accountOwner: req.ACC._id,
+					users_in: ds.us._id
+				}, "name");
+
 				comUser["us"] = oo;
 				let enseigneCommercialeOrg = await Account.findOne({
 						users: ds.us._id
@@ -701,23 +706,100 @@ module.exports.createCommunityFree = async (req, res) => {
 
 module.exports.getCommunitiesListData = async (req, res) => {
 	const accID = req.ACC._id;
+
 	try {
 		let commList = await CommunitiesData.find({
 			accountOwner: accID
 		}).populate([{
-			path: 'byUser'
+			path: 'byUser',
+			select: "lastname firstname function"
 		}]);
 		let dataCommList = [];
 		if (commList.length > 0) {
 			for (const cData of commList) {
-				console.log(cData);
+				let m = {
+					_id: cData._id,
+					name: cData.name,
+					creationDate: new Date(cData.creationDate).toDateString(),
+					byUser: cData.byUser,
+					exchangeNum: 0,
+					memberNum: cData.users_in.length,
+					lastTime: 0
+				}
+				dataCommList.push(m)
 			}
+
 		}
 		return sendJSONresponse(res, 200, {
 			status: "OK",
 			data: dataCommList
 		})
 	} catch (e) {
+		console.log(e);
+	}
+}
 
+module.exports.saveUserCommList = async (req, res) => {
+	console.log(req.body);
+	let userID = req.body.usedID;
+	let dataComm = req.body.dataComm;
+	try {
+		const usDComm = await CommunitiesData.find({
+			accountOwner: req.ACC._id,
+			users_in: userID
+		}, "name");
+		console.log(usDComm);
+		let userDATAComm = usDComm.map(x => x._id.toString());
+		let toDelete = userDATAComm.filter(el => dataComm.indexOf(el) === -1)
+		let toAdd = dataComm.filter(el => userDATAComm.indexOf(el) === -1)
+		console.log(userDATAComm);
+		console.log('To Add: ', toAdd);
+		console.log('To Delete: ', toDelete);
+		let cAdd = 0
+		let cDel = 0
+		for (const iter of toAdd) {
+			let r = await CommunitiesData.findOneAndUpdate({
+				_id: iter
+			}, {
+				$push: {
+					users_in: userID
+				}
+			}, {
+				new: true
+			})
+			if (r) {
+				cAdd++
+			}
+		}
+		for (const itera of toDelete) {
+			let r = await CommunitiesData.findOneAndUpdate({
+				_id: itera
+			}, {
+				$pull: {
+					users_in: userID
+				}
+			}, {
+				new: true
+			})
+			if (r) {
+				cDel++
+			}
+		}
+
+		return sendJSONresponse(res, 200, {
+			status: "OK",
+			message: "Successfully saved",
+			data: {
+				add: cAdd,
+				delete: cDel
+			}
+		})
+
+	} catch (e) {
+		console.log(e);
+		return sendJSONresponse(res, 500, {
+			status: "NOK",
+			message: "Error server"
+		})
 	}
 }

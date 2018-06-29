@@ -180,7 +180,6 @@ module.exports.getDealSpaceUserList = async (req, res) => {
                     user: userCD.applicationData.userID,
                     userAccount: userCD.applicationData.userCDAccount
                 }
-
                 listUser.push(m)
             }
         }
@@ -195,4 +194,23 @@ module.exports.getDealSpaceUserList = async (req, res) => {
             message: "Error server"
         })
     }
+}
+
+module.exports.getUserQuestionsResponse = async (req, res) => {
+    let userID = req.query['userID'];
+    let dealID = req.query['dealID'];
+
+    try {
+        let spDeal = await CollaborationDeal.findOne({
+            _id: dealID
+        }).populate([{
+            path: 'selectedUser.applicationData'
+        }])
+    } catch (e) {
+
+    }
+    return sendJSONresponse(res, 200, {
+        status: "OK",
+        data: []
+    })
 }
