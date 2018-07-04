@@ -191,6 +191,8 @@ router.get(
     ctrlProject.getApplicationByCollabID
 );
 
+router.get('/my-collabor_with', auth, req_mid.validUser, ctrlProject.myExtraCollaborations);
+
 router.put('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.updateProjects);
 
 router.delete('/bh-projects', auth, req_mid.validUser, req_mid.checkRole, ctrlProject.deleteProjects);

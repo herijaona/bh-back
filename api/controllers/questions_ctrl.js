@@ -327,17 +327,17 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 }
             };
 
-            let updateSeen = await Question.findOneAndUpdate({
-                _id: qID
-            }, {
-                $set: {
-                    'responseAll.$[].state': 'seen'
-                }
-            }, {
-                new: true,
-            });
-
-            console.log(updateSeen);
+            if (mq) {
+                let updateSeen = await Question.findOneAndUpdate({
+                    _id: qID
+                }, {
+                    $set: {
+                        'responseAll.$[].state': 'seen'
+                    }
+                }, {
+                    new: true,
+                });
+            }
 
             return sendJSONresponse(res, 200, {
                 status: "OK",
@@ -538,7 +538,7 @@ module.exports.getMyAskedQuestions = async (req, res) => {
                 let nF = false;
                 if (it.responseAll.length > 0) {
                     nF = it.responseAll.filter(el => {
-                        return el.state == 'not-seen'
+                        return el.state == 'not-seen' && el.user.toString() !== userID.toString()
                     }).length > 0 ? true : false;
                 }
                 let cnt = this.qLimiteText(it.question_content)

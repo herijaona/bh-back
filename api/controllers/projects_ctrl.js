@@ -9,6 +9,7 @@ var Account = mongoose.model("Account");
 var Question = mongoose.model("Question");
 var CollaborationType = mongoose.model("CollaborationType");
 var Project = mongoose.model("Project");
+var CollaborationDeal = mongoose.model("CollaborationDeal");
 /**
  * Require Logic File
  */
@@ -304,7 +305,10 @@ module.exports.getAllCompanyProjectApplication = async (req, res) => {
     let accId = req.ACC._id;
     try {
         let allApplication = await Candidature.find({
-            accountID: accId
+            accountID: accId,
+            status: {
+                $nin: [const_data.APPLICATION_STATUS._ACCEPTED, const_data.APPLICATION_STATUS._REFUSED]
+            }
         }).populate([{
                 path: "userID"
             },
@@ -898,5 +902,61 @@ module.exports.getAllCollaborationsByFilter = async (req, res) => {
             status: "NOK",
             message: "Error Serveur"
         })
+    }
+}
+
+module.exports.myExtraCollaborations = async (req, res) => {
+    let userID = req.userDATA._id;
+    try {
+        const allCand = await Candidature.find({
+            userID: userID,
+            status: {
+                $eq: const_data.APPLICATION_STATUS._ACCEPTED
+            }
+        }).populate([{
+            path: 'projectID',
+            populate: [{
+                path: 'account',
+                select: 'enseigneCommerciale'
+            }]
+        }]);
+
+        let resDATA = []
+        if (allCand) {
+            for (const collD of allCand) {
+                const des = await CollaborationDeal.findOne({
+                    collaborationObj: collD.projectID
+                }, 'selectedUser');
+                let interAct = 0;
+                let selectDate = '';
+                let dealID = '';
+                if (des) {
+                    dealID = des._id;
+                    for (const userSL of des['selectedUser']) {
+                        console.log(userSL);
+                        if (userSL.applicationData.toString() === collD._id.toString()) {
+                            selectDate = userSL.selectionDate;
+                            interAct += (userSL['dataExchanges'].files.length + userSL['dataExchanges'].questionsResponse.length + userSL['dataExchanges'].planning.length);
+                        }
+                    }
+                }
+                let m = {
+                    collabName: collD.projectID.name,
+                    orgCollab: collD.projectID.account,
+                    typeCollab: collD.projectID.typeCollab,
+                    interAction: interAct,
+                    slDate: new Date(selectDate).toDateString(),
+                    dealID: dealID
+                }
+                resDATA.push(m);
+            }
+        }
+
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: resDATA
+        })
+    } catch (e) {
+        console.log(e);
     }
 }
