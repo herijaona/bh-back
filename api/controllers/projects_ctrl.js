@@ -960,3 +960,29 @@ module.exports.myExtraCollaborations = async (req, res) => {
         console.log(e);
     }
 }
+
+module.exports.getArchivedApplication = async (req, res) => {
+    let accID = req.ACC._id;
+    try {
+        let allApll = await Candidature.find({
+            accountID: accID,
+            status: const_data.APPLICATION_STATUS._REFUSED
+        }).populate([{
+                path: "userID"
+            },
+            {
+                path: "projectID"
+            }
+        ]);
+        let applresp = [];
+        if (allApplication) {
+            applresp = await this.dataApplicationArr(allApplication);
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: applresp
+        });
+    } catch (e) {
+
+    }
+}
