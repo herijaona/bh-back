@@ -291,6 +291,7 @@ router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpa
  *  accept candidture params : applicationID 
  */
 router.post('/accept-application', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.acceptAddApplication)
+router.post('/refuse-application', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.refuseAddApplication)
 /* Get list user in a deal spaces params : dealID */
 router.get('/getDealUserlist', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getDealSpaceUserList)
 

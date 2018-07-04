@@ -16,6 +16,8 @@ var Account = mongoose.model("Account");
  */
 var mail_services = require("../services/mailing-service");
 var tools_service = require("../services/app-general");
+var const_data = require("../config/constantData");
+
 
 /**
  *  Return DATA 
@@ -85,6 +87,38 @@ module.exports.dealFormats = async (collDeal) => {
     return m;
 }
 
+module.exports.refuseAddApplication = async (req, res) => {
+    const applicationID = req.body.applicationID
+    try {
+        let applyData = await Candidature.findOneAndUpdate({
+            _id: applicationID
+        }, {
+            $set: {
+                status: const_data.APPLICATION_STATUS._REFUSED
+            }
+        }, {
+            new: true
+        })
+
+        if (applyData.status === const_data.APPLICATION_STATUS._REFUSED) {
+            return sendJSONresponse(res, 200, {
+                status: 'OK',
+                message: 'successfully saved'
+            })
+        }
+        return sendJSONresponse(res, 404, {
+            status: 'NOK',
+            message: "Not Found"
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: 'NOK',
+            message: 'Error Server'
+        })
+    }
+}
+
 module.exports.acceptAddApplication = async (req, res) => {
     const accID = req.ACC._id;
     const applicationID = req.body.applicationID
@@ -93,7 +127,7 @@ module.exports.acceptAddApplication = async (req, res) => {
             _id: applicationID
         }, {
             $set: {
-                status: 'accepted'
+                status: const_data.APPLICATION_STATUS._ACCEPTED
             }
         }, {
             new: true
