@@ -1,7 +1,7 @@
 const path = require('path')
 let APP = {}
 
-APP.name = 'BUSINESS HAVEN'
+APP.name = 'COLLABORATION CAPITAL'
 APP.protocol = 'http'
 APP.domain = 'localhost'
 APP.domain_front = 'localhost'
