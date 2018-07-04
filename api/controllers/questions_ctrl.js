@@ -327,6 +327,18 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 }
             };
 
+            let updateSeen = await Question.findOneAndUpdate({
+                _id: qID
+            }, {
+                $set: {
+                    'responseAll.$[].state': 'seen'
+                }
+            }, {
+                new: true,
+            });
+
+            console.log(updateSeen);
+
             return sendJSONresponse(res, 200, {
                 status: "OK",
                 data: retDetails
