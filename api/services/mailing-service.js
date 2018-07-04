@@ -46,7 +46,8 @@ module.exports.sendActivationMail = function (argMail) {
             " " +
             gen.titleCase(argMail.user.lastname),
         url_activation: app_const.url_front + "/activate/" + argMail.user.activation_text,
-        sitename: app_const.name
+        sitename: app_const.name,
+        logoImage: app_const.url+ '/files/defaults/logo.png'
     };
 
     var templ = activationTemplate;
