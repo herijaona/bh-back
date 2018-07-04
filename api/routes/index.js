@@ -268,6 +268,7 @@ router.post('/cInvitationValData', ctrlProfile.PostInvitationVal);
  *
  */
 
+router.get('/getAskedQuestions', auth, req_mid.validUser, ctrlQuestions.getMyAskedQuestions);
 router.post('/question-data', auth, req_mid.validUser, ctrlQuestions.postQuestions);
 router.get('/getallCompanyQuestions', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallquestionsCompany);
 router.get('/getallCompanyArchives', auth, req_mid.validUser, req_mid.checkRole, ctrlQuestions.getallCompanyArchives);

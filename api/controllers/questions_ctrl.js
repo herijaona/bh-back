@@ -294,9 +294,13 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                             userOnName: ww.lastname + " " + ww.firstname
                         };
                     }
-
                     break;
             }
+            let mq = false;
+            if (qdata.userAsk._id.toString() == req.userDATA._id.toString()) {
+                mq = true;
+            }
+
             let retDetails = {
                 _id: qdata._id,
                 hour: d.toTimeString().split(" ")[0],
@@ -304,6 +308,7 @@ module.exports.getDetailOnQuestion = async (req, res) => {
                 stateAdmin: qdata.stateAdmin,
                 question_content: qdata.question_content,
                 responseIN: await this.formatRespInQ(qdata.responseAll),
+                myQst: mq,
                 usr: {
                     _id: qdata.userAsk._id,
                     lastname: qdata.userAsk.lastname,
@@ -498,4 +503,55 @@ module.exports.qLimiteText = (params) => {
         params = params.substr(0, 300) + "...";
     }
     return params
+}
+
+module.exports.getMyAskedQuestions = async (req, res) => {
+    const userID = req.userDATA._id;
+    const typeREF = req.query['qREF'];
+    try {
+        const allQ = await Question.find({
+            userAsk: userID,
+            objectRef: typeREF
+        }).populate({
+            path: 'account',
+            select: 'enseigneCommerciale'
+        });
+
+        let rtData = [];
+        if (allQ) {
+            for (const it of allQ) {
+                let cl = await Project.findOne({
+                    _id: it.objectRefID
+                }, 'name typeCollab');
+                let nF = false;
+                if (it.responseAll.length > 0) {
+                    nF = it.responseAll.filter(el => {
+                        return el.state == 'not-seen'
+                    }).length > 0 ? true : false;
+                }
+                let cnt = this.qLimiteText(it.question_content)
+                let m = {
+                    _id: it._id,
+                    account: it.account,
+                    date: new Date(it.addDate).toDateString(),
+                    hour: new Date(it.addDate).toTimeString().split(" ")[0],
+                    collab: cl,
+                    interaction: it.responseAll.length,
+                    newFlag: nF,
+                    resumContent: cnt
+                }
+                rtData.push(m)
+            }
+        }
+        return sendJSONresponse(res, 200, {
+            status: "OK",
+            data: rtData
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: 'NOK',
+            message: 'Error server'
+        })
+    }
 }
