@@ -47,7 +47,7 @@ module.exports.getListCollabData = async (req, res) => {
         let dealData = [];
         if (dealSP.length > 0) {
             for (const collItem of dealSP) {
-                dealData.push(this.dealFormats(collItem));
+                dealData.push(await this.dealFormats(collItem));
             }
         }
         return sendJSONresponse(res, 200, {
@@ -63,16 +63,16 @@ module.exports.getListCollabData = async (req, res) => {
     }
 
 }
-module.exports.dealFormats = async (collDeal) => {
+module.exports.dealFormats = async (collabDeal) => {
     let filesNumber = 0;
     let qRespNumber = 0;
-    for (const slctdUsr of collDeal.selectedUser) {
+    for (const slctdUsr of collabDeal.selectedUser) {
         filesNumber += slctdUsr.dataExchanges.files.length;
         qRespNumber += slctdUsr.dataExchanges.questionsResponse.length;
 
     }
     let m = {
-        _id: collDeal._id,
+        _id: collabDeal._id,
         byUser: collabDeal.collaborationObj.createdByUser,
         collabData: {
             _id: collabDeal.collaborationObj._id,
