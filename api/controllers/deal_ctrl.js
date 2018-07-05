@@ -81,7 +81,8 @@ module.exports.dealFormats = async (collabDeal) => {
         },
         dealNumber: {
             files: filesNumber,
-            questions_response: qRespNumber
+            questions_response: qRespNumber,
+            applicationNum: collabDeal.selectedUser.length
         }
     }
     return m;
