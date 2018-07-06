@@ -10,6 +10,7 @@ var InvitationSent = mongoose.model("InvitationSent");
 var OrganisationInvitation = mongoose.model("OrganisationInvitation");
 var Project = mongoose.model("Project");
 var Account = mongoose.model("Account");
+var FilesData = mongoose.model("FilesData");
 
 /**
  *  FIles and services
@@ -312,9 +313,8 @@ module.exports.getApplDefl = async (req, res) => {
         }, 'selectedUser');
 
         if (dealSP) {
-            let selct0 = dealSP.selectedUser[1];
+            let selct0 = dealSP.selectedUser[0];
             req.query['applID'] = selct0.applicationData;
-            console.log(dealSP.selectedUser[1]);
             return ctrlProject.getProjectApplicationDetails(req, res)
         }
         return sendJSONresponse(res, 404, {
@@ -324,6 +324,88 @@ module.exports.getApplDefl = async (req, res) => {
 
     } catch (e) {
         console.log('Error getApplDefl');
+        console.log(e);
+    }
+}
+
+
+module.exports.getDEalFilesList = async (req, res) => {
+    let applID = req.query['dID'];
+    try {
+        let dealSP = await CollaborationDeal.findOne({
+            'selectedUser.applicationData': applID
+        }, 'selectedUser').populate({
+            path: 'selectedUser.dataExchanges.files',
+            populate: [{
+                path: 'userADD',
+                select: "firstname lastname"
+            }]
+        });
+        if (dealSP) {
+            let da = dealSP.selectedUser.filter(el => el.applicationData.toString() === applID.toString())[0];
+            return sendJSONresponse(res, 200, {
+                status: "OK",
+                data: da.dataExchanges.files
+            })
+        }
+        return sendJSONresponse(res, 404, {
+            status: 'NOK',
+            message: 'Not Found'
+        })
+    } catch (e) {
+        console.log(e);
+        return sendJSONresponse(res, 500, {
+            status: 'NOK',
+            message: 'Not Found'
+        })
+    }
+}
+
+module.exports.updateFilesAdd = async (req, res) => {
+    let filesList = req.body.allFiles;
+    let idAppl = req.body.idAppl;
+    try {
+        let idTab = [];
+        for (const iter of filesList) {
+            let r = await FilesData.findOneAndUpdate({
+                _id: iter
+            }, {
+                $set: {
+                    userADD: req.userDATA._id
+                }
+            }, {
+                new: true
+            });
+            if (r) {
+                idTab.push(r._id);
+            }
+        }
+
+        console.log(idTab);
+
+        let t = await CollaborationDeal.findOneAndUpdate({
+            selectedUser: {
+                $elemMatch: {
+                    applicationData: idAppl
+                }
+            }
+        }, {
+            $push: {
+                'selectedUser.$.dataExchanges.files': {
+                    $each: idTab
+                }
+            }
+        }, {
+            new: true
+        })
+        if (t) {
+            console.log('*********');
+            console.log(t);
+            return sendJSONresponse(res, 200, {
+                status: "OK"
+            })
+        }
+    } catch (e) {
         console.log(e);
     }
 }

@@ -289,6 +289,8 @@ router.get('/org_types', ctrlCompanies.getOrgTypes);
 router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData);
 router.get('/getDealByID', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.dealDetailsID);
 router.get('/getApplicationDefl', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getApplDefl);
+router.get('/getUsersFilesList', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getDEalFilesList);
+router.post('/updatesFilesAdder', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.updateFilesAdd);
 /**
  *  accept candidture params : applicationID 
  */

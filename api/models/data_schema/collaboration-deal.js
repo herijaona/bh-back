@@ -12,7 +12,10 @@ var collabDealSchema = new mongoose.Schema({
         },
         selectionDate: Date,
         dataExchanges: {
-            files: [{}],
+            files: [{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'FilesData'
+            }],
             questionsResponse: [{}],
             planning: [{}]
         }
