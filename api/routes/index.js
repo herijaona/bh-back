@@ -286,7 +286,9 @@ router.get('/org_types', ctrlCompanies.getOrgTypes);
 /**
  * Deal Spaces Routes
  */
-router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData)
+router.get('/deal/list', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getListCollabData);
+router.get('/getDealByID', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.dealDetailsID);
+router.get('/getApplicationDefl', auth, req_mid.validUser, req_mid.checkRole, ctrlDealSpaces.getApplDefl);
 /**
  *  accept candidture params : applicationID 
  */

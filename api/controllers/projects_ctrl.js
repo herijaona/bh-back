@@ -249,6 +249,7 @@ module.exports.applyToProjects = async (req, res) => {
         cndt.projectID = dataPr._id;
         let adrrC = "";
         if (req.body.candidatAccID) {
+            cndt.userCDAccount = req.body.candidatAccID;
             let cndCompC = await Account.findById(
                 req.body.candidatAccID,
                 "adresse"
@@ -348,9 +349,14 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                         path: "account"
                     }
                 ]
+            }, {
+                path: 'userCDAccount',
+                select: 'enseigneCommerciale adresse'
             }
         ]);
         if (allApplDetails) {
+            console.log('-----------------------');
+            console.log(allApplDetails);
             let d = new Date(allApplDetails.createdAt);
             let ensc = "";
             let enseigneCommercialeOrg = await Account.findOne({
@@ -372,6 +378,8 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                 date: d.toDateString(),
                 candidat: {
                     _id: allApplDetails.userID._id,
+                    firstname: allApplDetails.userID.firstname,
+                    lastname: allApplDetails.userID.lastname,
                     name: allApplDetails.userID.lastname +
                         " " +
                         allApplDetails.userID.firstname,
@@ -382,6 +390,7 @@ module.exports.getProjectApplicationDetails = async (req, res) => {
                         allApplDetails.userID.imageProfile.url
                     )
                 },
+                cdAccount: allApplDetails.userCDAccount,
                 status: allApplDetails.status,
                 projet: {
                     _id: allApplDetails.projectID._id,

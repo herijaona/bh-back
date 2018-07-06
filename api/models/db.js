@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var gracefulShutdown;
-var dbURI = 'mongodb://localhost/meanAuth4';
+var dbURI = 'mongodb://localhost:27027/meanAuth4';
 // var dbURI = 'mongodb://localhost:27042/meanAuth4';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGOLAB_URI;

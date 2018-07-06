@@ -205,8 +205,8 @@ module.exports.acceptAddApplication = async (req, res) => {
 
 }
 
-module.exports.getDealSpaceUserList = async (req, res) => {
-    let dealSpID = req.query.dealID;
+module.exports.getDealSpaceUserList = async (spID) => {
+    let dealSpID = spID;
     try {
         let dealSP = await CollaborationDeal.findOne({
             _id: dealSpID
@@ -217,29 +217,38 @@ module.exports.getDealSpaceUserList = async (req, res) => {
                 select: 'lastname firstname function'
             }, {
                 path: 'userCDAccount',
-                select: 'enseigneCommerciale'
+                select: 'enseigneCommerciale Logo',
+                populate: [{
+                    path: 'Logo',
+                    select: 'url'
+                }]
             }]
-        }])
+        }]);
         let listUser = [];
         if (dealSP && dealSP['selectedUser']) {
             for (const userCD of dealSP['selectedUser']) {
+                let usAcc = userCD.applicationData.userCDAccount;
+                console.log(userCD);
+                if (userCD.applicationData.userCDAccount) {
+                    usAcc = {
+                        enseigneCommerciale: userCD.applicationData.userCDAccount.enseigneCommerciale,
+                        logo: tools_service.media_url(userCD.applicationData.userCDAccount.Logo.url)
+                    }
+
+                }
                 let m = {
                     user: userCD.applicationData.userID,
-                    userAccount: userCD.applicationData.userCDAccount
+                    userAccount: usAcc,
+                    application: userCD.applicationData._id
                 }
                 listUser.push(m)
             }
         }
-        return sendJSONresponse(res, 200, {
-            status: "OK",
-            data: listUser
-        })
+
+        return listUser;
     } catch (e) {
         console.log(e);
-        return sendJSONresponse(res, 500, {
-            status: "NOK",
-            message: "Error server"
-        })
+        return null
     }
 }
 
@@ -258,6 +267,63 @@ module.exports.getUserQuestionsResponse = async (req, res) => {
             data: []
         })
     } catch (e) {
+        console.log(e);
+    }
+}
+
+module.exports.dealDetailsID = async (req, res) => {
+    let dID = req.query['dID'];
+    try {
+        let oneDeal = await CollaborationDeal.findOne({
+            _id: dID
+        }).populate([{
+            path: 'collaborationObj',
+            select: 'name'
+        }]);
+        if (oneDeal) {
+            let userList = await this.getDealSpaceUserList(dID);
+            let retData = {
+                _id: oneDeal._id,
+                observations: oneDeal.observations,
+                collaborationObj: oneDeal.collaborationObj,
+                users: userList
+            };
+
+            return sendJSONresponse(res, 200, {
+                status: 'OK',
+                data: retData,
+            })
+        }
+        return sendJSONresponse(res, 404, {
+            status: "NOK",
+            message: "Not Found"
+        })
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+var ctrlProject = require('./projects_ctrl');
+
+module.exports.getApplDefl = async (req, res) => {
+    try {
+        let dealSP = await CollaborationDeal.findOne({
+            _id: req.query.dID
+        }, 'selectedUser');
+
+        if (dealSP) {
+            let selct0 = dealSP.selectedUser[1];
+            req.query['applID'] = selct0.applicationData;
+            console.log(dealSP.selectedUser[1]);
+            return ctrlProject.getProjectApplicationDetails(req, res)
+        }
+        return sendJSONresponse(res, 404, {
+            status: 'NOK',
+            message: 'Not Found'
+        })
+
+    } catch (e) {
+        console.log('Error getApplDefl');
         console.log(e);
     }
 }
